@@ -40,7 +40,7 @@ public abstract class AbstractCrudBean<Entity extends Entidade, Service extends 
 	protected static Log logger = LogFactory.getLog("");
 	
 	/**Local onde fica o arquivo properties de mensagens.*/
-	private String fileMessages = "/modelo/src/MessagesResources.properties";
+	private String fileMessages = "/civitas/src/MessagesResources.properties";
 	
 	/**Properties de mensagens, carregado com o arquivo configurado em fileMessages.*/
 	private Properties messageProperties;

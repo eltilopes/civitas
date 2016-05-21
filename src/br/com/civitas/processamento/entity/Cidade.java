@@ -1,5 +1,6 @@
 package br.com.civitas.processamento.entity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -29,7 +30,10 @@ public class Cidade implements IEntity {
 	
 	@Column(name = "ds_descricao",nullable = false, length = 30)
 	private String descricao;
-	
+
+	@Column(name="fl_ativa",nullable = false)
+	private Boolean ativa;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cd_estado", nullable = false)
 	private Estado estado;
@@ -45,7 +49,7 @@ public class Cidade implements IEntity {
 	}
 
 	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+		this.descricao = descricao.toUpperCase();
 	}
 
 	public Estado getEstado() {
@@ -56,10 +60,23 @@ public class Cidade implements IEntity {
 		this.estado = estado;
 	}
 
+	public Boolean getAtiva() {
+		return ativa;
+	}
+	public void setAtiva(Boolean ativa) {
+		this.ativa = ativa;
+	}
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(descricao != null && descricao != ""){
+			map.put("descricao", descricao);
+		}if(estado != null && estado.getId() != null ){
+			map.put("estado.id",estado.getId() );
+		}
+		return map;
 	}
 
 

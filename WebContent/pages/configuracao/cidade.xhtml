@@ -22,7 +22,7 @@
     	</ui:define>
 
     	<ui:define name="tituloFieldSetFiltro">
-    		Eventos
+    		Cidade
 		</ui:define>
 		
 		<ui:define name="camposFiltro">
@@ -32,7 +32,7 @@
 							<div class="form-group">
 							<h:outputText value="Estado " />
 							<h:selectOneMenu id="estadoSearch"
-											 value="#{bean.entity.estado}"
+											 value="#{bean.entitySearch.estado}"
 											 converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
@@ -47,7 +47,7 @@
 		</ui:define>	
 		
 		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Eventos" />
+			<ui:param name="tituloPainel" value="Cidades" />
 		</ui:define>
 	
 	
@@ -58,19 +58,89 @@
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 			 		 
-			 		 <p:column headerText="Estado" style="text-align:center;">
-						<h:outputText value="#{cidade.estado.descricao}" />
+			 		 <p:column headerText="Estado" >
+						<h:outputText value="#{cidade.estado.descricao.toUpperCase()}" />
 					 </p:column>
 			 		 
 			 		 <p:column headerText="UF" style="text-align:center;">
 						<h:outputText value="#{cidade.estado.uf}" />
 					 </p:column>
 			 		 
-			 		 <p:column headerText="Nome" style="text-align:center;">
-						<h:outputText value="#{cidade.descricao}" />
+			 		 <p:column headerText="Nome">
+						<h:outputText value="#{cidade.descricao.toUpperCase()}" />
 					 </p:column>
+					 
+					 <p:column headerText="Ativa" style="text-align:center;">
+						<h:outputText rendered="#{cidade.ativa}"  value="SIM"/>
+						<h:outputText rendered="#{!cidade.ativa}" value="NÃO"/>
+					 </p:column>
+					 
 			</p:dataTable> 
 		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Cidade </h4>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+		<fieldset>
+			<legend>Cadastro de Cidade</legend>
+			<div class="row" >
+				<div class="col-md-6 form-group">
+					<h:outputLabel value="Estado:"/>
+					<p:selectOneMenu id="estadoInsert"
+									 value="#{bean.entity.estado}" required="true"
+									 label="Estado" converter="entityConverter"
+									 styleClass="select-custom" filterMatchMode="contains" 
+									 effectSpeed="20" filter="true" panelStyle="width:180px">
+						<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+						<f:selectItems value="#{bean.estados}" var="estado" 
+								   itemLabel="#{estado.descricao.toUpperCase()}" itemValue="#{estado}" />
+					</p:selectOneMenu>
+					<h:message for="estadoInsert" tooltip="true"
+						   styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group">
+					<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+					<p:inputText id="nome" styleClass="form-control"  value="#{bean.entity.descricao}" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group">
+			        <h:outputText value="Ativa " />
+			        <p:selectBooleanCheckbox onchange="carregando.show();" value="#{bean.entity.ativa}">
+						<p:ajax oncomplete="carregando.hide();" process="@this"/>
+					</p:selectBooleanCheckbox>
+				</div>
+			</div>
+		</fieldset>
+	</ui:define>
+	
+	<ui:define name="botoesInsert">
+		<h:panelGroup id="botoes">
+			<p></p>
+			<p:commandButton styleClass="btn btn-primary" value="Salvar"
+				actionListener="#{bean['save']}"
+				rendered="#{bean['inserting']}"
+				oncomplete="carregando.hide(); mensagemAviso.show();"
+				update=":painelGlobal" onclick="carregando.show();"
+				ajax="false" />
+		    
+		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
+				actionListener="#{bean['update']}"
+				rendered="#{bean['editing']}"
+				oncomplete="carregando.hide(); mensagemAviso.show();"
+				update=":painelGlobal" onclick="carregando.show();"
+				ajax="false" />
+				
+			<p:commandButton styleClass="btn btn-primary" value="Voltar"
+				actionListener="#{bean['cancel']}" immediate="true"
+				update=":painelGlobal" ajax="false" />
+			<p></p>
+		</h:panelGroup>
+	</ui:define>
 		
     </ui:composition>
 	
