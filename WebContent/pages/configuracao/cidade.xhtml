@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Cidade" />
+    	</ui:define>
+    	
+   		<ui:define name="pageScript">
+			<script type="text/javascript"
+				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{cidadeBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Eventos
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Estado " />
+							<h:selectOneMenu id="estadoSearch"
+											 value="#{bean.entity.estado}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.estados}" />
+							</h:selectOneMenu>
+							<h:message for="estadoSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Eventos" />
+		</ui:define>
+	
+	
+		<ui:define name="resultFiltro" >
+			<p:dataTable id="cidades" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaCidades" rows="10" emptyMessage="Nenhuma Cidade foi encontrado."
+			 		 value="#{bean.resultSearch}" var="cidade" paginator="#{bean.resultSearch.rowCount > 0}"
+			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+			 		 
+			 		 <p:column headerText="Estado" style="text-align:center;">
+						<h:outputText value="#{cidade.estado.descricao}" />
+					 </p:column>
+			 		 
+			 		 <p:column headerText="UF" style="text-align:center;">
+						<h:outputText value="#{cidade.estado.uf}" />
+					 </p:column>
+			 		 
+			 		 <p:column headerText="Nome" style="text-align:center;">
+						<h:outputText value="#{cidade.descricao}" />
+					 </p:column>
+			</p:dataTable> 
+		</ui:define>
+		
+    </ui:composition>
+	
+</html>

@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+	<ui:composition template="/new-template/template-crud.xhtml">
+	
+		<ui:define name="includeScript">
+<!-- 			<script type="text/javascript"> -->
+<!-- // 			     jQuery(function($) { -->
+<!-- // 				     $("input[id$=nome]").applyMask("palavra"); -->
+<!-- // 				     $("input[id$=cpf]").setMask("999.999.999-99") -->
+<!-- // 				     $("input[id$=dataNascimento_input]").mask('99/99/9999'); -->
+<!-- // 				     $("input[id$=email]").applyMask("email"); -->
+<!-- // 			     }); -->
+<!-- 			</script>			 -->
+		</ui:define>
+	
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Usuários :: Controle de Acesso :: SME" />
+    	</ui:define>
+    	    	
+    	<ui:define name="parametros">
+    	   	<ui:param name="bean" value="#{usuarioBean}" />
+    	  	<ui:param name="showInserir" value="#{sessionScope.perms.usuarios.ativoBool}"  />
+			<ui:param name="showRemover" value="#{sessionScope.perms.usuarios.editableBool}" />
+			<ui:param name="showEditar" value="#{sessionScope.perms.usuarios.removeBool}" />		
+    	</ui:define>
+    	
+    	<ui:define name="tituloFieldSetFiltro">
+    		<h4> Pesquisa de Usuários </h4>
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<div class="row">
+				<div class="col-md-6 form-group">
+					<h:outputLabel value="Login: " style="font-weight: normal;"/>
+					<p:inputText label="Login" id="login" styleClass="form-control" converter="converterStringVazia"
+								 value="#{usuarioBean.entitySearch.login}" maxlength="30" size="50">
+					   <f:validateLength maximum="50" minimum="3"/>
+					</p:inputText>
+				</div>
+				
+				<div class="col-md-6 form-group">
+					<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+					<p:inputText id="nome" styleClass="form-control" converter="converterStringVazia"
+					 			  validator="textoValidatorSge"
+					 			  value="#{usuarioBean.entitySearch.descricao}" maxlength="50" size="50">
+					 </p:inputText>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<h:outputLabel value="CPF: " style="font-weight: normal;"/>
+					<p:inputMask styleClass="form-control" id="cpf" label="CPF" converter="cpfConverter" 
+						value="#{usuarioBean.entitySearch.cpf}" maxlength="14" mask="###.###.###-##"/>
+				</div>
+				<div class="col-md-6">
+					<h:outputLabel value="Email: " style="font-weight: normal;"/>
+					<p:inputText label="Email" id="email" styleClass="form-control" value="#{usuarioBean.entitySearch.email}" 
+								 converter="converterStringVazia" validator="emailValidatorSge" size="50">
+						<f:validateLength minimum="4" maximum="50"/>
+					</p:inputText>
+				</div>
+			</div>
+			<p>&nbsp;</p>
+		</ui:define>
+		
+		<ui:define name="tituloPainel">
+		   <ui:param name="tituloPainel" value="Usuários" />
+		</ui:define>
+		
+		<ui:define name="resultFiltro">
+		
+				<p:dataTable styleClass="table table-responsive table-mobile" 
+   							 id="usuarios"
+   							 rows="10"
+   						 	 pageLinks="3"
+   						 	 widgetVar="tableUsuario"
+   						     paginatorAlwaysVisible="false"
+   						     emptyMessage="Nenhum usuário foi encontrado."
+   						 	 value="#{usuarioBean.resultSearch}" 
+       					 	 var="user" 
+       					 	 paginator="#{usuarioBean.resultSearch.rowCount > 0}"
+       					 	 paginatorPosition="bottom"
+       					 	 rowStyleClass="bgLinha1,bgLinha2">
+       					
+       						<p:column headerText="" style="width:60px; text-align:center;" rendered="#{sessionScope.perms.usuarios.editableBool}">
+       							<div class="colunaAcao">					    			
+									<h:commandLink id="cmdUpd" actionListener="#{usuarioBean.prepareUpdate}">
+									    <i class="glyphicon glyphicon-edit" />
+									</h:commandLink>
+									<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+										showEffect="fade" trackMouse="true" />
+								</div>
+       						</p:column>
+       						
+       						<p:column headerText="ID" style="text-align:center;">
+       							<h:outputText value="#{user.id}" />
+       						</p:column>
+       						
+       						<p:column headerText="Nome" style="text-align:left;" >
+       							<h:outputText value="#{user.descricao}" />
+       						</p:column>
+       						
+       						<p:column headerText="Login" style="text-align:left;" >
+       							<h:outputText value="#{user.login}" />
+       						</p:column>  
+       						<p:column headerText="Email" style="text-align:left;" >
+       							<h:outputText value="#{user.email}" />
+       						</p:column>  
+       						<p:column headerText="Grupos" style="text-align:left;" >
+       							<h:outputText value="#{user.grupos}" />
+       						</p:column>         						       						     						
+       						<p:column style="width:60px; text-align:center;" rendered="#{sessionScope.perms.usuarios.removeBool}" >
+       							<f:facet name="header">
+       								<h:selectBooleanCheckbox rendered="#{usuarioBean.resultSearch.rowCount > 0}" styleClass="ui-checkBoxMain" />
+       							</f:facet>
+       							<h:selectBooleanCheckbox styleClass="ui-checkBox" 
+       												     valueChangeListener="#{usuarioBean.select}" />
+       						</p:column>
+       						
+				 	</p:dataTable> 
+
+		</ui:define>
+			
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Usuarios </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 rendered="#{sessionScope.perms.usuarios.ativoBool}"
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+							 
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.usuarios.removeBool}"
+							 onclick="showIf()"/>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+			
+   		  	<h:panelGrid id="modalPanel" columns="4" >
+   		  		
+   		  			<p:dialog id="unidadesModal"
+          		  			  header="Unidades de Trabalho"
+              	  			  widgetVar="unidadesModal"
+              	  			  width="650"
+              	  			  closeOnEscape="true"
+              	  			  showEffect="fade"
+              	  			  rendered="#{usuarioBean.unidades.rowCount > 1}"
+              	  			  visible="#{usuarioBean.unidades.rowCount > 1}"
+          		  		      closable="false"  
+          		  			  modal="true">
+		  			  
+				  		<p:dataTable styleClass="table table-responsive table-mobile" 
+		   							 id="unidadeTrabalho"
+		   							 rows="10"
+		   						 	 pageLinks="3"
+		   						 	 widgetVar="tableUnidadeTrabalho"
+		   						     paginatorAlwaysVisible="false"
+		   						     emptyMessage="Nenhuma unidade de trabalho foi encontrada."
+		   						 	 value="#{usuarioBean.unidades}"
+		       					 	 var="unidade" 
+		       					 	 paginator="#{usuarioBean.unidades.rowCount > 0}"
+		                 			 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"         				 	 
+		       					 	 paginatorPosition="bottom"
+		       					 	 rowStyleClass="bgLinha1,bgLinha2">
+		       					 	 
+					  			<p:column headerText="Código da Escola" style="text-align:left;" >
+					  				<h:outputText value="#{unidade.id}" />
+					  			</p:column>
+					  			
+					  			<p:column headerText="Escola" style="text-align:left;">
+					  				<h:outputText value="#{unidade.descricao}" />
+					  			</p:column>
+					  			
+					  			<p:column>
+									<h:commandLink actionListener="#{usuarioBean.selecionarItem}">
+										<p:ajax process="@this" update=":formCadastro:modalPanel :formCadastro:unidadeLov" oncomplete="unidadesModal.hide(); carregando.hide();" />
+									    <i class="glyphicon glyphicon-ok green-icon" />
+									</h:commandLink>		
+									
+								</p:column>
+								
+		 		  		</p:dataTable>
+		  			</p:dialog>
+   		  	</h:panelGrid>	
+   		  	
+			<script type="text/javascript">
+				/* <![CDATA[ */						             
+   			      var handler = function handler(data) {
+   			        
+   			       	  var loading = carregando || $j(carregando);
+					  if(data.status === 'begin') {
+   			    	  	 loading.show(); 
+   			    	  }  else if (data.status === 'success') {
+   			    	     loading.hide();
+   			     	  }
+   				   };						
+				/* ]]> */
+  			</script>
+  			
+   		  	<h:panelGrid id="modalPanelUsuarios" columns="4" >
+   		  		
+   		  			<p:dialog id="usuariosModal"
+          		  			  header="Usuários SGA"
+              	  			  widgetVar="usuariosModal"
+              	  			  width="650"
+              	  			  closeOnEscape="true"
+              	  			  showEffect="fade"
+              	  			  rendered="#{usuarioBean.usuariosSga.rowCount > 0}"
+              	  			  visible="#{usuarioBean.usuariosSga.rowCount > 0}"
+              	  			  closable="false"  
+          		  			  modal="true">
+		  			  
+				  		<p:dataTable styleClass="table table-responsive table-mobile"
+		   							 id="usuarios"
+		   							 rows="10"
+		   						 	 pageLinks="3"
+		   						 	 widgetVar="tableUsuario"
+		   						     paginatorAlwaysVisible="false"
+		   						     emptyMessage="Nenhum usuário foi encontrado."
+		   						 	 value="#{usuarioBean.usuariosSga}"
+		       					 	 var="usuSga" 
+		       					 	 paginator="#{usuarioBean.usuariosSga.rowCount > 0}"
+		                 			 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"         				 	 
+		       					 	 paginatorPosition="bottom"
+		       					 	 rowStyleClass="bgLinha1,bgLinha2">
+		       					 	 
+					  			<p:column headerText="Login" style="text-align:left;" >
+					  				<h:outputText value="#{usuSga.login}" />
+					  			</p:column>
+					  			
+					  			<p:column headerText="Nome" style="text-align:left;">
+					  				<h:outputText value="#{usuSga.descricao}" />
+					  			</p:column>
+					  			
+					  			<p:column  headerText="Selecionar" style="text-align:left;" >
+									<h:commandLink actionListener="#{usuarioBean.selecionarUsuario}">
+										<p:ajax process="@this" update=":formCadastro:modalPanelUsuarios :formCadastro:login :formCadastro:nome" oncomplete="usuariosModal.hide(); carregando.hide();" />
+									    <i class="glyphicon glyphicon-ok green-icon" />
+									</h:commandLink>								
+								</p:column>
+					  			
+					  			
+		 		  		</p:dataTable>
+		 		  			<p:commandButton styleClass="btn btn-primary" 
+											 value="Voltar"
+											 onclick="usuariosModal.hide()"
+											 actionListener="#{usuarioBean.cancelaSelecaoUsuario}"
+											 immediate="true"
+											 ajax="false"/>		  	
+		  			</p:dialog>
+   		  	</h:panelGrid>	
+		
+			<fieldset>
+				<legend>Cadastro de Usuários</legend>
+				
+				<h:panelGroup id="unidadeLov">
+					<div class="row">
+						<div class="col-md-3">
+							<h:outputLabel value="Unidade de Trabalho:" styleClass="required"/>
+						</div>
+						<div class="col-md-9">
+							<h:outputLabel value="Descrição Unidade de Trabalho:" styleClass="required"/>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div class="col-md-3">
+							<h:inputText id="codigoUnidade"
+					  				     value="#{usuarioBean.entity.unidadeTrabalho.id}"
+					  				     styleClass="form-control"
+					  				     maxlength="25">
+					  			<f:ajax event="change"
+					  					listener="#{usuarioBean.findUnidadeByCodigo}"
+					  					execute="@this"
+					  					render=":formCadastro:unidadeLov :formCadastro:modalPanel :formPanel:mensagemAviso :formCadastro:login :formCadastro:nome" />	     
+					  		</h:inputText>
+					  		<h:message for="descricaoUnidade" tooltip="true" styleClass="error-messages" />
+					  	</div>
+					  	
+					  	<div class="col-md-9 form-group">
+							<div class="input-group">
+						  		<h:inputText id="descricaoUnidade" size="50" required="true"
+						  		             value="#{usuarioBean.entity.unidadeTrabalho.descricao}"
+						  		             styleClass="form-control"
+						  		             label="Unidade de Trabalho"
+						  		             converter="converterStringVazia" >
+						  		</h:inputText>
+						  		<h:message for="descricaoUnidade" tooltip="true" styleClass="error-messages" />
+
+			  	  	  			<span class="input-group-btn" id="basic-addon1">
+									<h:commandButton id="searchLov" styleClass="magnifying"
+			 	  	  					     		 actionListener="#{usuarioBean.findUnidadeByDescricao}">
+			 	  	  		     		<f:ajax onevent="handler"
+			 	  	  		     			    render=":formCadastro:unidadeLov :formCadastro:modalPanel :formPanel:mensagemAviso :formCadastro:login :formCadastro:nome" 
+			 	  	  		     		 	    execute="descricaoUnidade" />		 
+				  	  				</h:commandButton>
+				  	  				<h:inputHidden id="hiddenLov" required="#{usuarioBean.entity.unidadeTrabalho.descricao == null}" requiredMessage="&nbsp;" />
+				  	  				<h:message for="hiddenLov" tooltip="true" styleClass="error-messages" /> 
+								</span>
+								<h:inputHidden required="#{not usuarioBean.setorInformado}"
+												   requiredMessage="O preenchimento do campo Unidade de Trabalho é obrigatório."
+												   value="#{usuarioBean.entity.unidadeTrabalho.id}"  />
+							</div>
+						</div>
+					</div>
+				</h:panelGroup>
+				
+				<h:panelGroup id="nomeLov">
+					<div class="row">
+						<div class="col-md-5">
+							<h:outputLabel value="Nome:" styleClass="required"/>
+						</div>
+						<div class="col-md-3">
+							<h:outputLabel value="Login:" styleClass="required"/>
+						</div>
+						<div class="col-md-4">
+							<h:outputLabel value="E-mail:" styleClass="required"/>
+						</div>
+					</div>
+				
+					<div class="row">
+						<div class="col-md-5">
+							<div class="input-group form-group">
+								<h:inputText id="nome"  required="true" label="Nome" size="77"
+										 styleClass="form-control input-mobile"
+										 value="#{usuarioBean.entity.descricao}" 
+								 		 disabled="#{usuarioBean.editing or usuarioBean.importaSGA}"
+								 		 maxlength="50" >
+									<f:converter converterId="converterStringVazia"/>
+									<f:validator validatorId="textoValidatorSge"/>
+									<f:validateLength minimum="3"/>
+									<p:ajax event="change" update="@this"/>			
+								</h:inputText>
+								<h:message for="nome" tooltip="true" styleClass="error-messages" />
+								
+							  	<span class="input-group-btn" id="basic-addon2">
+							  		<h:commandButton id="searchLovUsu" styleClass="magnifying"
+													 actionListener="#{usuarioBean.findUsuarioSgaByDesc}">
+										<f:ajax onevent="handler" execute="nome"
+											render=":formCadastro:modalPanelUsuarios :formPanel:mensagemAviso" />
+									</h:commandButton>
+									<h:inputHidden id="hiddenLovUsu" requiredMessage="&nbsp;" 
+												   required="#{usuarioBean.entity.descricao == null}"/>
+				  	  				<h:message for="hiddenLovUsu" tooltip="true" styleClass="error-messages" /> 
+								</span>
+							</div>
+						</div>
+						<div class="col-md-3 form-group">
+							<p:inputText id="login" required="true" 						
+								disabled="#{usuarioBean.editing or usuarioBean.importaSGA}"
+								value="#{usuarioBean.entity.login}" label="Login" 
+								maxlength="50" styleClass="form-control"
+								converter="converterStringVazia">
+								<f:validateLength minimum="3" maximum="50"/>						
+							</p:inputText>
+							<h:message for="login" tooltip="true" styleClass="error-messages" />
+						</div>
+						<div class="col-md-4 form-group">
+							<p:inputText id="email" required="true" label="Email" 
+								style="text-transform: lowercase;"
+								value="#{usuarioBean.entity.email}" 
+								maxlength="100" styleClass="form-control"
+								validator="emailValidatorSge" converter="converterStringVazia"/>	
+							<h:message for="email" tooltip="true" styleClass="error-messages" />
+						</div>
+					</div>
+				</h:panelGroup>
+					
+				<div class="row">
+					<div class="col-md-4 form-group">
+						<h:outputLabel value="CPF: " styleClass="required"/>
+						<p:inputMask id="cpf" required="true" styleClass="form-control"
+									 converter="cpfConverter" label="CPF"
+									 value="#{usuarioBean.entity.cpf}"
+									 mask="###.###.###-##" 
+									 validator="cpfValidator"/>
+						<h:message for="cpf" tooltip="true" styleClass="error-messages" />		 
+					</div>
+					<div class="col-md-3 form-group">
+						<h:outputLabel value="Data de Nascimento: " styleClass="required"/>
+						<p:calendar id="dataNascimento" pattern="dd/MM/yyyy"
+									navigator="true" mindate="01/01/1908" maxdate="calwidget.today()"
+									 label="Data de Nascimento"
+									styleClass="removeArredondadoCalendar date-input" locale="pt"
+									value="#{usuarioBean.entity.dataNascimento}" required="true">
+						</p:calendar>
+						<h:message for="dataNascimento" tooltip="true" styleClass="error-messages" />
+					</div>
+					<div class="col-md-3 form-group">
+						<h:outputLabel value="Sexo: " styleClass="required"/>
+						<h:selectOneRadio id="sexo" required="true" 
+									label="Sexo" style="font-size:small"
+									value="#{usuarioBean.entity.sexo}" >
+							<f:selectItem itemLabel="Masculino&nbsp;&nbsp;" itemValue="0"/>
+							<f:selectItem itemLabel="Feminino" itemValue="1"/>						
+						</h:selectOneRadio>
+						<h:message for="sexo" tooltip="true" styleClass="error-messages" />
+					</div>
+					<div class="col-md-2 form-group">
+						<h:outputLabel value="Professor: " style="font-weight: normal;"/>
+						 <h:selectOneRadio id="isProfessor" 
+						 			       style="font-size:small"
+						 				   value="#{usuarioBean.entity.usuarioProfessor}" 
+						 				   layout="spread">
+	                        <f:selectItem itemLabel="Não&nbsp;&nbsp;" itemValue="N"/>
+	                        <f:selectItem itemLabel="Sim" itemValue="S" />
+	                    </h:selectOneRadio>	
+					</div>
+				</div>
+					
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Grupos: " styleClass="required"/>
+	                    <p:pickList id="listagemGrupos"
+	                    			value="#{usuarioBean.listaGrupos}" 
+	                    			addAllLabel="Adicionar Todos"
+	                    			addLabel="Adicionar"
+	                    			removeAllLabel="Remover Todos"
+	                    			removeLabel="Remover"
+	                    			var="grupo"
+	                    			requiredMessage="É obrigatório informar ao menos 1 (um) grupo de usuários."
+	                    			required="true" 
+	                     			converter="converterEntity"
+	                                itemLabel="#{grupo.descricao}" 
+	                                itemValue="#{grupo}">                    
+	                    </p:pickList>
+	                    <h:message for="listagemGrupos" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>
+			</fieldset>
+			
+		</ui:define>
+	</ui:composition>
+</html>

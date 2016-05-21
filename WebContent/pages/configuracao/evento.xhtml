@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Evento" />
+    	</ui:define>
+    	
+   		<ui:define name="pageScript">
+			<script type="text/javascript"
+				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{eventoBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Eventos
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Cidade " />
+							<h:selectOneMenu id="cidadeSearch"
+											 value="#{bean.entity.cidade}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cidades}" />
+							</h:selectOneMenu>
+							<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4 form-group">
+						<h:outputText value="Tipo Arquivo " />
+						<h:selectOneMenu id="tipoArquivoSearch" 
+										 value="#{bean.entity.tipoArquivo}" 
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoArquivoSearch" tooltip="true"
+							styleClass="error-messages" />	
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Eventos" />
+		</ui:define>
+	
+	
+		<ui:define name="resultFiltro" >
+			<p:dataTable id="eventos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaEventos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
+			 		 value="#{bean.resultSearch}" var="evento" paginator="#{bean.resultSearch.rowCount > 0}"
+			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+			 		 
+			 		 <p:column headerText="Cidade" >
+						<h:outputText value="#{evento.cidade.descricao.toUpperCase()}" />
+					 </p:column>
+			 		 
+			 		 <p:column headerText="Tipo Arquivo" >
+						<h:outputText value="#{evento.tipoArquivo.descricao}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Nome" >
+						<h:outputText value="#{evento.nome}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Chave" >
+						<h:outputText value="#{evento.chave}" />
+					 </p:column>
+			
+			</p:dataTable> 
+		</ui:define>
+		
+    </ui:composition>
+	
+</html>

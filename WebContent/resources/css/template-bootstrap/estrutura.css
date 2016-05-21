@@ -1,0 +1,252 @@
+
+/* ALTERE O QUE PRECISAR */
+/* Space out content a bit */
+body {
+  padding:0;
+  margin:0;
+  font-family: 'Open Sans', "Trebuchet MS", Arial, Helvetica, sans-serif
+}
+/* ALTERAR O QUE FOR PRECISO */
+.bordas_15_b{border-radius: 0px 0px 15px 15px;}
+.hr{
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+  
+}
+
+
+.logo{ background:url(../../images/template-bootstrap/images/logo.png) no-repeat; height:104px; text-indent:-50000px; }
+.logo-login{ background:url(../../images/template-bootstrap/images/logo.png) no-repeat center; height:104px; text-indent:-50000px; }
+
+@media (min-width: 450px) {
+  .panel-default {
+    max-width: 400px;
+    margin:0 auto;
+  }
+}
+
+.panel-default-filtros {
+  width: 100%;
+  margin:0 auto;
+  border: 1px solid #ddd !important;
+  margin-bottom: 20px;
+}
+  
+.panel-default-filtros > .panel-heading {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #dddddd;
+  border-bottom: 1px solid #ddd !important;
+}
+
+.panel-default-filtros .panel-heading {
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+}
+
+.label-primary, .btn-primary{
+	background-color:#FFA500 !important;
+	border: 1px solid #FFA500;
+	}
+
+.label-primary{
+	margin-left:3px; margin-top:-3px !important;
+	}
+
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* Custom page header */
+.header {
+	padding-top:0px;
+	margin-top:0px;
+}
+/* Make the masthead heading the same height as the navigation  */
+.header .row {
+  color:#FFF; padding:8px;  margin:0px; min-height:28px; height:auto;
+  
+ }
+.header .row .col-md-7, .header .row .col-md-5{
+	margin: 0px;
+	height: 100px !important;
+}
+.logo{
+	margin-top: 4px;
+}
+.alert {
+ padding: 10px !important; 
+ margin-top: 10px
+}
+.row-topo{
+	background:#FFA500;
+}
+.header .users{
+	color:#000;
+}
+
+.header .h3{font-size:16px; font-weight: normal; }
+.header .horario{ text-align: right;}
+
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 40px;
+}
+
+/* Customize container */
+/*
+@media (min-width: 1010px) {
+  .container {
+    max-width: 1010px;
+  }
+}
+
+@media (min-width: 1250px) {
+  .container {
+    max-width: 1250px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1520px;
+  }
+}
+*/
+
+.container {
+    width: 95%;
+    max-width:1400px;
+  }
+  
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.conteudo {
+  margin: 40px 0;
+}
+.conteudo p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer { 
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .footer{
+	text-align:center;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 0px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+ 
+}
+
+@media screen and (max-width: 768px) {
+	.header .horario{ 
+	text-align: left !important;
+	 margin-top: 10px;
+	 }
+	.col-md-6{padding:0px;}
+	.col-md-3{padding:0px;}
+	.col-md-9{padding:0px;}
+	.font-mobile{}
+	.table-mobile{width: 100%; font-size: 100%}
+	.form-control{width: 100% !important;}
+	
+}
+
+@media screen and (max-width: 600px) { /* MUITO PEQUENO */ 
+	.form-control{width: 95% !important; }
+}
+
+@media screen and (max-width: 500px) { /* MUITO PEQUENO */ 
+	.form-control{width: 85% !important; }
+}
+
+@media screen and (max-width: 400px) { /* MUITO PEQUENO */ 
+	.form-control{width: 75% !important; }
+}
+
+.input-pequeno{width: 30%;}
+.input-medio{width: 60%;}
+.input-grande{width: 90%;}
+.magbt{margin-bottom: 10px;}
+
+.table-mobile{width: 100%; }
+
+
+.relatorio-row{
+	height:40px; 
+	border-bottom: 1px solid #e7e7e7;
+	padding: 10px 0 10px 10px;
+}
+
+.text-container{
+	padding-top:0px;
+}
+
+.bt-container{
+	height:20px;
+	width:65px;
+	float:left;
+}
+
+.bt-icon-report{
+	border:none;
+	background:transparent;
+	width:20px;
+	height:20px;
+	margin-right:10px;
+}
+
+.xlsx{
+	background:url('../../img/report-xlsx.png') !important;
+	
+}
+
+.html{
+	background:url('../../img/report-html.png') !important;
+	
+}

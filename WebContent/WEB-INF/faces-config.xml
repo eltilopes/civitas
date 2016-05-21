@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<faces-config
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd"
+    version="2.1">
+    
+    <application>
+		<el-resolver>
+    		    org.springframework.web.jsf.el.SpringBeanFacesELResolver
+		</el-resolver>
+  	</application>
+ 
+    
+    <navigation-rule>
+    
+		<navigation-case>
+			<description>Inicio do Sistema</description>
+			<from-outcome>home</from-outcome>
+			<to-view-id>/home.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<description>Recuperacao de Senha</description>
+			<from-outcome>esqueceuSenha</from-outcome>
+			<to-view-id>/recupera-senha.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+
+		<navigation-case>
+			<description>Alterar Senha</description>
+			<from-outcome>alterarSenha</from-outcome>
+			<to-view-id>/acesso/alterar-senha.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<description>Módulos</description>
+			<from-outcome>modulo</from-outcome>
+			<to-view-id>/acesso/modulo.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<description>Transações</description>
+			<from-outcome>transacao</from-outcome>
+			<to-view-id>/acesso/transacao.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<description>Grupos de Usuários</description>
+			<from-outcome>grupoUsuario</from-outcome>
+			<to-view-id>/acesso/grupo-de-usuarios.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<description>Usuários</description>
+			<from-outcome>usuario</from-outcome>
+			<to-view-id>/acesso/usuario.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		
+		<navigation-case>
+			<description>Logout do Usuario</description>
+			<from-outcome>logout</from-outcome>
+			<to-view-id>/login.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>	
+
+<!-- 	<factory> -->
+<!--         <exception-handler-factory> -->
+<!--             br.com.civitas.exception.CustomExceptionHandlerFactory -->
+<!--         </exception-handler-factory> -->
+<!-- 	</factory> -->
+
+</faces-config>

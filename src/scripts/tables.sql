@@ -1,0 +1,961 @@
+/*configuração do modulo*/
+INSERT INTO util.TB_MODULO VALUES (174, 'EDUCACAO', '172.23.7.102', ':8082', 'educacao'); -- Modulo
+INSERT INTO util.TB_GRUPO VALUES (util.seq_tb_grupo.nextval, 'MASTER', 174/*CD_MODULO*/, SYSDATE, 4); -- Grupo
+INSERT INTO util.TB_USUARIOGRUPOS VALUES (util.seq_tb_usuariosgrupo.nextval, 231/*CD_USUARIO*/, 312/*CD_GRUPO*/);
+
+-- SELECT * FROM TB_TRANSACAO ORDER BY 1 DESC
+INSERT INTO util.TB_TRANSACAO VALUES (util.seq_tb_transacao.nextval, 'CADASTRO DE AVALIACAO', 'cadastroAvaliacao');
+INSERT INTO util.TB_TRANSACAO VALUES (util.seq_tb_transacao.nextval, 'DIGITACAO DE AVALIACAO', 'digitacaoAvaliacao');
+INSERT INTO util.TB_TRANSACAO VALUES (util.seq_tb_transacao.nextval, 'CADASTRO DE DOWNLOAD', 'cadastroDownload');
+
+-- SELECT * FROM TB_MODULOTRANSACAO ORDER BY 1 DESC
+INSERT INTO util.TB_MODULOTRANSACAO (CD_MODULO, CD_TRANSACAO)
+select 174, ci_transacao from util.tb_transacao
+       where ci_transacao in (1,2,3,4)
+
+-- SELECT * FROM TB_GRUPOTRANSACOES ORDER BY 1 DESC
+INSERT INTO util.TB_GRUPOTRANSACOES (CI_GRUPOTRANSACOES, CD_GRUPO, CD_TRANSACAO, FL_INSERIR, FL_ALTERAR, FL_DELETAR, DT_CRIACAO, CD_USUARIO_INSERT)
+select util.seq_tb_grupotransacoes.nextval, 312, ci_transacao, 'S', 'S', 'S', SYSDATE, 1 from util.tb_transacao
+       where ci_transacao in (1,2,3,4) 
+       
+       
+       
+/*Tabelas de regra de negócio educação*/
+ 
+/*********/
+/* Aluno */
+/*********/
+create table TB_ALUNO
+(
+  CI_ALUNO           NUMBER not null,
+  NM_ALUNO           VARCHAR2(120) not null,
+  DT_NASCIMENTO      DATE not null,
+  SEXO               NUMBER not null,
+  NR_RNE             VARCHAR2(14),
+  CD_RACA            NUMBER not null,
+  CD_PAIS_ORIGEM     NUMBER,
+  CD_NATURALIDADE    NUMBER,
+  NM_MAE             VARCHAR2(120),
+  NM_PAI             VARCHAR2(120),
+  NR_NIS_ALUNO       VARCHAR2(11),
+  NR_NIS_MAE         VARCHAR2(11),
+  DT_ENTRADA_PAIS    DATE,
+  NR_RG              VARCHAR2(16),
+  NR_CPF             VARCHAR2(11),
+  NR_COD_ALUNO_CENSO VARCHAR2(12),
+  CD_RG_UF           NUMBER,
+  DT_EXPEDICAO_RG    DATE,
+  FL_DEFICIENCIA     NUMBER,
+  CD_NACIONALIDADE   NUMBER,
+  FL_GEMEO           NUMBER,
+  NR_NIT             VARCHAR2(11),
+  CD_ORIGEM          NUMBER,
+  HASH_ALUNO         VARCHAR2(200),
+  FL_ATIVO           NUMBER(1) default 1 not null,
+  DT_REGISTRO        DATE default sysdate not null,
+  CD_USUARIO         NUMBER,
+  NM_RESPONSAVEL     VARCHAR2(120),
+  NR_PORTADOR_RG     NUMBER,
+  NR_PORTADOR_CPF    NUMBER
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Add comments to the columns 
+comment on column TB_ALUNO.nacionalidade
+  is '1-brasileira, 2 brasileira nascido no exterior, 3-estrangeiro';
+comment on column TB_ALUNO.fl_deficiencia
+  is '1-sim, 0-não';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_ALUNO
+  add constraint PK_TB_ALUNO primary key (CI_ALUNO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_ALUNO
+  add constraint FK_TB_ALUNO_NATURALIDADE foreign key (CD_NATURALIDADE)
+  references util.TB_LOCALIDADE (CI_LOCALIDADE);
+alter table TB_ALUNO
+  add constraint FK_TB_ALUNO_PAIS foreign key (CD_PAIS_ORIGEM)
+  references util.TB_PAIS (CI_PAIS);
+alter table TB_ALUNO
+  add constraint FK_TB_ALUNO_RACA foreign key (CD_RACA)
+  references util.TB_RACA (CI_RACA);
+alter table TB_ALUNO
+  add constraint FK_TB_ALUNO_RG_UF foreign key (RG_UF)
+  references util.TB_ESTADO (CI_ESTADO);
+  
+  
+/************/ 
+/* Endereço */
+/************/
+-- Create table
+create table TB_ENDERECO
+(
+  ci_endereco      NUMBER not null,
+  cd_logradouro    NUMBER,
+  cd_tipo_endereco NUMBER not null,
+  nr_numero        VARCHAR2(10),
+  ds_complemento   VARCHAR2(20)
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Add comments to the columns 
+comment on column TB_ENDERECO.cd_tipo_endereco
+  is '0 - Residencial, 1 - Comercial, 2 - Correnpondencia';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_ENDERECO
+  add constraint PK_TB_ENDERECO primary key (CI_ENDERECO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_ENDERECO
+  add constraint FK_TB_ENDERECO_LOGRADOURO foreign key (CD_LOGRADOURO)
+  references util.TB_LOGRADOURO (CI_LOGRADOURO);
+  
+----------------------------------------------------
+  
+-- Create table
+create table TB_ALUNO_ENDERECO
+(
+  ci_aluno_endereco NUMBER not null,
+  cd_aluno          NUMBER not null,
+  cd_endereco       NUMBER not null
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_ALUNO_ENDERECO
+  add constraint PK_TB_ALUNO_ENDERECO primary key (CI_ALUNO_ENDERECO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_ALUNO_ENDERECO
+  add constraint FK_TB_ALUNO_ENDERECO_ALUNO foreign key (CD_ALUNO)
+  references TB_ALUNO (CI_ALUNO);
+alter table TB_ALUNO_ENDERECO
+  add constraint TB_ALUNO_ENDERECO_ENDERECO foreign key (CD_ENDERECO)
+  references TB_ENDERECO (CI_ENDERECO);
+  
+  
+-------------------------------------------------
+
+/**********/
+/*Certidao*/
+/**********/
+-- Create table
+create table TB_CERTIDAO_NASCIMENTO
+(
+  ci_certidao_nascimento NUMBER not null,
+  cd_aluno               NUMBER not null,
+  nr_matricula_certidao  VARCHAR2(32),
+  cd_localidade          NUMBER,
+  dt_emissao             DATE,
+  nr_folha               VARCHAR2(4),
+  nr_livro               VARCHAR2(8),
+  nr_termo               VARCHAR2(8),
+  cd_cartorio            NUMBER
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Add comments to the columns 
+comment on column TB_CERTIDAO_NASCIMENTO.cd_localidade
+  is 'localidade do cartorio';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_CERTIDAO_NASCIMENTO
+  add constraint PK_TB_CERTIDAO primary key (CI_CERTIDAO_NASCIMENTO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_CERTIDAO_NASCIMENTO
+  add constraint FK_TB_CERTIDAO_ALUNO foreign key (CD_ALUNO)
+  references TB_ALUNO (CI_ALUNO);
+alter table TB_CERTIDAO_NASCIMENTO
+  add constraint FK_TB_CERTIDAO_LOCALIDADE foreign key (CD_LOCALIDADE)
+  references util.TB_LOCALIDADE (CI_LOCALIDADE);
+
+-----------------------------------------------------------------------
+/*****************/
+/*vulnerabilidade*/
+/*****************/
+-- Create table
+create table TB_VULNERABILIDADE
+(
+  ci_vulnerabilidade            NUMBER not null,
+  cd_aluno                      NUMBER not null,
+  fl_filho_professor            NUMBER not null,
+  qtd_jovens_adultos            NUMBER,
+  qtd_criancas                  NUMBER,
+  renda_familiar                BINARY_DOUBLE,
+  fl_beneficiario_bolsa_familia NUMBER,
+  fl_pais_trabalho_diurno       NUMBER,
+  fl_pais_menores_idade         NUMBER
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Add comments to the columns 
+comment on column TB_VULNERABILIDADE.fl_filho_professor
+  is '1-sim, 0-não';
+comment on column TB_VULNERABILIDADE.qtd_jovens_adultos
+  is 'pessoas que moram na mesma casa';
+comment on column TB_VULNERABILIDADE.fl_beneficiario_bolsa_familia
+  is '1-sim, 0-não';
+comment on column TB_VULNERABILIDADE.fl_pais_trabalho_diurno
+  is '1-sim, 0-não';
+comment on column TB_VULNERABILIDADE.fl_pais_menores_idade
+  is '1-sim, 0-não';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_VULNERABILIDADE
+  add constraint PK_TB_VULNERABILIDADE primary key (CI_VULNERABILIDADE)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_VULNERABILIDADE
+  add constraint FK_TB_VULNERABILIDADE_AULUNO foreign key (CD_ALUNO)
+  references TB_ALUNO (CI_ALUNO);
+
+  ----------------------------------------------------
+  
+  
+  /**********/
+  /*Telefone*/
+  /**********/
+  
+  create table TB_TELEFONE
+(
+  ci_telefone NUMBER not null,
+  nr_ddd      VARCHAR2(2) not null,
+  nr_telefone VARCHAR2(9) not null
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_TELEFONE
+  add constraint PK_TB_TELEFONE primary key (CI_TELEFONE)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+  
+  ---------------------------------------------------------
+  
+  -- Create table
+create table TB_ALUNO_TELEFONE
+(
+  ci_aluno_telefone NUMBER not null,
+  cd_aluno          NUMBER not null,
+  cd_telefone       NUMBER not null
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_ALUNO_TELEFONE
+  add constraint PK_TB_ALUNO_TELEFONE primary key (CI_ALUNO_TELEFONE)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_ALUNO_TELEFONE
+  add constraint FK_TB_ALUNO_TELEFONE_ALUNO foreign key (CD_ALUNO)
+  references TB_ALUNO (CI_ALUNO);
+alter table TB_ALUNO_TELEFONE
+  add constraint FK_TB_ALUNO_TELEFONE_TELEFONE foreign key (CD_TELEFONE)
+  references TB_TELEFONE (CI_TELEFONE);
+--------------------------------------------
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+/***************/
+/*perido letivo*/
+/***************/
+
+-- Create table
+create table TB_PERIODO_LETIVO
+(
+  ci_periodo_letivo   NUMBER not null,
+  perido_letivo       NUMBER not null,
+  dt_inicio_periodo   DATE not null,
+  dt_fim_periodo      DATE not null,
+  dt_inicio_matricula DATE not null,
+  dt_fim_matricula    DATE not null,
+  fl_status           NUMBER not null
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_PERIODO_LETIVO
+  add constraint PK_TB_PERIDO_LETIVO primary key (CI_PERIODO_LETIVO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+  
+  
+
+
+  /**
+ * EDUCACAO.TB_TIPO_ENSINO
+ */
+CREATE TABLE EDUCACAO.TB_TIPO_ENSINO(
+       CI_TIPO_ENSINO NUMBER(10) NOT NULL,
+       NM_TIPO_ENSINO VARCHAR2(128),
+       DS_CODIGO VARCHAR2(8),
+       CONSTRAINT PK_TIPO_ENSINO PRIMARY KEY(CI_TIPO_ENSINO)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_TIPO_ENSINO;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_TIPO_ENSINO.NM_TIPO_ENSINO is 'Nome do tipo de ensino.';
+
+grant select on EDUCACAO.TB_TIPO_ENSINO to RH;
+grant select on EDUCACAO.TB_TIPO_ENSINO to SAEF;
+
+-- Insert
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(1, 'ENSINO INFANTIL', 'EI');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(2, 'ENSINO FUNDAMENTAL', 'EF');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(3, 'ENSINO MÉDIO', 'EM');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(4, 'EDUCAÇÃO DE JOVENS E ADULTOS', 'EJA');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(5, 'PRÉ-VESTIBULAR', 'PV');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(6, 'APOIO PEDAGÓGICO', 'A.PED.');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(7, 'ATENDIMENTO EDUCAÇÃO ESPECIAL', 'AEE');
+INSERT INTO EDUCACAO.TB_TIPO_ENSINO VALUES(8, 'OUTROS', 'OUTROS');
+
+
+/**
+ * EDUCACAO.TB_MODALIDADE
+ */
+CREATE TABLE EDUCACAO.TB_MODALIDADE(
+       CI_MODALIDADE NUMBER(10) NOT NULL,
+       NM_MODALIDADE VARCHAR2(128),
+       NM_DETALHE VARCHAR2(128),
+       CD_TIPO_ENSINO NUMBER(10),
+       FL_ATIVO NUMBER(1) DEFAULT 1 NOT NULL,
+       CONSTRAINT PK_MODALIDADE PRIMARY KEY(CI_MODALIDADE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_MODALIDADE;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_MODALIDADE.NM_MODALIDADE is 'Nome da modalidade.';
+comment on column EDUCACAO.TB_MODALIDADE.NM_DETALHE is 'Nome detalhe caso tenha';
+comment on column EDUCACAO.TB_MODALIDADE.CD_TIPO_ENSINO is 'Tipo de Ensino.';
+
+alter table EDUCACAO.TB_MODALIDADE
+  add constraint FK_MODALIDADE_TIPO_ENSINO foreign key (CD_TIPO_ENSINO)
+  references TB_TIPO_ENSINO (CI_TIPO_ENSINO);
+
+-- Grant/Revoke object privileges 
+grant select on EDUCACAO.TB_MODALIDADE to RH;
+grant select on EDUCACAO.TB_MODALIDADE to SAEF;
+
+-- Insert
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(1, 'EDUCAÇÃO INFANTIL', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 1, 1);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(2, 'ENSINO FUNDAMENTAL - 1º À 5º ANO', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 2, 1);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(3, 'ENSINO FUNDAMENTAL - 6º À 9º ANO', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 2, 1);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(4, 'ENSINO MÉDIO', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 3, 0);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(5, 'EDUCAÇÃO DE JOVENS E ADULTOS', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 4, 1);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(6, 'PRÉ-VESTIBULAR', 'CURSO PRESENCIAL COM AVALIAÇÃO NO PROCESSO', 5, 0);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(7, 'APOIO PEDAGÓGICO', 'APOIO PEDAGÓGICO', 6, 0);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(8, 'ATENDIMENTO EDUCAÇÃO ESPECIAL', 'ATENDIMENTO EDUCAÇÃO ESPECIAL', 7, 1);
+INSERT INTO EDUCACAO.TB_MODALIDADE VALUES(9, 'OUTRAS LOTAÇÕES', 'OUTRAS LOTAÇÕES', 8, 0);
+
+/**
+ * EDUCACAO.TB_STATUS_SITUACAO
+ */
+CREATE TABLE EDUCACAO.TB_STATUS_SITUACAO(
+  CI_STATUS_SITUACAO NUMBER(1,0) NOT NULL ENABLE, 
+  NM_STATUS_SITUACAO VARCHAR2(3) NOT NULL ENABLE, 
+  CONSTRAINT PK_STATUS_SITUACAO PRIMARY KEY (CI_STATUS_SITUACAO)
+);
+CREATE SEQUENCE EDUCACAO.SEQ_STATUS_SITUACAO;
+
+INSERT INTO EDUCACAO.TB_STATUS_SITUACAO VALUES(0, 'NAO');
+INSERT INTO EDUCACAO.TB_STATUS_SITUACAO VALUES(1, 'SIM');
+
+/**
+ * EDUCACAO.TB_SERIE
+ */
+CREATE TABLE EDUCACAO.TB_SERIE(
+  CI_SERIE NUMBER(10,0) NOT NULL, 
+  CD_MODALIDADE NUMBER(10,0) NOT NULL,
+  NM_SERIE VARCHAR2(20) NOT NULL,
+  CD_SERIE_PAI NUMBER(10,0), 
+  NM_CODIGO VARCHAR2(20), 
+  CD_STATUS_SITUACAO NUMBER(1,0) DEFAULT (1),
+  CONSTRAINT PK_SERIE PRIMARY KEY (CI_SERIE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_SERIE;
+
+alter table EDUCACAO.TB_SERIE
+  add constraint FK_SERIE_SERIE_PAI foreign key (CD_SERIE_PAI)
+  references EDUCACAO.TB_SERIE (CI_SERIE);
+alter table EDUCACAO.TB_SERIE
+  add constraint FK_SERIE_STATUS_SITUACAO foreign key (CD_STATUS_SITUACAO)
+  references EDUCACAO.TB_STATUS_SITUACAO (CI_STATUS_SITUACAO);
+alter table EDUCACAO.TB_SERIE
+  add constraint FK_SERIE_MODALIDADE foreign key (CD_MODALIDADE)
+  references EDUCACAO.TB_MODALIDADE (CI_MODALIDADE);
+
+-- Index
+CREATE INDEX EDUCACAO.IDX_TB_SERIE_MODALIDAE ON EDUCACAO.TB_SERIE (CD_MODALIDADE);
+CREATE INDEX EDUCACAO.IDX_TB_SERIE_SERIE_PAI ON EDUCACAO.TB_SERIE (CD_SERIE_PAI); 
+CREATE INDEX EDUCACAO.IDX_TB_SERIE_NM_SERIE ON EDUCACAO.TB_SERIE (NM_SERIE); 
+CREATE INDEX EDUCACAO.IDX_TB_SERIE_NM_CODIGO ON EDUCACAO.TB_SERIE (NM_CODIGO); 
+CREATE INDEX EDUCACAO.IDX_TB_SERIE_STATUS_SITUACAO ON EDUCACAO.TB_SERIE (CD_STATUS_SITUACAO);
+
+-- Add comments to the columns 
+COMMENT ON COLUMN EDUCACAO.TB_SERIE.NM_SERIE IS 'Nome da serie.';
+COMMENT ON COLUMN EDUCACAO.TB_SERIE.CD_SERIE_PAI IS 'Serie que antecede a serie referenciada.';
+COMMENT ON COLUMN EDUCACAO.TB_SERIE.NM_CODIGO IS 'Abreviação do nome';
+
+GRANT SELECT ON EDUCACAO.TB_SERIE TO RH;
+GRANT ALTER, DELETE, INDEX, INSERT, SELECT, UPDATE, REFERENCES, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON EDUCACAO.TB_SERIE TO DIRETOR_TURMA;
+GRANT ALTER, DELETE, INDEX, INSERT, SELECT, UPDATE, REFERENCES, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON EDUCACAO.TB_SERIE TO SAEF; 
+
+-- Insert
+INSERT INTO EDUCACAO.TB_SERIE VALUES(1, 1, 'CRECHE', NULL, 'CR', 0);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(2, 1, 'JARDIM I', 1, 'J1', 0);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(3, 1, 'JARDIM II', 2, 'J2', 0);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(16, 4, '4ª MÉDIO', NULL, '24', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(18, 8, 'SUPL. REGULAR', NULL, 'SU', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(19, 6, 'EJA (NIVEL I)', NULL, 'K1', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(24, 8, 'SALA DE BIBLIOTECA', NULL, 'SB', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(25, 8, 'LAB.INFORMATICA', NULL, 'LI', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(26, 8, 'SALA ATEND.EDU.ESPEC', NULL, 'SA', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(27, 8, 'PRO-MEDIO', NULL, 'PM', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(28, 8, 'SALA DE LEITURA', NULL, 'SL', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(29, 8, 'ESCOVODROMO', NULL, 'EV', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(30, 8, 'APOIO PEDAGÓGICO', NULL, 'AG', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(31, 8, 'PROJETOS', NULL, 'PJ', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(32, 8, 'PROJ SEGUNDO TEMPO', NULL, 'ST', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(33, 8, 'COORD PEDAGOGICA', NULL, 'CP', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(34, 8, 'PROG MAIS EDUCACAO', NULL, 'ME', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(35, 8, 'ESCOLA CRIATIVA', NULL, 'EC', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(36, 8, 'PRESIDENTE CONSELHO', NULL, 'PC', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(37, 8, 'CONSELHO MUNIC EDUCA', NULL, 'CM', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(38, 8, 'PROFESSOR ITINERANTE', NULL, 'PI', 0);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(39, 8, 'PROJ SME NA ESCOLA', NULL, 'SE', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(40, 8, 'COORDENACAO EJA', NULL, 'CE', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(41, 1, 'INFANTIL I', NULL, 'I1', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(47, 8, 'PROJETO ARTE', NULL, 'PA', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(48, 8, 'PROJETO ESPANHOL', NULL, 'PE', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(49, 8, 'PG BOLSA INIC DOC', NULL, 'PB', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(50, 8, 'PROJETO DE RELIGIAO', NULL, 'PR', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(51, 8, 'PROJETO UCA', NULL, 'PU', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(52, 8, 'PJ REF ESC EXTRACLAS', NULL, 'PX', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(53, 8, 'REPOSICAO DEFICIT CH', NULL, 'RD', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(54, 8, 'GEEMPA', NULL, 'GE', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(55, 8, 'PEDAGOGO 2', NULL, 'P2', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(56, 8, 'LAB. CIENCIAS', NULL, 'LC', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(57, 8, 'PRO-TECNICO', NULL, 'PT', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(58, 8, 'CORRECAO FLUXO ALFA', NULL, 'CF', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(59, 8, 'PSICOMOTRI RELACIONA', NULL, 'PS', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(60, 6, 'PBA', NULL, 'K0', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(61, 6, 'PROJOVEM', NULL, 'K6', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(62, 2, 'PCA I', NULL, 'PCA 1', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(63, 2, 'PCA II', NULL, 'PCA 2', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(42, 1, 'INFANTIL II', 41, 'I2', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(43, 1, 'INFANTIL III', 42, 'I3', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(44, 1, 'INFANTIL IV', 43, 'I4', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(45, 1, 'INFANTIL V', 44, 'I5', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(46, 9, 'A ESP', 46, 'AE', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(4, 2, '1º ANO', 45, '1A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(5, 2, '2º ANO', 4, '2A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(6, 2, '3º ANO', 5, '3A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(7, 2, '4º ANO', 6, '4A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(8, 2, '5º ANO', 7, '5A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(9, 3, '6º ANO', 8, '6A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(10, 3, '7º ANO', 9, '7A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(11, 3, '8º ANO', 10, '8A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(12, 3, '9º ANO', 11, '9A', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(13, 4, '1ª MÉDIO', 12, '21', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(14, 4, '2ª MÉDIO', 13, '22', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(15, 4, '3ª MÉDIO', 14, '23', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(17, 7, 'PRE-VESTIBULAR', 15, 'PV', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(20, 6, 'EJA (NIVEL II)', 19, 'K2', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(21, 6, 'EJA (NIVEL III)', 20, 'K3', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(22, 6, 'EJA (NIVEL IV)', 21, 'K4', 1);
+INSERT INTO EDUCACAO.TB_SERIE VALUES(23, 6, 'EJA (NIVEL V)', 22, 'K5', 1);
+
+
+/**
+ * EDUCACAO.TB_PERIODO_LETIVO_ETAPA
+ */
+CREATE TABLE EDUCACAO.TB_PERIODO_LETIVO_ETAPA(
+       CI_PERIODO_LETIVO_ETAPA NUMBER(10) NOT NULL,
+       NR_PERIODO_LETIVO_ETAPA NUMBER(1) NOT NULL,
+       NM_PERIODO_LETIVO_ETAPA VARCHAR2(128) NOT NULL,
+       CD_PERIODO_LETIVO NUMBER(10),
+       DT_INICIO DATE NOT NULL,
+       DT_FIM DATE NOT NULL,
+       DT_REGISTRO DATE DEFAULT SYSDATE NOT NULL,
+       CD_USUARIO NUMBER(10),
+       CONSTRAINT PK_PERIODO_LETIVO_ETAPA PRIMARY KEY(CI_PERIODO_LETIVO_ETAPA)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_PERIODO_LETIVO_ETAPA;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_PERIODO_LETIVO_ETAPA.NR_PERIODO_LETIVO_ETAPA is 'Número da etapa do Período Letivo.';
+comment on column EDUCACAO.TB_PERIODO_LETIVO_ETAPA.NM_PERIODO_LETIVO_ETAPA is 'Nome da etapa do Período Letivo.';
+comment on column EDUCACAO.TB_PERIODO_LETIVO_ETAPA.CD_PERIODO_LETIVO is 'Período Letivo ao qual esta etapa faz parte.';
+comment on column EDUCACAO.TB_PERIODO_LETIVO_ETAPA.DT_INICIO is 'Data do início desta etapa.';
+comment on column EDUCACAO.TB_PERIODO_LETIVO_ETAPA.DT_FIM is 'Data do fim desta etapa.';
+
+alter table EDUCACAO.TB_PERIODO_LETIVO_ETAPA
+  add constraint FK_ETAPA_PERIODO_LETIVO foreign key (CD_PERIODO_LETIVO)
+  references EDUCACAO.TB_PERIODO_LETIVO (CI_PERIODO_LETIVO);
+
+alter table EDUCACAO.TB_PERIODO_LETIVO_ETAPA
+  add constraint FK_ETAPA_USUARIO foreign key (CD_USUARIO)
+  references UTIL.TB_USUARIO (CI_USUARIO);
+
+-- Grant/Revoke object privileges 
+grant select on EDUCACAO.TB_PERIODO_LETIVO_ETAPA to RH;
+grant select on EDUCACAO.TB_PERIODO_LETIVO_ETAPA to SAEF;
+grant select on EDUCACAO.TB_PERIODO_LETIVO_ETAPA to DIRETOR_TURMA;
+
+
+
+/**
+ * EDUCACAO.TB_TURNO
+ */
+CREATE TABLE EDUCACAO.TB_TURNO(
+       CI_TURNO NUMBER(10) NOT NULL,
+       NM_TURNO VARCHAR2(64) NOT NULL,
+       HR_INICIO DATE NOT NULL,
+       HR_FIM DATE NOT NULL,
+       CONSTRAINT PK_TURNO PRIMARY KEY(CI_TURNO)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_TURNO;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_TURNO.NM_TURNO is 'Nome do Turno.';
+comment on column EDUCACAO.TB_TURNO.HR_INICIO is 'Hora início do Turno.';
+comment on column EDUCACAO.TB_TURNO.HR_FIM is 'Hora fim do Turno.';
+
+-- Grant/Revoke object privileges 
+grant select on EDUCACAO.TB_TURNO to RH;
+grant select on EDUCACAO.TB_TURNO to SAEF;
+grant select on EDUCACAO.TB_TURNO to DIRETOR_TURMA;
+
+-- Insert 
+INSERT INTO EDUCACAO.TB_TURNO VALUES(1, 'MANHÃ', TO_DATE('01/01/1970 07:00:00', 'DD/MM/YYYY HH24:MI:SS'), TO_DATE('01/01/1970 11:00:00', 'DD/MM/YYYY HH24:MI:SS'));
+INSERT INTO EDUCACAO.TB_TURNO VALUES(2, 'TARDE', TO_DATE('01/01/1970 13:00:00', 'DD/MM/YYYY HH24:MI:SS'), TO_DATE('01/01/1970 17:00:00', 'DD/MM/YYYY HH24:MI:SS'));
+INSERT INTO EDUCACAO.TB_TURNO VALUES(3, 'NOITE', TO_DATE('01/01/1970 19:00:00', 'DD/MM/YYYY HH24:MI:SS'), TO_DATE('01/01/1970 22:00:00', 'DD/MM/YYYY HH24:MI:SS'));
+INSERT INTO EDUCACAO.TB_TURNO VALUES(4, 'INTEGRAL', TO_DATE('01/01/1970 07:00:00', 'DD/MM/YYYY HH24:MI:SS'), TO_DATE('01/01/1970 17:00:00', 'DD/MM/YYYY HH24:MI:SS'));
+INSERT INTO EDUCACAO.TB_TURNO VALUES(5, 'INTERMEDIARIO', TO_DATE('01/01/1970 11:00:00', 'DD/MM/YYYY HH24:MI:SS'), TO_DATE('01/01/1970 15:00:00', 'DD/MM/YYYY HH24:MI:SS'));
+
+
+/**
+ * EDUCACAO.TB_STATUS_CLASSE
+ */
+CREATE TABLE EDUCACAO.TB_STATUS_CLASSE
+(
+  CI_STATUS_CLASSE NUMBER(10) NOT NULL,
+  NM_STATUS_CLASSE VARCHAR2(20) NOT NULL,
+  DS_STATUS_CLASSE VARCHAR2(100),
+  CONSTRAINT PK_STATUS_CLASSE PRIMARY KEY(CI_STATUS_CLASSE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_STATUS_CLASSE;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_STATUS_CLASSE.NM_STATUS_CLASSE is 'Nome do status da classe. (Ex: Em formacao)';
+comment on column EDUCACAO.TB_STATUS_CLASSE.DS_STATUS_CLASSE is 'Descrição do status';
+
+-- Insert 
+INSERT INTO EDUCACAO.TB_STATUS_CLASSE VALUES(1, 'ATIVA', 'QUANDO A CLASSE JÁ ESTÁ DEFINIDA');
+INSERT INTO EDUCACAO.TB_STATUS_CLASSE VALUES(2, 'INATIVA', 'QUANDO SE ENCERROU O PERIODO LETIVO');
+INSERT INTO EDUCACAO.TB_STATUS_CLASSE VALUES(3, 'EM FORMAÇÃO', 'QUANDO SE ESTÁ ALOCANDO OS ALUNOS · CLASSE');
+INSERT INTO EDUCACAO.TB_STATUS_CLASSE VALUES(4, 'EXTINTA', 'CLASSE EXTINTA NO PERIODO LETIVO ATIVO');
+
+
+/**
+ * EDUCACAO.TB_USO_CLASSE
+ */
+CREATE TABLE EDUCACAO.TB_USO_CLASSE(
+  CI_USO_CLASSE NUMBER(10) NOT NULL,
+  DS_USO_CLASSE VARCHAR2(50) NOT NULL,
+  CONSTRAINT PK_USO_CLASSE PRIMARY KEY(CI_USO_CLASSE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_USO_CLASSE;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_USO_CLASSE.DS_USO_CLASSE is 'Uso da Classe.';
+
+-- Insert 
+INSERT INTO EDUCACAO.TB_USO_CLASSE VALUES(1, 'AULA');
+INSERT INTO EDUCACAO.TB_USO_CLASSE VALUES(2, 'MULTIUSO');
+INSERT INTO EDUCACAO.TB_USO_CLASSE VALUES(3, 'APOIO');
+
+
+
+/**
+ * EDUCACAO.TB_TIPO_CLASSE
+ */
+CREATE TABLE EDUCACAO.TB_TIPO_CLASSE(
+  CI_TIPO_CLASSE NUMBER(10) NOT NULL,
+  DS_TIPO_CLASSE VARCHAR2(20) NOT NULL,
+  CONSTRAINT PK_TIPO_CLASSE PRIMARY KEY(CI_TIPO_CLASSE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_TIPO_CLASSE;
+
+-- Add comments to the columns 
+comment on column EDUCACAO.TB_TIPO_CLASSE.DS_TIPO_CLASSE is 'Tipo da Classe.';
+
+-- Insert
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(1, 'MULTISSERIADA');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(2, 'TELECURSO');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(3, 'ACELERAÇÃO');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(4, 'FLEXIBILIZADA');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(5, 'RECUPERAÇÃO DE CICLO');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(6, 'SALA DE RECURSO');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(7, 'PROGRAMA PROFISSÃO');
+INSERT INTO EDUCACAO.TB_TIPO_CLASSE VALUES(8, 'CONVENCIONAL');
+
+
+
+/**
+ * EDUCACAO.TB_CLASSE
+ */
+CREATE TABLE EDUCACAO.TB_CLASSE(
+  CI_CLASSE NUMBER(10,0) NOT NULL,
+	NM_CLASSE VARCHAR2(10),
+	CD_UNIDADE_TRABALHO NUMBER(10,0) NOT NULL,
+  CD_SERIE NUMBER(10,0),
+	CD_PERIODO_LETIVO NUMBER(10,0) NOT NULL,
+	CD_TURNO NUMBER(10,0) NOT NULL,
+	CD_STATUS_CLASSE NUMBER(10,0) NOT NULL,
+	CD_TIPO_CLASSE NUMBER(10,0),
+	CD_USO_CLASSE NUMBER(10,0) NOT NULL, 
+	NR_CAPACIDADE_LOGICA NUMBER(10,0),
+	FL_LIBERA_LOTACAO NUMBER(1,0) DEFAULT (0), 
+	DT_REGISTRO DATE DEFAULT SYSDATE,
+  CD_USUARIO NUMBER(10,0) NOT NULL,
+  CD_ORIGEM NUMBER(10,0) NOT NULL,
+	CONSTRAINT PK_CLASSE PRIMARY KEY (CI_CLASSE)
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_CLASSE;
+
+-- Add comments to the columns 
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.NM_CLASSE IS 'Nome da classe de aula.(Ex: A, B, F)';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_UNIDADE_TRABALHO IS 'Escola da classe';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_SERIE IS 'Serie da classe';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_PERIODO_LETIVO IS 'Periodo letivo em que a classe eh oferecida';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_TURNO IS 'Turno da classe.';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_STATUS_CLASSE IS 'Status da classe';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_TIPO_CLASSE IS 'Tipo da Classe. ';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_USO_CLASSE IS 'Uso da Classe.';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.NR_CAPACIDADE_LOGICA IS 'Capacidade lógica da classe.';
+COMMENT ON COLUMN EDUCACAO.TB_CLASSE.CD_ORIGEM IS 'Código de origem da tabela prefsme_prd_01.classe.';
+
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_UNIDADE_TRABALHO foreign key (CD_UNIDADE_TRABALHO)
+  references UTIL.TB_UNIDADE_TRABALHO (CI_UNIDADE_TRABALHO);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_SERIE foreign key (CD_SERIE)
+  references EDUCACAO.TB_SERIE (CI_SERIE);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_PERIODO_LETIVO foreign key (CD_PERIODO_LETIVO)
+  references EDUCACAO.TB_PERIODO_LETIVO (CI_PERIODO_LETIVO);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_TURNO foreign key (CD_TURNO)
+  references EDUCACAO.TB_TURNO (CI_TURNO);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_STATUS_CLASSE foreign key (CD_STATUS_CLASSE)
+  references EDUCACAO.TB_STATUS_CLASSE (CI_STATUS_CLASSE);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_TIPO_CLASSE foreign key (CD_TIPO_CLASSE)
+  references EDUCACAO.TB_TIPO_CLASSE (CI_TIPO_CLASSE);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_USO_CLASSE foreign key (CD_USO_CLASSE)
+  references EDUCACAO.TB_USO_CLASSE (CI_USO_CLASSE);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_USUARIO foreign key (CD_USUARIO)
+  references UTIL.TB_USUARIO (CI_USUARIO);
+
+alter table EDUCACAO.TB_CLASSE
+  add constraint FK_CLASSE_ORIGEM foreign key (CD_ORIGEM)
+  references PREFSME_PRD_01.CLASSE (IDCLASSE);
+
+
+-- Grant/Revoke object privileges
+GRANT SELECT, REFERENCES ON EDUCACAO.TB_CLASSE TO RH;
+GRANT SELECT, REFERENCES ON EDUCACAO.TB_CLASSE TO DIRETOR_TURMA;
+GRANT SELECT, REFERENCES ON EDUCACAO.TB_CLASSE TO SAEF;
+
+
+/**
+ * EDUCACAO.TB_MATRICULA_CLASSE
+ */
+
+CREATE TABLE EDUCACAO.TB_MATRICULA_CLASSE (
+  CI_MATRICULA_CLASSE NUMBER(10,0) NOT NULL, 
+	CD_MATRICULA NUMBER(10,0) NOT NULL,
+	CD_CLASSE NUMBER(10,0) NOT NULL,
+	NR_CHAMADA NUMBER(3,0) NOT NULL,
+	FL_STATUS_ALUNO NUMBER(1,0) NOT NULL,
+	DT_MOVIMENTACAO DATE DEFAULT (SYSDATE),
+	DT_INCLUSAO DATE DEFAULT SYSDATE,
+	CD_USUARIO NUMBER(10,0) NOT NULL,
+  DT_REGISTRO DATE DEFAULT SYSDATE,
+  CD_ORIGEM NUMBER(10,0) NOT NULL,
+	CONSTRAINT PK_MATRICULA_CLASSE PRIMARY KEY (CI_MATRICULA_CLASSE),
+	CONSTRAINT CHK_MATRICULA_CLASSE_STATUS CHECK (FL_STATUS_ALUNO IN (0,1))
+);
+
+CREATE SEQUENCE EDUCACAO.SEQ_MATRICULA_CLASSE;
+
+-- Add comments to the columns 
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.CI_MATRICULA_CLASSE IS 'Aluno';
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.CD_MATRICULA IS 'Id da matrícula do aluno.';
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.CD_CLASSE IS 'Classe';
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.NR_CHAMADA IS 'Número de chamada do aluno na classe';
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.FL_STATUS_ALUNO IS 'Status do aluno na classe. 1-ativo 0-inativo';
+COMMENT ON COLUMN EDUCACAO.TB_MATRICULA_CLASSE.CD_ORIGEM IS 'Código de origem da tabela prefsme_prd_01.aluno_classe.';
+
+ALTER TABLE EDUCACAO.TB_MATRICULA_CLASSE
+    ADD CONSTRAINT FK_MATRICULA_CLASSE_MATRICULA FOREIGN KEY (CD_MATRICULA)
+	  REFERENCES EDUCACAO.TB_MATRICULA (CI_MATRICULA); 
+ALTER TABLE EDUCACAO.TB_MATRICULA_CLASSE
+    ADD CONSTRAINT FK_MATRICULA_CLASSE_CLASSE FOREIGN KEY (CD_CLASSE)
+	  REFERENCES EDUCACAO.TB_CLASSE (CI_CLASSE);
+ALTER TABLE EDUCACAO.TB_MATRICULA_CLASSE
+    ADD CONSTRAINT FK_MATRICULA_CLASSE_USUARIO FOREIGN KEY (CD_USUARIO)
+	  REFERENCES UTIL.TB_USUARIO (CI_USUARIO);
+ALTER TABLE EDUCACAO.TB_MATRICULA_CLASSE
+    ADD CONSTRAINT FK_MATRICULA_CLASSE_ORIGEM FOREIGN KEY (CD_ORIGEM)
+    REFERENCES PREFSME_PRD_01.ALUNO_CLASSE (IDALUNO_CLASSE);
+
+CREATE INDEX EDUCACAO.IDX_MATRICULA_CLASSE_CLASSE ON EDUCACAO.TB_MATRICULA_CLASSE (CD_CLASSE);
+CREATE INDEX EDUCACAO.IDX_MATRICULA_CLASSE_MATRICULA ON EDUCACAO.TB_MATRICULA_CLASSE (CD_MATRICULA);
+CREATE INDEX EDUCACAO.IDX_MATRICULA_CLASSE_MAT_CLA ON EDUCACAO.TB_MATRICULA_CLASSE (CD_MATRICULA, CD_CLASSE);
+CREATE INDEX EDUCACAO.IDX_MATRICULA_CLASSE_STATUS ON EDUCACAO.TB_MATRICULA_CLASSE (FL_STATUS_ALUNO);
+
+
+-- Grant/Revoke object privileges
+GRANT ALTER, DELETE, INDEX, INSERT, SELECT, UPDATE, REFERENCES, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON EDUCACAO.TB_ALUNO_CLASSE TO RH;
+GRANT ALTER, DELETE, INDEX, INSERT, SELECT, UPDATE, REFERENCES, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON EDUCACAO.TB_ALUNO_CLASSE TO SAEF;
+GRANT ALTER, DELETE, INDEX, INSERT, SELECT, UPDATE, REFERENCES, ON COMMIT REFRESH, QUERY REWRITE, DEBUG, FLASHBACK ON EDUCACAO.TB_ALUNO_CLASSE TO DIRETOR_TURMA;
+
+ 
+
+
+/**
+ * TABELA TB_PLANEJAMENTO_RU
+ */
+create table TB_PLANEJAMENTO_RU
+(
+  CI_PLANEJAMENTO_RU      NUMBER not null,
+  DS_PLANEJAMENTO_RU	  VARCHAR2(64),
+  DT_LIBERACAO_INICIO     DATE,
+  DT_LIBERACAO_FIM        DATE,
+  DT_CORTE                DATE,
+  NR_RENDA_FAMILIAR		  NUMBER(20, 2),
+  FL_ATIVO NUMBER(1)	  DEFAULT 0	 NOT NULL,
+  CD_USUARIO NUMBER(10,0) NOT NULL,
+  DT_REGISTRO DATE DEFAULT SYSDATE
+);
+
+CREATE SEQUENCE SEQ_PLANEJAMENTO_RU;
+
+alter table TB_PLANEJAMENTO_RU
+  add constraint PK_PLANEJAMENTO_RU primary key (CI_PLANEJAMENTO_RU);
+
+/**
+ * TABELA TB_IDADE_CORTE
+ */
+create table TB_DATA_CORTE_SERIE
+(
+  CI_DATA_CORTE_SERIE          NUMBER not null,
+  CD_PLANEJAMENTO_RU      NUMBER not null,
+  DT_MINIMA               DATE,
+  DT_MAXIMA               DATE,
+  DT_MINIMA_FLEXIBILIDADE DATE,
+  DT_MAXIMA_FLEXIBILIDADE DATE,
+  CD_SERIE                NUMBER,
+  CD_USUARIO NUMBER(10,0) NOT NULL,
+  DT_REGISTRO DATE DEFAULT SYSDATE
+);
+
+CREATE SEQUENCE SEQ_DATA_CORTE_SERIE;
+
+alter table TB_DATA_CORTE_SERIE
+  add constraint PK_DATA_CORTE_SERIE primary key (CI_DATA_CORTE_SERIE);
+alter table TB_DATA_CORTE_SERIE
+  add constraint FK_DATA_CORTE_SERIE_SERIE foreign key (CD_SERIE)
+  references TB_SERIE (CI_SERIE);
+alter table TB_DATA_CORTE_SERIE
+  add constraint FK_PLANEJAMENTO_RU foreign key (CD_PLANEJAMENTO_RU)
+  references TB_PLANEJAMENTO_RU (CI_PLANEJAMENTO_RU);
+  
+  
+  
+/*
+ * REGISTRO UNICO
+ */
+-- Create table
+-- Create table
+create table TB_JUSTIFICATIVA_MOVIMENTACAO
+(
+  CI_JUSTIFICATIVA_MOVIMENTACAO NUMBER not null,
+  NR_GRUPO_JUSTIFICATIVA        NUMBER not null,
+  DS_JUSTIFICATIVA              VARCHAR2(160)
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_JUSTIFICATIVA_MOVIMENTACAO
+  add constraint PK_JUSTIFICATIVA_MOVIMENTACAO primary key (CI_JUSTIFICATIVA_MOVIMENTACAO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+  
+  
+-- Create table
+create table TB_HISTORICO_REGISTRO_UNICO
+(
+  CI_HISTORICO_REGISTRO_UNICO   NUMBER not null,
+  DS_HISTORICO                  VARCHAR2(500) not null,
+  NR_PROCESSO                   VARCHAR2(14),
+  CD_UNIDADE_TRABALHO           NUMBER not null,
+  CD_ALUNO                      NUMBER not null,
+  TP_MOVIMENTACAO               NUMBER not null,
+  CD_JUSTIFICATIVA_MOVIMENTACAO NUMBER not null
+)
+tablespace EDUCACAO
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    minextents 1
+    maxextents unlimited
+  );
+-- Add comments to the columns 
+comment on column TB_HISTORICO_REGISTRO_UNICO.TP_MOVIMENTACAO
+  is '0 - inicio, 1 - fim, 2 - remoção';
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table TB_HISTORICO_REGISTRO_UNICO
+  add constraint PK_HISTORICO_RU primary key (CI_HISTORICO_REGISTRO_UNICO)
+  using index 
+  tablespace EDUCACAO
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table TB_HISTORICO_REGISTRO_UNICO
+  add constraint FK_ALUNO foreign key (CD_ALUNO)
+  references TB_ALUNO (CI_ALUNO);
+alter table TB_HISTORICO_REGISTRO_UNICO
+  add constraint FK_JUSTIFICATIVA foreign key (CD_JUSTIFICATIVA_MOVIMENTACAO)
+  references TB_JUSTIFICATIVA_MOVIMENTACAO (CI_JUSTIFICATIVA_MOVIMENTACAO);
+alter table TB_HISTORICO_REGISTRO_UNICO
+  add constraint FK_UNIDADE_TRABALHO foreign key (CD_UNIDADE_TRABALHO)
+  references UTIL.TB_UNIDADE_TRABALHO (CI_UNIDADE_TRABALHO);
+
+
+-- Create sequence 
+create sequence SEQ_HISTORICO_REGISTRO_UNICO
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+/******** Functions and types*********/
+
+create or replace function fc_encontra_aluno_duplicado(nome_aluno in varchar2, nome_mae in varchar2, dt_nasc in varchar2)
+return educacao.table_of_aluno
+is
+  alunos educacao.table_of_aluno;
+  v_hash varchar2(200);
+  v_dt_nasc date;
+begin
+  
+  v_dt_nasc := to_date(dt_nasc, 'dd/mm/yyyy');
+  alunos := educacao.table_of_aluno();
+  v_hash := util.fc_retira_espacos(
+               util.fc_retira_acento_numero(
+                   util.fc_retira_espacos(nome_aluno||nome_mae)
+               )
+            )||v_dt_nasc;
+  
+  for alu in 
+    (select a.* from educacao.tb_aluno a where a.hash_aluno = util.buscabr_frase(v_hash)) loop
+     alunos.extend();
+     alunos(alunos.count) := educacao.aluno(alu.ci_aluno, alu.nm_aluno, alu.nm_mae, alu.dt_nascimento, 1);
+                     
+  end loop;
+  
+  return alunos;
+end;
+
+--types
+CREATE OR REPLACE TYPE table_of_aluno IS TABLE OF educacao.aluno;

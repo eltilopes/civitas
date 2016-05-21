@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:f="http://java.sun.com/jsf/core"
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:p="http://primefaces.org/ui"
+		xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<ui:composition>
+	<h:panelGroup rendered="#{loginCivitasBean.usuarioLogado}">
+	
+		<h:form id="formTopo">
+		
+			<div class="header">
+	
+				<div class="row h3 bordas_15_b row-topo">
+					<div class="col-md-8">Cívitas - Gestão Pagamentos</div>
+					<div class="col-md-4 horario">
+						<span class="glyphicon glyphicon-calendar">&nbsp;</span>#{loginCivitasBean.dateTime}&nbsp;&nbsp;
+						<p:commandLink styleClass="glyphicon glyphicon-log-out" title="Sair" action="#{loginCivitasBean.logout}" ajax="false"/>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-md-5">
+						<h1 class="logo" style="padding-bottom: 0px;">Cívitas - Fortaleza</h1>
+					</div>
+					
+					<div class="col-md-2 text-center">
+						<h:panelGroup rendered="#{environmentBean.desenvolvimento}">
+							<div class="alert alert-danger">
+								<strong>AMBIENTE DE DESENVOLVIMENTO</strong>
+							</div>
+	                	</h:panelGroup>
+					</div>
+					
+		            <div class="col-md-5">
+		                <div class="users alert">
+		                	<div class="text-right">
+		                    	<span class="font-mobile"> <b>Usuário:</b> #{facesContext.externalContext.sessionMap.usuario.login} </span> <span class="glyphicon glyphicon-user text-left"/><br/>
+							</div>                    
+		                </div>
+		            </div>
+				</div>
+
+			</div>
+			
+		</h:form>
+
+	</h:panelGroup>	
+</ui:composition>
+</f:view>

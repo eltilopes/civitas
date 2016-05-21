@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:composition template="/new-template/template.xhtml">
+	
+		<ui:define name="tituloPagina">
+			<h:outputText value="ESQUECI MINHA SENHA ::SISTEMAS SME"/>
+		</ui:define>
+
+		<ui:define name="tituloFieldSetFiltro">
+			<h:outputText value="Esqueci minha senha" />
+		</ui:define>
+			
+		<ui:define name="body">
+		
+			<div class="row conteudo">
+			
+    			<div class="panel panel-default">
+    			
+      				<div class="panel-heading"><span class="glyphicon glyphicon-user"></span>&nbsp;Recuperar de Senha</div>
+      				
+      				<div class="panel-body">
+      
+						<h:form id="formRecuperarSenha">
+			
+<!-- 							<h:panelGroup rendered="#{not loginCivitasBean.usuarioLogado}"> -->
+				
+<!-- 								<h:outputLabel for="usuario" value="Usuário: *" styleClass="label label-primary"/> -->
+								
+<!-- 								<h:inputText id="usuario" required="true" label="Usuário" maxlength="50" -->
+<!-- 										styleClass="form-control" title="Digite seu Usuário" value="#{usuarioBean.entity.login}"/> -->
+								        
+<!-- 						        <br/> -->
+						        
+<!-- 						        <h:outputLabel for="email" value="E-mail: *" styleClass="label label-primary"/> -->
+								        
+<!-- 								<h:inputText id="email" required="true" label="E-mail" styleClass="form-control" validator="emailValidatorSge" -->
+<!-- 										 value="#{usuarioBean.entity.email}" maxlength="50" title="Digite seu E-mail"/> -->
+								        
+<!-- 								<br/> -->
+								
+<!-- 								<h:outputLabel for="cpf" value="CPF: *" styleClass="label label-primary"/> -->
+								
+<!-- 								<p:inputMask id="cpf" required="true" label="CPF" styleClass="form-control" title="Digite seu CPF" -->
+<!-- 										value="#{usuarioBean.entity.cpf}" mask="999.999.999-99" converter="cpfConverter" size="30"/> -->
+										
+<!-- 								<br/> -->
+								
+<!-- 								<p:commandButton id="bt-enviar" styleClass="btn btn-primary" value="Enviar" onclick="carregando.show()"  -->
+<!-- 										actionListener="#{usuarioBean.recuperarSenha}" update=":painelGlobal" ajax="false"/> -->
+						
+<!-- 								<p:commandButton id="bt-voltar" styleClass="btn btn-primary" value="Voltar"  -->
+<!-- 										action="login?faces-redirect=true" immediate="true" update=":painelGlobal" /> -->
+
+<!-- 							 </h:panelGroup> -->
+           
+           				</h:form>
+           
+					</div>
+			      
+				</div>
+			    
+			</div>
+  
+		</ui:define>
+
+			
+	</ui:composition>
+
+</html>

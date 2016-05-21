@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template-crud.xhtml">
+    
+<!--     	<ui:define name="includeScript"> -->
+<!-- 			<script type="text/javascript"> -->
+<!-- // 			     jQuery(function($) { -->
+<!-- // 			        $("input[id$=nome]").applyMask( {mask: "[a-z0-9_\\-\\s]"} ); -->
+<!-- // 				    $("input[id$=label]").applyMask({mask: "[a-z0-9_\\-]"}); -->
+<!-- // 			     }); -->
+<!-- 			</script>			 -->
+<!-- 		</ui:define> -->
+    	
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Transações :: Controle de Acesso :: SME" />
+    	</ui:define>
+    	
+    	<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{transacaoBean}" />
+		</ui:define>
+    	
+    	<ui:define name="tituloFieldSetFiltro">
+    		<h4> Pesquisa de Transações </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 rendered="#{sessionScope.perms.transacoes.ativoBool}"
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+							 
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.transacoes.removeBool}"
+							 onclick="showIf()"/>
+		</ui:define>
+		
+		
+		<ui:define name="camposFiltro">
+		 	<h:panelGrid columns="1">
+				  		
+				 <h:outputLabel value="Nome: " style="font-weight: normal;"/>
+				 <h:inputText id="nome" value="#{transacaoBean.entitySearch.descricao}" size="50" maxlength="50" styleClass="form-control">
+					<f:converter converterId="converterStringVazia"/>
+					
+				 </h:inputText>	
+				 
+				<h:outputLabel value="Módulo: " style="font-weight: normal;"/>
+				<h:selectOneMenu id="selectModuloSeach"
+							     styleClass="form-control"
+								 label="Módulo"
+								 converter="converterEntity"
+							     value="#{transacaoBean.entitySearch.modulo}">
+					<f:selectItem itemLabel="Selecione um Módulo" />	
+					<f:selectItems value="#{moduloBean.allSelectItem}"/>						
+				</h:selectOneMenu>				  	
+			</h:panelGrid>
+			<p>&nbsp;</p>
+		</ui:define>
+		
+		<ui:define name="tituloPainel">
+		  <ui:param name="tituloPainel" value="Transação" />
+		</ui:define>
+		
+		<ui:define name="resultFiltro">
+			<p:dataTable styleClass="table table-responsive table-mobile"
+   						 id="transacoes"
+   						 rows="10"
+   						 pageLinks="3"
+   						 paginatorAlwaysVisible="false"
+   						 emptyMessage="Nenhuma Transação foi encontrada."
+   						 value="#{transacaoBean.resultSearch}" 
+       					 var="transacao" 
+       					 paginator="#{transacaoBean.resultSearch.rowCount > 0}"
+       					 paginatorPosition="bottom"
+       					 rowStyleClass="bgLinha1,bgLinha2">
+       					 <p:ajax event="page"  oncomplete="attachEventDelete()" />
+       					
+       						<p:column headerText="" style="width:60px; text-align:center;" rendered="#{sessionScope.perms.transacoes.editableBool}">
+       							<div class="colunaAcao">
+									<h:commandLink id="cmdUpd" actionListener="#{transacaoBean.prepareUpdate}">
+									    <i class="glyphicon glyphicon-edit" />
+									</h:commandLink>
+									<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+										showEffect="fade" trackMouse="true" />
+								</div>
+       						</p:column>
+       						
+       						<p:column headerText="ID" style="text-align:center;">
+       							<h:outputText value="#{transacao.id}" />
+       						</p:column>
+       						
+       						<p:column headerText="Nome" style="text-align:left;">
+       							<h:outputText value="#{transacao.descricao}" />
+       						</p:column>
+       						
+       						<p:column style="width:60px; text-align:center;" rendered="#{sessionScope.perms.transacoes.removeBool}"  >
+       							<f:facet name="header">
+       								<h:selectBooleanCheckbox rendered="#{transacaoBean.resultSearch.rowCount > 0}" styleClass="ui-checkBoxMain" />
+       							</f:facet>
+       							
+       							<h:selectBooleanCheckbox styleClass="ui-checkBox" 
+       												     valueChangeListener="#{transacaoBean.select}" />
+       						</p:column>
+       						
+				 	</p:dataTable> 
+		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Transações </h4>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+			<h:panelGrid columns="1">
+				  		
+			  <h:outputLabel value="Nome: " styleClass="required"/>
+			  <h:inputText required="true"
+			  			   id="nome" 
+						   label="Nome"
+						   value="#{transacaoBean.entity.descricao}" 
+						   maxlength="50" 
+						   size="50"
+						   styleClass="form-control">
+				<f:converter converterId="converterStringVazia"/>
+				<f:validateLength minimum="5" />						
+			  </h:inputText>	
+			  
+			 <h:outputLabel value="Label: " styleClass="required"/>
+			 <h:inputText label="Label"
+			              id="label"
+			 			  styleClass="form-control"
+			 			  required="true"
+						  value="#{transacaoBean.entity.label}" 
+					  	  maxlength="100"
+					  	  size="50">
+				<f:converter converterId="converterStringVazia"/>
+				<f:validateLength minimum="5" />						
+			 </h:inputText>
+			 
+			 <h:outputLabel value="Módulos:" style="font-weight: normal;"/>
+		     <p:pickList value="#{transacaoBean.moduloList}" 
+		     			 addLabel="Adicionar"
+		     			 addAllLabel="Adicionar Todos"
+		     			 removeLabel="Remover"
+		     			 removeAllLabel="Remover Todos"   
+		                 var="modulo"  
+		                 itemLabel="#{modulo.descricao}"  
+		                 itemValue="#{modulo}"
+		                 converter="converterEntity">
+			</p:pickList>               
+		   
+			  
+		  </h:panelGrid>
+		</ui:define>
+		
+    </ui:composition>
+</html>

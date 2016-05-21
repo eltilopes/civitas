@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="icon" href="#{request.contextPath}/resources/img/favicon.png" type="image/png" />
+
+	<link href="#{request.contextPath}/resources/css/template-bootstrap/bootstrap.css" rel="stylesheet" type="text/css" />
+	<link href="#{request.contextPath}/resources/css/template-bootstrap/estrutura.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/primefaces.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/theme.css" media="screen" />
+	<link href="#{request.contextPath}/resources/fonts/fonts.css" rel="stylesheet" type="text/css" />
+	<link href="#{request.contextPath}/resources/css/fuelux.min.css" rel="stylesheet" type="text/css" />
+	
+	<script type="text/javascript" src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+	<script type="text/javascript" src="#{request.contextPath}/resources/js/template-bootstrap/bootstrap.js" />
+	<script type="text/javascript" src="#{request.contextPath}/resources/js/jquery.mask.js" />
+	<h:outputScript library="js" name="util.js" />
+	<h:outputScript library="primefaces" name="jquery/jquery.js" />
+
+	<ui:insert name="pageScript">
+	
+	</ui:insert>
+
+	<title>
+		<ui:insert name="tituloPagina">
+			<h:outputText value="Novo Projeto Padrão" />
+		</ui:insert>
+	</title>
+	
+</h:head>
+
+<h:body>
+	<div id="geral" class="container">
+
+		<div id="topo" class="header">
+			<h:panelGroup rendered="#{not loginCivitasBean.usuarioLogado}">
+				<ui:include src="/pages/topo-login.xhtml" />
+			</h:panelGroup>
+			<h:panelGroup rendered="#{loginCivitasBean.usuarioLogado}">
+				<ui:include src="/pages/topo.xhtml" />
+			</h:panelGroup>
+		</div>
+
+		<div id="menu">
+			<ui:include src="/pages/menu.xhtml" />
+		</div>
+
+		<h:panelGroup id="painelGlobal">
+			<div id="conteudo">
+				<ui:insert name="body">
+				</ui:insert>
+			</div>
+			<h:form id="formPanel">
+
+				<p:dialog id="carregando" showHeader="false" widgetVar="carregando"
+					closable="false" fixedCenter="true" modal="true" height="45"
+					width="150" resizable="false" showEffect="fade" hideEffect="fade">
+					<div class="loader" style="margin-top: 5px"></div>
+					<h:outputLabel style="margin-left:40px; margin-top:10px;"
+						value="Aguarde..." />
+				</p:dialog>
+
+				<p:dialog fixedCenter="true" id="mensagemAvisoErros"
+					draggable="false" resizable="false" header="Aviso"
+					widgetVar="mensagemAvisoErros" showEffect="fade" hideEffect="fade"
+					rendered="#{facesContext.validationFailed}"
+					visible="#{not empty facesContext.maximumSeverity}" modal="true">
+					<h:panelGroup id="painelMensagensErro">
+						<p>Por favor, verifique se os campos foram preenchidos
+							corretamente.</p>
+
+						<div style="vertical-align: bottom; text-align: center">
+							<p:commandButton value=" OK " styleClass="btn btn-primary"
+								onclick="mensagemAvisoErros.hide();" ajax="true" />
+
+						</div>
+					</h:panelGroup>
+				</p:dialog>
+
+				<p:dialog fixedCenter="true" id="mensagemAviso" width="400"
+					header="Aviso" widgetVar="mensagemAviso" showEffect="fade"
+					hideEffect="fade" rendered="#{!facesContext.validationFailed}"
+					visible="#{not empty facesContext.maximumSeverity}" modal="true" closable="false">
+					<h:panelGroup id="painelMensagens">
+						<span id="messages"> <h:messages layout="table"
+								infoClass="info" warnClass="warning" errorClass="error"
+								fatalClass="error">
+								<f:facet name="infoMarker">
+									<h:graphicImage width="16" height="16"
+										value="#{resource['img:info.gif']}" />
+								</f:facet>
+								<f:facet name="warnMarker">
+									<h:graphicImage width="16" height="16"
+										value="#{resource['img:warning.gif']}" />
+								</f:facet>
+								<f:facet name="errorMarker">
+									<h:graphicImage width="16" height="16"
+										value="#{resource['img:warning.gif']}" />
+								</f:facet>
+								<f:facet name="fatalMarker">
+									<h:graphicImage width="16" height="16"
+										value="#{resource['img:warning.gif']}" />
+								</f:facet>
+							</h:messages>
+						</span>
+						<br clear="all" />
+						<div style="vertical-align: bottom; text-align: center">
+						
+						<ui:insert name="btOk">
+							<p:commandButton value=" OK " styleClass="btn btn-primary"
+								onclick="mensagemAviso.hide();" update=":formPanel" ajax="true" />
+						</ui:insert>
+							
+						</div>
+					</h:panelGroup>
+				</p:dialog>
+			</h:form>
+		</h:panelGroup>
+
+		<ui:include src="/pages/rodape.xhtml" />
+
+	</div>
+</h:body>
+</html>

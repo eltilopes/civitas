@@ -1,0 +1,105 @@
+@charset "utf-8";
+
+/* CSS Document */
+* {	font-family: Verdana, Geneva, sans-serif;	font-size: 11px;}
+
+body {margin: 0px;	padding: 0px;	background: url(../resources/img/bg.jpg);}
+#geral {margin: 0 auto;	width: 955px;	background: #FFF;}
+select {font-size: 10px;	width: auto;	border: none;	border: 1px solid #CCCCCC;	padding: 1px;	color: #666666;}
+.btVerde {	clear: both;	background-image: url(../resources/img/bg_botao.jpg) !important;	width: 90px;	height: 27px;	border: none;	color: #FFF !important;	cursor: pointer;}
+.btIcon {	background-image: url(../resources/img/bg_icon.jpg) !important;	width: 105px;	height: 30px;	color: #FFF !important;	font-weight: bold !important;	border: none !Important;}
+.btIcon:hover {	/*background-image: url(../resources/img/bg_icon_hover.jpg) !important;*/	color:#FFFFFF !important;}
+.margemtop {	margin-top: 10px;}
+
+
+/* TOPO */
+#topo {	background-image: url(../resources/img/bg_topo.jpg);	height: 130px;}
+#topo img.profile { position: absolute; margin-left: 900px; margin-top: 37px;}
+#topo #data { position: relative; margin-left: 720px; margin-top: 85px; color: #FFF; font-size: 11px;}
+#topo #escola { position: absolute; margin-left: 240px; margin-top: 110px; color: #000; font-size: 9px; width:500px; font-weight: bold; }
+#topo #data img { margin-right: 5px;}
+#topo #nome { color: #fff; margin: 0px 0px 0px 20px; padding-top: 5px; font-size: 14px;}
+
+/* DADOS NO TOPO */
+#topo #dados { position: absolute; margin: 55px 0px 0px 580px; width: 345px; font-size: 10px; font-weight: bold; }
+#topo #dados ul { margin: 0px; padding: 0px; list-style: none;}
+#topo #dados ul li { float: left; margin: 2px;}
+#topo #dados ul li.info { width: 155px; text-align: right; color: #00aba5;}
+#topo #dados ul li.user { color: #525252;}
+
+/* FIM DE DADOS NO TOPO */
+#topo #sair {	position: absolute;	text-align: center;	margin-top: 4px;	margin-left: 865px;	background: url(../resources/img/bg_botao_sair.jpg) no-repeat;	width: 85px;	height: 20px;	line-height: 18px;	font-size: 11px;	font-weight: bold;}
+#topo #sair a {	color: #DDF1DA;	text-decoration: none}
+
+#conteudo {	padding: 0px 10px;	color: #525252;	height: expression(this.scrollHeight <=   "310" ?   "310" :   "auto");	min-height: 310px; /* para ff, safari, chrome, etc */}
+#conteudo fieldset {	border: #CCCCCC 1px dashed;	padding: 10px;}
+#conteudo fieldset legend {	font-size: 11px;	font-weight: bold;	color: #00aba5;	background: #FFFFFF;	padding: 5px;	margin-bottom: 10px;}
+#conteudo .colunaBusca {	font-size: 11px;}
+#conteudo tr input {	padding: 4px;	border: 1px solid #CCCCCC;	font-size: 10px;	font-weight: bold;	color: #666 !important;	text-transform: uppercase;	margin: 0px 2px;}
+#conteudo .btAba {background: url("../resources/img/bgBotaoAba.jpg");	border: 0px;	width: 88px;	height: 23px;	color: #FFF !important;	margin-right: 1px;	font-weight: bold;	font-family: Verdana, Geneva, sans-serif;	cursor: pointer;}
+#conteudo .ui-datepicker-trigger {	margin: 0px;	background: #F2FBF0;	cursor: pointer;	border: 0px;}
+
+/*MENU*/
+#menu { margin: 0px; padding:0px;  height: 40px;}
+
+/* ÁREA DE LOGIN */
+#conteudo #login {width: 300px;	margin: 0px auto;	margin-top: 50px;	margin-bottom: 80px;}
+#conteudo #login ul {margin: 0px;	padding: 0px;	list-style: none;	float: left;}
+#conteudo #login ul li {float: left;	font-size: 11px;	margin: 5px 0px}
+#conteudo #login ul li a {color: #666;}
+#conteudo #login input.textLogin {	padding: 5px;	border: #CCC 1px solid;	color: #666;	font-size: 14px;	width: 180px;}
+#conteudo #login fieldset {	border: #CCCCCC 1px dashed;	padding: 10px;	margin: 10px;}
+#conteudo #login fieldset legend {	color: #00aba5;	font-weight: bold;	margin-right: 20px;	background: #FFFFFF;	padding: 3px;}
+
+/* FIM ÁREA DE LOGIN */
+#rodape {	padding-top: 10px;	text-align: center;	height: 50px;	line-height: 45px;	font-size: 10px;	background-image: url(../resources/img/borda-rodape.jpg);	background-repeat: repeat-x;	color: #00aba5;}
+
+.colunaAcao {	width: 60px;	text-align: center;}
+#conteudo .colunaAcao input {	border: none;}
+.ui-icon {	margin-left: 3px !important}
+.ui-paginator-pages .ui-state-active {	border: 1px solid #4DA177 !important;	background: #4DA177 !important;	color: #038444 !important;}
+.ui-icon-closethick {	background-position: -98px -128px !important;}
+.ui-button-text-only.ui-state-hover {	color: #000000 !important;  position: relative;}
+.btVerde.ui-button-text-only.ui-state-hover {	color: #FFF !important}
+
+/* REMOVER BORDA ARREDONDADA DO COMPONENTE*/
+.ui-inputfield {	color: 1px solid #999999 !important;	font-sizse: 10px !important;	font-family: Verdana, Geneva, sans-serif;}
+.ui-inputfield.ui-state-hover {	border-color: 1px solid red !important;}
+.removeArredondadoCalendar .ui-inputfield {	-moz-border-radius: 0px !important;	-moz-box-shadow: 0 2px 2px #FFFFFF inset !important;	height: 11px;	color: #666666 !important}
+.removeArredondadoCalendar .ui-inputfield.ui-state-focus {	-moz-box-shadow: 0 0 5px #FFF, 0 2px 2px #FFF inset !important border :		  1px solid #CCCCCC !important;}
+.removeArredondadoCalendar .ui-inputfield.ui-state-hover {	border: 1px solid #CCCCCC !important;}
+.removeArredondadoCalendar .ui-datepicker-trigger {	background: #FFF !important;}
+
+.removeArredondado {	-moz-border-radius: 0px !important;	-moz-box-shadow: 0 2px 2px #FFFFFF inset !important;	height: 11px;}
+.ui-inputfield.ui-widget.ui-state-default.ui-corner-all.removeArredondado.ui-state-hover	{	border: 1px solid #CCC !important;}
+.ui-inputfield.ui-widget.ui-state-default.ui-corner-all.removeArredondado.ui-state-focus	{	-moz-box-shadow: 0 0 5px #FFF, 0 2px 2px #FFF inset !important;	border: 1px solid #CCC !important;}
+
+/* highlight */
+.ui-picklist .ui-picklist-list li {	font-size: 10px !important;}
+.ui-state-highlight,.ui-widget-content .ui-state-highlight,.ui-widget-header .ui-state-highlight	{	background: #05A158 !important;	color: #FFF !important;	border: none !important;}
+.ui-icon-arrow-1-w {	background-position: -95px -32px !important;}
+.ui-datepicker {	width: 20em !important;}
+#home {width: 395px;	height: auto;	margin: 0 auto;	padding-top: 100px;}
+
+/* AJUSTES */
+.ui-datepicker .ui-datepicker-prev span,.ui-datepicker .ui-datepicker-next span	{	left: 0 !important;}
+.removeBordaLupa {	border: none !important;	padding-top: 5px;}
+.ui-datepicker select.ui-datepicker-month,.ui-datepicker select.ui-datepicker-year	{	padding: 0px !important;	width: 55px !important;	margin-left: 2px !important;}
+
+/* ERROR */
+#erro400 {	width: 405px;	height: auto;	margin: 0 auto;	padding-top: 100px;}
+#erro500 {	width: 440px;	height: auto;	margin: 0 auto;	padding-top: 100px;}
+
+ul.wijmo-wijmenu-item{ background: #f2fbf0 !important;}
+ul li.wijmo-wijmenu-item{ background: #f2fbf0 !important;}
+.ui-picklist-button .ui-state-hover .ui-icon, .ui-picklist-button  .ui-state-focus .ui-icon{background-image: url("../resources/images/ui-icons_847e71_256x240.png") !important;}
+.ui-picklist-button.ui-state-hover{ color:#FFF !important}
+.ui-picklist-button.ui-state-focus{ background: url("/projeto-padrao/javax.faces.resource/themes/sam/images/ui-default.png.jsf?ln=primefaces&amp;v=2.2") repeat-x scroll 0 0 #D8D8D8; color:#000000 !important}
+.ui-picklist-button.ui-state-focus.ui-button-icon-primary.ui-icon{background:url("../resources/images/ui-icons_847e71_256x240.png") }
+.wijmo-wijmenu-item{ background: #f2fbf0 !important; border:1px solid red; }
+.ui-button-icon-only .ui-icon, .ui-button-text-icon-primary .ui-icon, .ui-button-text-icon-secondary .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon{ margin: 0px !important; padding:0px; top: 28%;}
+.ui-button-text-icon-primary .ui-button-icon-primary, .ui-button-text-icons .ui-button-icon-primary, .ui-button-icons-only .ui-button-icon-primary{left: 8px;}
+
+
+
+

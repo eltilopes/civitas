@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template-crud.xhtml">
+    
+<!--     	<ui:define name="includeScript"> -->
+<!-- 			<script type="text/javascript"> -->
+<!-- // 			     jQuery(function($) { -->
+<!-- // 				     $("input[id$=nome]").applyMask("palavra"); -->
+<!-- // 			     }); -->
+<!-- 			</script>			 -->
+<!-- 		</ui:define> -->
+    	
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Grupo de Usuários :: Controle de Acesso :: SME" />
+    	</ui:define>
+    	
+    	<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{grupoDeUsuariosBean}" />
+    	</ui:define>
+    	
+    	<ui:define name="tituloFieldSetFiltro">
+    		<h4> Pesquisa por Grupo de Usuários </h4>
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+		   <h:panelGrid id="painelGroup" columns="1">
+				<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+				<p:inputText id="nome" value="#{grupoDeUsuariosBean.entitySearch.descricao}" size="50" maxlength="50" styleClass="form-control">
+					<f:converter converterId="converterStringVazia"/>
+				</p:inputText>	
+				<h:message for="nome" tooltip="true" styleClass="error-messages" />
+		  	</h:panelGrid>
+		  	<p>&nbsp;</p>
+		</ui:define>
+		
+		<ui:define name="botoesFiltro">
+		
+			<p:commandButton styleClass="btn btn-primary"
+							 value="Consultar"
+							 onclick="carregando.show();"
+							 actionListener="#{grupoDeUsuariosBean.findByNivel}" 
+							 oncomplete="carregando.hide();"
+							 update=":painelGlobal"
+							 ajax="false"/>
+		</ui:define>
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Grupo de Usuários" />
+		</ui:define>
+		
+		<ui:define name="resultFiltro">
+		
+			<p:dataTable styleClass="table table-responsive table-mobile"
+						 id="grupos"
+   						 rows="10"
+   						 pageLinks="3"
+   						 paginator="#{grupoDeUsuariosBean.resultSearch.rowCount > 0}"
+   						 paginatorAlwaysVisible="false"
+   						 emptyMessage="Nenhum grupo de usuários foi encontrado."
+   						 value="#{grupoDeUsuariosBean.resultSearch}" 
+       					 var="grupo" 
+       					 paginatorPosition="bottom">
+       					
+       				<p:column headerText="" style="width:60px; text-align:center;"  rendered="#{sessionScope.perms.grupoUsuarios.editableBool}" >
+       					<div class="colunaAcao">					    			
+							<h:commandLink id="cmdUpd" actionListener="#{grupoDeUsuariosBean.prepareUpdate}" style="text-decoration:none;">
+							    <i class="glyphicon glyphicon-edit" />
+							</h:commandLink>
+							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+								showEffect="fade" trackMouse="true" />
+						</div>
+       				</p:column>
+       						
+       				<p:column headerText="ID" style="text-align:center;">
+       					<h:outputText value="#{grupo.id}" />
+       				</p:column>
+       						
+       				<p:column headerText="Nome" style="text-align:left;" >
+       					<h:outputText value="#{grupo.descricao}" />
+       				</p:column>
+       				
+       				<p:column headerText="Nível de Acesso" style="text-align:center;" >
+       					<h:outputText value="#{grupo.nivelDeAcesso.descricao}" />
+       				</p:column>
+       				
+       				<p:column headerText="Módulo" style="text-align:left;" >
+       					<h:outputText value="#{grupo.modulo.descricao}" />
+       				</p:column>
+       						
+       				<p:column style="width:60px; text-align:center;" >
+       					<f:facet name="header">
+       						<h:selectBooleanCheckbox styleClass="ui-checkBoxMain" rendered="#{grupoDeUsuariosBean.resultSearch.rowCount > 0}" />
+       					</f:facet>
+       					<h:selectBooleanCheckbox styleClass="ui-checkBox" valueChangeListener="#{grupoDeUsuariosBean.select}" />
+       				</p:column>
+			</p:dataTable>
+		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Grupo de Usuários </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 rendered="#{sessionScope.perms.grupoUsuarios.ativoBool}"
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.grupoUsuarios.removeBool}"
+							 onclick="showIf()"/>
+									 
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+		
+		<h:panelGrid id="painelGroup" columns="1">
+			
+			<h:outputLabel value="Nome: " styleClass="required"/>
+			<h:inputText required="true" 
+						 label="Nome"
+						 id="nome"
+						 disabled="#{grupoDeUsuariosBean.entity.nivelMaster}"
+						 value="#{grupoDeUsuariosBean.entity.descricao}" 
+						 maxlength="50" 
+						 styleClass="form-control input-mobile">
+				<f:validateLength minimum="5" />						
+			</h:inputText>
+			<h:message for="nome" tooltip="true" styleClass="error-messages" />
+						
+			<h:outputLabel value="Nível de Acesso: " styleClass="required"/>
+			<h:selectOneMenu  styleClass="form-control"
+							  id="selectNivelDeAcesso"
+						      required="true"
+						      label="Nível de Acesso"
+						      disabled="#{grupoDeUsuariosBean.entity.nivelMaster}"
+						      value="#{grupoDeUsuariosBean.entity.nivelDeAcesso}">
+				<f:selectItem itemLabel="Selecione um Nível de Acesso"/>	
+				<f:selectItems value="#{grupoDeUsuariosBean.niveis}" />		
+			</h:selectOneMenu>
+			<h:message for="selectNivelDeAcesso" tooltip="true" styleClass="error-messages" />
+			
+			<h:outputLabel value="Transações Existentes: " styleClass="required"/>
+			<h:column>
+			   <h:panelGrid id="existentes">
+			   	
+			   	<h:inputHidden required="#{not grupoDeUsuariosBean.permissaoInformada}"
+			   				   requiredMessage="É obrigatório informar ao menos uma transação para o grupo de usuários."	/>
+			   
+				<p:dataTable styleClass="table table-responsive table-mobile"
+							 rows="10"
+   						 	 pageLinks="3"
+   						 	 emptyMessage="Nenhuma transação encontrada."
+   						 	 value="#{grupoDeUsuariosBean.resultExistentes}" 
+       					 	 var="classe" 
+       					 	 paginator="#{grupoDeUsuariosBean.resultExistentes.rowCount > 0}"
+       					 	 paginatorPosition="bottom"
+       					 	 >
+       				
+       				<p:column headerText="" style="width:60px; text-align:center;">
+						<h:commandLink id="cmdRemove" actionListener="#{grupoDeUsuariosBean.selecionarExistente}"
+							rendered="#{!grupoDeUsuariosBean.entity.nivelMaster}">
+							<i class="glyphicon glyphicon-remove-sign red-icon"/>
+							<p:ajax update=":painelGlobal" />
+						</h:commandLink>	
+       				</p:column>
+       				
+       				<p:column headerText="ID" style="text-align:center;">
+       					<h:outputText value="#{classe.transacao.id}" />
+       				</p:column>
+       				
+       				<p:column headerText="Nome" style="text-align:left;">
+       					<h:outputText value="#{classe.transacao.descricao}"/>
+       				</p:column>
+       				
+       				<p:column headerText="Inserir" style="text-align:center;">
+						<h:selectBooleanCheckbox value="#{classe.ativoBool}" >
+            				<p:ajax event="change" process="@this" update=":formCadastro:existentes" />
+            			</h:selectBooleanCheckbox>      					
+       				</p:column>
+       				
+       				<p:column headerText="Alterar" style="text-align:center;">
+						<h:selectBooleanCheckbox value="#{classe.editableBool}" >
+            				<p:ajax event="change" process="@this" update=":formCadastro:existentes" />
+            			</h:selectBooleanCheckbox>      					
+       				</p:column>
+       				
+       				<p:column headerText="Deletar" style="text-align:center;" rendered="#{sessionScope.perms.grupoUsuarios.removeBool}" >
+						<h:selectBooleanCheckbox value="#{classe.removeBool}" >
+            				<p:ajax event="change" process="@this" update=":formCadastro:existentes" />
+            			</h:selectBooleanCheckbox>      					
+       				</p:column>
+       			</p:dataTable>
+       			</h:panelGrid>
+       		</h:column>
+       		
+			<h:outputLabel value="Transações Possíveis:" style="font-weight: normal;"/>
+			  <h:column id="colunaTeste">
+			  
+			        <p:spacer height="10" />
+			        <h:panelGrid id="possiveis">
+			  		<p:dataTable styleClass="table table-responsive table-mobile"
+			  					 rows="15"
+		   						 pageLinks="3"
+		   						 emptyMessage="Nenhuma transação encontrada."
+		   						 value="#{grupoDeUsuariosBean.resultPossiveis}" 
+		       					 var="classe" 
+		       					 paginator="#{grupoDeUsuariosBean.resultPossiveis.rowCount > 0}"
+		       					 paginatorPosition="bottom">
+       					 
+       					 <p:column headerText="" style="width:60px; text-align:center;">
+							 <h:commandLink id="cmdRemove" actionListener="#{grupoDeUsuariosBean.selecionarPossivel}"
+								rendered="#{!grupoDeUsuariosBean.entity.nivelMaster}">
+								<i class="glyphicon glyphicon-plus-sign green-icon"/>
+								<p:ajax update=":painelGlobal" />
+							</h:commandLink>
+       					 </p:column>
+       					 
+       					 <p:column headerText="ID" style="text-align:center;">
+       					    <h:outputText value="#{classe.id}" />	
+       					 </p:column>
+       					 
+       					 <p:column headerText="Nome" style="text-align:left;">
+       					    <h:outputText value="#{classe.descricao}" />	
+       					 </p:column>
+       				</p:dataTable>
+       				</h:panelGrid>
+  			   </h:column>
+  		   </h:panelGrid>
+  		   <p>&nbsp;</p>
+		</ui:define>
+		
+		<ui:define name="botoesInsert">
+		
+			 <p:commandButton styleClass="btn btn-primary"
+							  value="Salvar"
+							  actionListener="#{grupoDeUsuariosBean.save}" 
+							  rendered="#{grupoDeUsuariosBean.inserting and sessionScope.perms.grupoUsuarios.ativoBool and !grupoDeUsuariosBean.entity.nivelMaster}" 
+							  oncomplete="mensagemAviso.show();"
+							  update=":painelGlobal"
+							  ajax="false"/>
+						
+			 <p:commandButton styleClass="btn btn-primary" 
+						 	  value="Atualizar"
+							  actionListener="#{grupoDeUsuariosBean.update}"
+							  oncomplete="mensagemAviso.show();" 
+							  update=":painelGlobal"
+							  ajax="false"/>
+						
+			 <p:commandButton styleClass="btn btn-primary"
+							  value="Voltar"
+							  actionListener="#{grupoDeUsuariosBean.cancel}" 
+							  immediate="true" 
+							  update=":painelGlobal"
+							  ajax="false"/>
+							  
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.grupoUsuarios.removeBool}"
+							 onclick="showIf()"/>
+			<p>&nbsp;</p>
+		</ui:define>
+		
+    </ui:composition>
+</html>

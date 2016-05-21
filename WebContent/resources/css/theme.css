@@ -1,0 +1,707 @@
+#formPanel .ui-dialog-content {
+	text-align: left !important;
+}
+
+/* Overlays */
+.ui-widget-overlay {
+	background: #000 !important;
+}
+
+.ui-widget-shadow {
+	-moz-box-shadow: 0px 0px 5px rgba(0,0,0,0.2) !important;
+	-webkit-box-shadow: 0px 0px 5px rgba(0,0,0,0.2) !important;
+	box-shadow: 0px 0px 5px rgba(0,0,0,0.2) !important;
+}
+
+button.ui-state-default , .ui-widget-content button.ui-state-default , .ui-widget-header button.ui-state-default{ background: none;}
+
+.preview { background: #EEE; color: #777; border: 1px solid #DDD; border-radius: 5px; }
+
+.ui-icon.fa {
+	text-indent: 0px;
+	background-image: none;
+}
+
+/* headers de modal */
+.ui-dialog > .ui-widget-header {
+	border-bottom: none !important;
+	background: #00aba5 !important; 
+	text-shadow: none !important;
+}
+
+.ui-dialog .ui-dialog-title {
+  color:#fff !important;
+}
+
+.ui-dialog{
+  border:none !important;
+}
+
+.ui-dialog > .ui-widget-content {
+	border: none !important;
+}
+
+.ui-shadow {
+	-moz-box-shadow: 0px 0px 10px rgba(0,0,0,0.2) !important;
+	-webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.2) !important;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.2) !important;
+}
+
+.hasDatepicker {
+	width: 100% !important;
+}
+
+.ui-corner-all, .form-control {
+	-moz-border-radius: 3px !important;
+	-webkit-border-radius: 3px !important;
+	border-radius: 3px !important;
+}
+
+
+/**Seleco box**/
+
+.select-custom {
+	width: 100% !important;
+}
+
+.ui-selectonemenu .ui-inputfield, 
+.ui-selectonemenu .ui-widget-content .ui-inputfield, 
+.ui-selectonemenu .ui-widget-header .ui-inputfield,
+.ui-selectonemenu-filter {
+	
+	width: 100% !important;
+	height: 34px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.428571429;
+	color: #555555;
+	background-image: none;
+	border-radius: 2px;
+	height: 33px !important;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	color: #313131;
+}
+
+.ui-state-default{
+	border: 1px solid #cccccc !important;
+	color: #4f4f4f;
+}
+
+.ui-selectonemenu, .ui-selectonemenu-filter {
+	border: 1px solid #cccccc !important;
+	background: none !important;
+	font-weight: bold;
+	color: #4f4f4f;
+}
+
+.ui-selectonemenu-panel .ui-selectonemenu-filter-container {
+	width: 100%;
+}
+
+.ui-selectonemenu .ui-selectonemenu-trigger {
+	border-right: none !important;
+	border-top: none !important;
+	border-bottom: none !important;
+	cursor: pointer;
+	width: 24px;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	padding: 0 3px;
+	background: #f3f3f3 !important;
+}
+
+.ui-selectonemenu .ui-selectonemenu-trigger .ui-icon {
+	margin-top: 8px;
+}
+
+ .ui-state-highlight, 
+ .ui-widget-content .ui-state-highlight, 
+ .ui-widget-header .ui-state-highlight {
+	background: #00aba5;
+	color: #ffffff;
+	text-shadow:none;
+}
+
+.ui-state-hover, 
+.ui-widget-content .ui-state-hover, 
+.ui-widget-header .ui-state-hover, 
+.ui-state-focus, 
+.ui-widget-content .ui-state-focus, 
+.ui-widget-header .ui-state-focus {
+	box-shadow: none;
+}
+
+.ui-selectonemenu-items .ui-state-hover{
+	color:#fff !important;
+	background: #00aba5;
+}
+
+.ui-selectonemenu .ui-widget-content {
+	border: 1px solid #ccc;
+	background: #ffffff;
+	color: #4f4f4f;
+}
+
+
+.ui-button {
+	border: 1px solid #009D99 !important;
+}
+
+/**loader**/
+.loader{
+	background:transparent;
+	position:absolute;
+	width:30px;
+	height:30px;
+	border: 4px solid rgba(0, 171, 165, .2 );
+	border-top-color: #00aba5;
+	border-radius:100%;
+	-webkit-animation: spine 1.0s infinite linear;
+}
+
+@-webkit-keyframes spine{
+	100%  {
+		-webkit-transform: rotate(360deg);
+	}
+}
+
+/**fieldset**/
+legend {
+	font-size: 18px !important;
+}
+
+/** disabled class **/
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled {
+  opacity: .50;
+  filter: Alpha(Opacity=50);
+}
+
+/**tables**/
+
+.ui-datatable{
+	font-family: 'Open Sans' !important;
+}
+
+.ui-datatable .ui-state-default {
+	border: 1px solid #d8d8d8 !important;
+	color: #4f4f4f;
+	
+}
+
+.ui-datatable th{
+	height: 39px !important;
+	font-size: 14px !important;
+}
+
+.ui-datatable tbody td {
+	border-color: #d8d8d8 !important;
+}
+
+.ui-paginator {
+	border: 1px solid #d8d8d8 !important;
+	background: #f8f8f8 !important;
+	color: #333;
+}
+
+.ui-datatable .ui-state-default, 
+.ui-datatable .ui-widget-content .ui-state-default, 
+.ui-datatable .ui-widget-header .ui-state-default {
+	background: #f8f8f8;
+	font-weight: bold;
+	color: #777;
+}
+
+.ui-datatable tbody td {
+	border: none !important;
+	border-top: 1px solid #d8d8d8 !important;
+	font-size: 14px;
+}
+
+.ui-datatable .column-date{
+	width:100px;
+}
+
+.ui-datatable .ui-widget-content {
+border: 1px solid #d8d8d8;
+background: #ffffff;
+color: #4f4f4f;
+}
+
+
+/**fonts**/
+
+.ui-widget-header{
+	font-family: 'Open Sans';
+}
+
+/** modal **/
+
+.ui-dialog .ui-dialog-titlebar-close span {
+  margin-top: 4px;
+}
+
+.ui-dialog .ui-dialog-titlebar-close{
+  float: right;
+  margin: 0px;
+  top: 0px;
+  padding: 0px !important;
+  cursor: pointer;
+}
+
+/**lupa**/
+
+.magnifying{
+  border: none;
+  height:34px;
+  width:34px;
+  background: url('../img/magnifying.png') #00aba5 no-repeat center !important;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+/** close icons **/
+
+.ui-widget-header .ui-icon {
+  background-color: white;
+}
+
+.ui-state-hover .ui-icon{
+	background:none !importante;
+}
+
+.ui-dialog-titlebar-icon {
+  border: none !important;
+  background: none !important;
+  font-weight: normal !important;
+  color: #313131;
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/** space **/
+.space-between-vertical{
+	height:20px;
+}
+
+.ui-selectmanycheckbox label, .ui-selectoneradio label {
+  display: block;
+  margin-top: 4px;
+  font-family: 'Open Sans';
+}
+
+.ui-selectmanycheckbox{
+	width:100% !important;
+}
+
+/** panel **/
+
+.ui-panel{
+	border: 1px solid #d8d8d8 !important;
+	padding:0 !important;
+}
+
+
+.ui-panel .ui-widget-header {
+  border:none;
+  border-bottom: 1px solid #d8d8d8;
+  background: #f8f8f8;
+  color: #777;
+  font-weight: bold;
+  padding-bottom: 9px !important;
+}
+/** buttons **/
+
+.ui-button-text-only .ui-button-text {
+  font-family: 'Open Sans' !important;
+  font-weight: normal !important;
+}
+
+/** input **/
+
+.ui-inputfield {
+  width: 100%;
+  height: 34px;
+}
+
+/** messages **/
+.error-messages{
+  color: red;
+  display: block;
+  z-index:300;
+}
+
+.ui-dialog .ui-dialog-content {
+  padding: 1em;
+}
+
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-weight: 500;
+  line-height: 1.1;
+  color: inherit;
+}
+/**text-shadow**/
+*{
+  text-shadow: none !important;
+  font-family: "Open Sans";
+  font-weight: normal;
+}
+/** hover effects **/
+
+.ui-widget-header {
+    background-color: #F8F8F8;
+}
+
+.ui-datatable .ui-state-active{
+  background: #eee !important;
+  color: #00aba5 !important;
+}
+
+.ui-datatable .ui-state-hover{
+  background: #f2f2f2 !important;
+}
+
+/** panel header and buttons **/
+
+.ui-panel-titlebar > span {
+  float: left;
+  line-height: 31px;
+  height: 31px;
+}
+
+.button-panel {
+  float: right;
+}
+
+.ui-panel-titlebar {
+  border-radius: 3px 3px 0 0 !important;
+}
+
+.result-filtro-container .ui-panel .ui-panel-content {
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+.result-filtro-container .ui-datatable .ui-widget-content {
+  border: none !important;
+}
+
+.result-filtro-container .ui-paginator {
+  border-top: 1px solid #d8d8d8 !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+.result-filtro-container .ui-datatable .ui-state-default {
+  border: 1px solid #d8d8d8 !important;
+  border-left: none !important;
+  border-top: none !important;
+  text-align: left;
+  color: #4f4f4f;
+}
+
+.result-filtro-container .ui-datatable-tablewrapper table tr th:last-child {
+  border: none !important;
+}
+
+.result-filtro-container .table {
+  margin-bottom: 0px;
+}
+
+.result-filtro-container .ui-paginator .ui-state-default {
+  border: 1px solid #d8d8d8 !important;
+}
+
+.result-filtro-container .ui-paginator .ui-state-default, 
+.result-filtro-container .ui-paginator .ui-state-default, 
+.result-filtro-container .ui-paginator.ui-state-default {
+
+	font-weight: normal !important;
+
+}
+
+
+/*** toltip ***/
+
+.ui-tooltip {
+  position: absolute;
+  display: none;
+  padding: 3px 5px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: white;
+}
+
+/** table status **/
+/*
+.status-matriculado{
+  background: #26C281;
+  color: white;
+}
+*/
+
+/* painel duplicidade */
+
+.info-duplicidade{
+	float:left;
+}
+
+.little-square{
+	margin-top:6px;
+	width:15px;
+	height:15px;
+	border-radius:100%;
+}
+
+.red-icon{
+	color: #CC0000;
+}
+
+.yellow-icon{
+	color: #FFCC00;
+	background-color: #000000;
+	border-radius: 26px;
+}
+
+.green-icon{
+	color: green;
+}
+
+.green-icon-big{
+	color: green;
+	font-size: 32px;
+}
+
+.red{
+	background: #F2784B;
+}
+
+.yellow{
+	background: #FDE3A7;
+}
+
+.dupli-text, .little-square{
+	float:left;
+	margin-left: 0px;
+  	margin-right: 10px;
+}
+
+.dupli-text{
+	line-height: 30px;
+}
+
+
+/***** Pagina Registro Unico ********/
+
+.alunos-ru{
+	margin-bottom:15px;
+}
+
+.alunos-ru .ui-panel .ui-panel-content {
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+.alunos-ru .ui-datatable .ui-widget-content {
+  border: none !important;
+}
+
+.alunos-ru .ui-paginator {
+  border-top: 1px solid #d8d8d8 !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+.alunos-ru .ui-datatable .ui-state-default {
+  border: 1px solid #d8d8d8 !important;
+  border-left: none !important;
+  border-top: none !important;
+  text-align: left;
+  color: #4f4f4f;
+}
+
+.alunos-ru .ui-datatable-tablewrapper table tr th:last-child {
+  border: none !important;
+}
+
+.alunos-ru .table {
+  margin-bottom: 0px;
+}
+
+.alunos-ru .ui-paginator .ui-state-default {
+  border: 1px solid #d8d8d8 !important;
+}
+
+.alunos-ru .ui-paginator .ui-state-default, 
+.alunos-ru .ui-paginator .ui-state-default, 
+.alunos-ru .ui-paginator.ui-state-default {
+
+	font-weight: normal !important;
+
+}
+/**** modal mensagens ****/
+#messages ul{
+	list-style: none;
+	padding: 0 !important;
+}
+
+/**** table ru *****/
+
+.row-aluno-flexivel{
+	background:#fcf8e3 !important;
+}
+
+
+/****** botoes personalizados*******/
+
+.btn{
+  margin-left: 0px;
+  margin-right: 3px;
+}
+
+.alunos-ru .ui-datatable .btn-sge, .btn-sge{
+  background-color: #00aba5 !important;
+  border: 1px solid #03A19C !important;
+  color: #fff;
+  
+}
+
+.alunos-ru .ui-datatable .btn-sge:hover, .btn-sge:hover{
+  background-color: #01A19C !important;
+  border-color: #03A19C !important;
+  color: #fff !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-warning, .btn-sge-warning{
+  background-color: #f0ad4e !important;
+  border: 1px solid #eea236 !important;
+  color: #fff;
+  
+}
+
+.alunos-ru .ui-datatable .btn-sge-warning:hover, .btn-sge-warning:hover{
+  background-color: #ec971f !important;
+  border-color: #d58512 !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-info, .btn-sge-info{
+  background-color: #5bc0de !important;
+  border: 1px solid #46b8da !important;
+  color: #fff !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-info:hover, .btn-sge-info:hover{
+  background-color: #31b0d5 !important;
+  border-color: #269abc !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-danger, 
+.btn-sge-danger{
+  background-color: #d9534f !important;
+  border: 1px solid #d43f3a !important;
+  color: #fff;
+}
+
+.alunos-ru .ui-datatable .btn-sge-danger:hover,
+.btn-sge-danger:hover{
+  background-color: #c9302c !important;
+  border-color: #ac2925 !important;
+  color:#fff !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-success, 
+.btn-sge-success{
+  background-color: #5cb85c !important;
+  border-color: #4cae4c !important;
+  color: #fff;
+}
+
+.alunos-ru .ui-datatable .btn-sge-success,
+.btn-sge-success{
+  background-color: #5cb85c !important;
+  border-color: #4cae4c !important;
+  color:#fff !important;
+}
+
+.alunos-ru .ui-datatable .btn-sge-primary, .btn-sge-primary{
+  background-color: #337ab7 !important;
+  border: 1px solid #2e6da4 !important;
+  color: #fff;
+}
+
+.alunos-ru .ui-datatable .btn-sge-primary:hover, .btn-sge-primary:hover{
+  background-color: #286090 !important;
+  border-color: #204d74 !important;
+}
+
+
+/** pagina de erro **/
+
+.error-number {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.error-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.msg-error-page {
+	padding:60px 0 60px 0;
+	text-align: center;
+}
+
+.bt-remover-small {
+  	border: none !important;
+  	color: white !important;
+  	padding: 0px 6px 2px 6px !important;
+}
+
+.ui-datatable .bt-remover-small {
+  border: none !important;
+}
+
+.tooltip-inner {
+    white-space:pre-wrap;
+}
+
+.ui-widget-header {
+	background-image: none;
+}
+
+.ui-fileupload-buttonbar .ui-button {
+    top: -1px;
+    color: white;
+    background-color: #00ABA5;
+    background-image: none;
+    border-color: #00ABA5 !important;
+}
+
+.ui-fileupload-buttonbar .ui-fileupload-upload {
+    color: white;
+    background-color: #00ABA5 !important;
+}
+
+.ui-fileupload-buttonbar .ui-fileupload-cancel {
+    color: white;
+    background-color: #00ABA5 !important;
+}
+
+.btn-danger{
+	color:#ffffff !important;
+}
+
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template.xhtml">
+    	
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Alterar Senha" />
+    	</ui:define>
+		
+		<ui:define name="body">
+		
+			<h:form id="alterarSenhaForm">
+			
+    		     <h:panelGroup id="alterarSenhaGroup" styleClass="row conteudo" rendered="#{loginCivitasBean.usuarioLogado}">
+    		     
+    		     	
+				    <h4> Alterar Senha </h4>
+				    <div class="hr"></div>
+				       
+				       <h:panelGrid columns="1" >
+				       	
+							<h:outputLabel value="Senha atual: " styleClass="required"/>
+							<h:inputSecret required="true" 
+										   value="#{userBean.senhaAtual}"
+										   label="Senha atual"
+										   styleClass="form-control"
+										   title="Senha atual"
+										   id="senhaAtual"
+										   size="50"/>
+							<h:message for="senhaAtual" tooltip="true" styleClass="error-messages" />
+										   
+							<h:outputLabel value="Nova senha: " styleClass="required"/>
+						    <h:inputSecret required="true"
+										   value="#{userBean.novaSenha}"
+										   label="Nova senha"
+										   styleClass="form-control"
+										   title="Nova senha"
+										   id="novaSenha"
+										   size="50">
+							</h:inputSecret>
+							<h:message for="novaSenha" tooltip="true" styleClass="error-messages" />
+							
+							<h:outputLabel value="Repita a nova senha: " styleClass="required"/>
+							<h:inputSecret value="#{userBean.novaSenhaRepita}" styleClass="form-control" size="50"
+										   title="Repita a nova senha" required="true" label="Repita a nova senha"
+										   id="repetirSenha">
+							</h:inputSecret>
+							<h:message for="repetirSenha" tooltip="true" styleClass="error-messages" />
+				       </h:panelGrid>
+				       
+				       <p>&nbsp;</p>
+				       
+				       <p:commandButton styleClass="btn btn-primary" value="Alterar" ajax="false" onclick="carregando.show()"
+										update=":painelGlobal" actionListener="#{userBean.alteraSenha}" />
+						
+				</h:panelGroup>
+				
+				 <p>&nbsp;</p>
+				 
+			</h:form>
+			
+		</ui:define>	
+			  
+    </ui:composition>
+</html>

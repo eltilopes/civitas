@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/new-template/template.xhtml">
+
+	<ui:define name="tituloPagina">
+		<h:outputText value="500 erro interno" />
+	</ui:define>
+
+	<ui:define name="body">
+		<div id="erro500" class="msg-error-page">
+			<p class="error-number">500</p>
+			<p class="error-text">Ocorreu um erro, por favor contate o administrador do sistema.</p>
+			<a href="#{request.contextPath}" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span> Voltar ao Início</a>
+		</div>
+	</ui:define>
+
+</ui:composition>
+</html>

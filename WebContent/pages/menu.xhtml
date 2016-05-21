@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      
+<ui:composition>
+
+	<h:panelGroup rendered="#{loginCivitasBean.usuarioLogado}">
+	 
+	 	<h:form id="formMenu">
+	 	
+		 	<div class="navbar navbar-default" role="navigation">
+		 	
+				<div class="container">
+				
+					<div class="navbar-header">
+						<button type="button" title="Menu" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+	          		</div>
+		    
+					<div class="navbar-collapse collapse">
+		    
+						<ul class="nav navbar-nav">
+		    
+							<li><p:commandLink styleClass="navbar-brand" action="home" ajax="false"><span class="glyphicon glyphicon-home"/></p:commandLink></li>
+		    
+							<h:panelGroup  >
+								<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Arquivo<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="#{request.contextPath}/pages/processamento/processamento.jsf">Importar</a>
+										</li>
+									</ul>
+								</li>
+							</h:panelGroup>
+							
+							<h:panelGroup  >
+								<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuração<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li>
+											<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
+										</li>
+										<li>
+											<a href="#{request.contextPath}/pages/configuracao/cidade.jsf">Cidade</a>
+										</li>
+									</ul>
+								</li>
+							</h:panelGroup>
+							
+							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Opções<b class="caret"></b></a>
+								<ul class="dropdown-menu">
+								
+									<li><a href="#{request.contextPath}/acesso/alterar-senha.jsf">Alterar Senha</a></li>
+									<h:panelGroup rendered="#{sessionScope.perms.grupoUsuarios.ativoBool}">
+										<li>
+											<a href="#{request.contextPath}/acesso/grupo-de-usuarios.jsf">
+												Grupos de Usuários
+											</a>
+										</li>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{sessionScope.perms.modulos.ativoBool}">
+										<li>
+											<a href="#{request.contextPath}/acesso/modulo.jsf">
+												Módulos
+											</a>
+										</li>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{sessionScope.perms.transacoes.ativoBool}">
+										<li>
+											<a href="#{request.contextPath}/acesso/transacao.jsf">
+												Transações
+											</a>
+										</li>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{sessionScope.perms.usuarios.ativoBool}">
+										<li>
+											<a href="#{request.contextPath}/acesso/usuario.jsf">
+												Usuários
+											</a>
+										</li>
+									</h:panelGroup>
+								</ul>
+							</li>
+							
+						</ul>
+						
+					</div>
+		        
+				</div>
+		      
+		    </div>
+	 	  
+  	 	</h:form>
+	 	
+	</h:panelGroup>
+</ui:composition>     
+</html>

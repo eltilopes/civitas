@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template.xhtml">
+    	
+    	<ui:define name="tituloPagina">
+		   <h:outputText value="ERRO 403"/>
+		</ui:define> 
+    	
+    	<ui:define name="body">
+		<p:dialog  
+              widgetVar="scrapeImagesDlg" closable="false"
+              modal="true" draggable="true" resizable="false"
+              showEffect="fade" hideEffect="fade" visible="true"
+              width="400" height="140">
+		
+		<div class="alert alert-danger" role="alert">
+		<center>
+		<strong>Desculpe</strong>, você não pode acessar a página solicitada. 
+		</center>
+		</div>
+		<input type="button" onClick="history.go(-1)" value="Voltar" class="btn btn-primary"/>
+		</p:dialog>
+		</ui:define>
+    	
+    </ui:composition>
+</html>

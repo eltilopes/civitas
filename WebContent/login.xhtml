@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/new-template/template.xhtml">
+	
+		<ui:define name="tituloPagina">
+		   <h:outputText value="LOGIN :: Cívitas"/>
+		</ui:define> 
+		
+		<ui:define name="body">
+				
+			<h:inputHidden value="#{environmentBean}" />	
+		
+			<div class="row conteudo">
+			
+    			<div class="panel panel-default">
+    			
+      				<div class="panel-heading"><span class="glyphicon glyphicon-user"></span>&nbsp;Acesso ao sistema</div>
+      				
+      				<div class="panel-body">
+      
+						<h:form id="formLogin">
+			
+							<h:panelGroup rendered="#{not loginCivitasBean.usuarioLogado}">
+				
+						          <h:outputLabel for="usuario" value="Usuário: " styleClass="label label-primary"/>
+						          
+						          <h:inputText id="usuario" label="Usuário" required="true" styleClass="form-control" title="Digite seu Usuário" value="#{loginCivitasBean.usuario.login}"/>
+						          
+						          <p>&nbsp;</p>
+						          
+						          <h:outputLabel for="senha" value="Senha: " styleClass="label label-primary"/>
+						          
+						          <h:inputSecret id="senha" label="Senha" required="true" styleClass="form-control" title="Digite sua Senha" value="#{loginCivitasBean.usuario.senha}"/>
+						          
+								  <p>&nbsp;</p>
+          
+								  <p:commandButton styleClass="btn btn-primary" value="Enviar" ajax="false"
+										update=":painelGlobal :formPanel" action="#{loginCivitasBean.logar}" />
+									
+							 </h:panelGroup>
+           
+           				</h:form>
+           
+					</div>
+			      
+					<h:form id="formEsqueciSenha">
+
+						<div class="panel-footer">
+						
+							<p:commandLink value="Esqueceu a senha?" action="esqueceuSenha" ajax="false"/>
+							
+						</div>
+						  
+					</h:form>
+      
+			    </div>
+			    
+			  </div>
+  
+		</ui:define>
+		
+	</ui:composition>
+	
+</html>

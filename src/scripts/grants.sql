@@ -1,0 +1,13 @@
+grant execute on util.buscabr_frase to educacao;
+grant execute on util.buscabr_palavra to educacao;
+grant execute on util.fc_retira_acento_numero to educacao;
+grant execute on util.fc_retira_espacos to educacao;
+grant references on util.tb_raca to educacao;
+grant references on util.tb_pais to educacao;
+grant references on util.tb_localidade to educacao;
+grant references on util.tb_estado to educacao;
+grant references on util.tb_logradouro to educacao;
+grant references on util.tb_raca to educacao;
+grant references on util.tb_nacionalidade to educacao;
+grant references on util.tb_unidade_trabalho to educacao;
+grant references on util.tb_usuario to educacao;
