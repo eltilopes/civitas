@@ -17,14 +17,14 @@
     	</ui:define>
 
     	<ui:define name="tituloFieldSetFiltro">
-    		Cidade
+    		Cidade 
 		</ui:define>
 		
 		<ui:define name="camposFiltro">
 			<fieldset>
 				<div class="row">
 					<div class="col-md-4">
-							<div class="form-group">
+						<div class="form-group">
 							<h:outputText value="Estado " />
 							<h:selectOneMenu id="estadoSearch"
 											 value="#{bean.entitySearch.estado}"
@@ -35,6 +35,13 @@
 							</h:selectOneMenu>
 							<h:message for="estadoSearch" tooltip="true"
 							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+							<p:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
+							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
 						</div>
 					</div>
 				</div>	
@@ -53,6 +60,16 @@
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 			 		 
+		 		 	<p:column headerText="" style="width:60px; text-align:center;" >
+						<div class="colunaAcao">					    			
+							<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
+							    <i class="glyphicon glyphicon-edit" />
+							</h:commandLink>
+							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+								showEffect="fade" trackMouse="true" />
+						</div>
+					</p:column>
+					
 			 		 <p:column headerText="Estado" >
 						<h:outputText value="#{cidade.estado.descricao.toUpperCase()}" />
 					 </p:column>
@@ -70,6 +87,13 @@
 						<h:outputText rendered="#{!cidade.ativa}" value="NÃO"/>
 					 </p:column>
 					 
+				 	 <p:column style="width:60px; text-align:center;"  >
+						<f:facet name="header">
+							<h:selectBooleanCheckbox rendered="#{bean.resultSearch.rowCount > 0}" styleClass="ui-checkBoxMain" />
+						</f:facet>
+						<h:selectBooleanCheckbox styleClass="ui-checkBox"  valueChangeListener="#{bean.select}" />
+					 </p:column>
+					 
 			</p:dataTable> 
 		</ui:define>
 		
@@ -77,6 +101,20 @@
 			<h4> Cadastro de Cidade </h4>
 		</ui:define>
 		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+							 
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 onclick="showIf()"/>
+		</ui:define>
 		<ui:define name="camposInsert">
 		<fieldset>
 			<legend>Cadastro de Cidade</legend>

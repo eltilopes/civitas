@@ -65,6 +65,10 @@ public class ValidarArquivoService {
 		boolean segundaLinha = false;
 		boolean lancarExcessaoCidade = false;
 		boolean lancarExcessaoMes = false;
+		boolean lancarExcessaoAno = false;
+		String erroCidade = "";
+		String erroMes = "";
+		String erroAno = "";
 		int numeroLinha = 1;
 		if (!document.isEncrypted()) {
 			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
@@ -81,12 +85,21 @@ public class ValidarArquivoService {
 				String linha = brEvento.readLine();
 				if(!linha.toUpperCase().contains(arquivo.getCidade().getDescricao().toUpperCase()) && primeiraLinha){
 					lancarExcessaoCidade = true;
+					erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
 				}	
 				primeiraLinha = false;
 				if(!linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) ){
 					lancarExcessaoMes = true;
+					erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
 				}else{
 					lancarExcessaoMes = false;
+				}
+				if(!linha.toUpperCase().contains("" + arquivo.getAno().getAno()) ){
+					lancarExcessaoAno = true;
+					System.lineSeparator();   
+					erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+					}else{
+					lancarExcessaoAno = false;
 				}
 				if(numeroLinha==2){
 					segundaLinha = true;
@@ -100,10 +113,13 @@ public class ValidarArquivoService {
 		}
 		document.close();
 		if(lancarExcessaoCidade){
-			throw new ApplicationException("Arquivo não é da cidade informada: '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' !");
+			throw new ApplicationException(erroCidade);
 		}
 		if(lancarExcessaoMes){
-			throw new ApplicationException("Arquivo não é do mês informado: '"  + arquivo.getMes().getDescricao().toUpperCase() + "' !");
+			throw new ApplicationException(erroMes);
+		}
+		if(lancarExcessaoAno){
+			throw new ApplicationException(erroAno);
 		}
 	}
 		private void criarArquivoProcessamento() throws IOException {

@@ -11,7 +11,7 @@ import br.com.civitas.arquitetura.util.PropertiesUtils;
 
 public class AbstractBean {
 
-	private String fileMessages = "/modelo/src/MessagesResources.properties";
+	private String fileMessages = "/civitas/src/MessagesResources.properties";
 
 	private Properties messageProperties;
 
