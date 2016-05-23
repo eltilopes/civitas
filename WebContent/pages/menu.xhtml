@@ -44,12 +44,14 @@
 							<h:panelGroup  >
 								<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuração<b class="caret"></b></a>
 									<ul class="dropdown-menu">
-										<li>
-											<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
-										</li>
 										<h:panelGroup rendered="#{sessionScope.perms.CIDADE_R}">
 											<li>
 												<a href="#{request.contextPath}/pages/configuracao/cidade.jsf">Cidade</a>
+											</li>
+										</h:panelGroup>
+										<h:panelGroup rendered="#{sessionScope.perms.EVENTO_R}">
+											<li>
+												<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
 											</li>
 										</h:panelGroup>
 									</ul>
@@ -78,6 +80,13 @@
 										<li>
 											<a href="#{request.contextPath}/pages/acesso/permissao.jsf">
 												Permissões
+											</a>
+										</li>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{sessionScope.perms.GRUPO_PERMISSAO_R}">
+										<li>
+											<a href="#{request.contextPath}/pages/acesso/grupoPermissao.jsf">
+												Grupo Permissões
 											</a>
 										</li>
 									</h:panelGroup>

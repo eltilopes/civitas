@@ -32,8 +32,7 @@ public class GrupoPermissao implements IEntity {
 	@Column(name = "ci_grupo_permissao")
 	private Long id;
 	
-	@NotNull
-	@Column(name = "nm_nome")
+	@Column(name = "nm_nome" , nullable = false)
 	@Size(max=40)
 	private String nome;
 	
