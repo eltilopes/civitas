@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Permissões" />
+    	</ui:define>
+    	
+    	<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{permissaoBean}" />
+		</ui:define>
+    	
+    	<ui:define name="tituloFieldSetFiltro">
+    		<h4> Pesquisa de Permissões </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 rendered="#{sessionScope.perms.PERMISSAO_C}"
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+							 
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.PERMISSAO_D}"
+							 onclick="showIf()"/>
+		</ui:define>
+		
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Grupo Permissão " />
+							<h:selectOneMenu id="grupoSearch"
+											 value="#{bean.entitySearch.grupoPermissao}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.nome.toUpperCase()}"
+										value="#{bean.gruposPermissao}" />
+							</h:selectOneMenu>
+							<h:message for="grupoSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Chave: " style="font-weight: normal;"/>
+							<p:inputText id="chaveSearch" styleClass="form-control"  value="#{bean.entitySearch.chave}" />
+							<h:message for="chaveSearch" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+		  <ui:param name="tituloPainel" value="Permissão" />
+		</ui:define>
+		
+		<ui:define name="resultFiltro">
+			<p:dataTable styleClass="table table-responsive table-mobile"
+   						 id="permissoes"
+   						 rows="10"
+   						 pageLinks="3"
+   						 paginatorAlwaysVisible="false"
+   						 emptyMessage="Nenhuma Permissão foi encontrada."
+   						 value="#{bean.resultSearch}" 
+       					 var="permissao" 
+       					 paginator="#{bean.resultSearch.rowCount > 0}"
+       					 paginatorPosition="bottom"
+       					 rowStyleClass="bgLinha1,bgLinha2">
+       					 
+       					 	<p:column headerText="" style="width:60px; text-align:center;"  rendered="#{sessionScope.perms.PERMISSAO_U}" >
+								<div class="colunaAcao" >					    			
+									<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
+									    <i class="glyphicon glyphicon-edit" />
+									</h:commandLink>
+									<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+										showEffect="fade" trackMouse="true" />
+								</div>
+							</p:column>
+       					
+       						<p:column headerText="Grupo" style="text-align:left;">
+       							<h:outputText value="#{permissao.grupoPermissao.nome}" />
+       						</p:column>
+       						
+       						<p:column headerText="Chave" style="text-align:left;">
+       							<h:outputText value="#{permissao.chave}" />
+       						</p:column>
+       						
+       						<p:column headerText="Descrição" style="text-align:left;">
+       							<h:outputText value="#{permissao.descricao}" />
+       						</p:column>
+
+							<p:column style="width:60px; text-align:center;" rendered="#{sessionScope.perms.PERMISSAO_D}">
+								<f:facet name="header">
+									<h:selectBooleanCheckbox
+										rendered="#{bean.resultSearch.rowCount > 0}"
+										styleClass="ui-checkBoxMain" />
+								</f:facet>
+				
+								<h:selectBooleanCheckbox styleClass="ui-checkBox"
+									valueChangeListener="#{bean.select}" />
+							</p:column>
+
+		</p:dataTable> 
+		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Permissão </h4>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+			<fieldset>
+				<legend>Cadastro de Cidade</legend>
+				<div class="row" >
+					<div class="col-md-6 form-group">
+						<h:outputLabel value="Grupo Permissão:"/>
+						<p:selectOneMenu id="grupoInsert"
+										 value="#{bean.entity.grupoPermissao}" required="true"
+										 label="Estado" converter="entityConverter"
+										 styleClass="select-custom" filterMatchMode="contains" 
+										 effectSpeed="20" filter="true" panelStyle="width:180px">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.nome.toUpperCase()}"
+										value="#{bean.gruposPermissao}" />
+						</p:selectOneMenu>
+						<h:message for="grupoInsert" tooltip="true"
+							   styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Chave: " style="font-weight: normal;"/>
+							<p:inputText id="chaveInsert" styleClass="form-control" required="true" value="#{bean.entity.chave}" />
+							<h:message for="chaveInsert" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Descrição: " style="font-weight: normal;"/>
+							<p:inputText id="descricaoInsert" styleClass="form-control" required="true" value="#{bean.entity.descricao}" />
+							<h:message for="descricaoInsert" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>
+		</ui:define>
+	
+		
+    </ui:composition>
+</html>

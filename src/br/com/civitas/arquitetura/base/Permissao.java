@@ -35,7 +35,7 @@ public class Permissao implements IEntity {
 	@Column(name = "ds_descricao", nullable = false, length = 80)
 	private String descricao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="cd_grupo_permissao", nullable = false)
 	private GrupoPermissao grupoPermissao;
 
@@ -104,6 +104,9 @@ public class Permissao implements IEntity {
 		}
 		if (descricao != null && !descricao.trim().isEmpty()) {
 			map.put("descricao", descricao);
+		}
+		if (grupoPermissao != null && grupoPermissao.getId() != null ) {
+			map.put("grupoPermissao.id", grupoPermissao.getId() );
 		}
 		return map;
 	}

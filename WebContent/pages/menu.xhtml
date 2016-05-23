@@ -59,7 +59,7 @@
 							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Opções<b class="caret"></b></a>
 								<ul class="dropdown-menu">
 								
-									<li><a href="#{request.contextPath}/acesso/alterar-senha.jsf">Alterar Senha</a></li>
+									<li><a href="#{request.contextPath}/pages/acesso/alterar-senha.jsf">Alterar Senha</a></li>
 									<h:panelGroup rendered="#{sessionScope.perms.grupoUsuarios.ativoBool}">
 										<li>
 											<a href="#{request.contextPath}/acesso/grupo-de-usuarios.jsf">
@@ -74,10 +74,10 @@
 											</a>
 										</li>
 									</h:panelGroup>
-									<h:panelGroup rendered="#{sessionScope.perms.transacoes.ativoBool}">
+									<h:panelGroup rendered="#{sessionScope.perms.PERMISSAO_R}">
 										<li>
-											<a href="#{request.contextPath}/acesso/transacao.jsf">
-												Transações
+											<a href="#{request.contextPath}/pages/acesso/permissao.jsf">
+												Permissões
 											</a>
 										</li>
 									</h:panelGroup>
