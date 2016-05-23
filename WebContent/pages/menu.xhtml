@@ -47,9 +47,11 @@
 										<li>
 											<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
 										</li>
-										<li>
-											<a href="#{request.contextPath}/pages/configuracao/cidade.jsf">Cidade</a>
-										</li>
+										<h:panelGroup rendered="#{sessionScope.perms.CIDADE_R}">
+											<li>
+												<a href="#{request.contextPath}/pages/configuracao/cidade.jsf">Cidade</a>
+											</li>
+										</h:panelGroup>
 									</ul>
 								</li>
 							</h:panelGroup>

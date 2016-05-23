@@ -2,6 +2,8 @@ package br.com.civitas.arquitetura.service;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +48,16 @@ public class AuthenticationService implements Serializable {
 				AuthenticationService.getLoggedUser().setLogAcessos(logAcessoService.buscarUltimosAcessos(AuthenticationService.getLoggedUser()));
 				saveLogAcesso(AuthenticationService.getLoggedUser());
 				HttpServletRequest request = (HttpServletRequest) FacesUtils.getServletRequest();
+				Map<String, Boolean> perms = buscarPermissoes( AuthenticationService.getLoggedUser() );
+				if( perms.isEmpty() ){
+					logout();
+					perms = null;
+					FacesUtils.addErrorMessage( "Você não tem permissão de acesso a esse sistema." );
+					request.getSession().invalidate();
+					return false;
+				}
+				request.getSession().setMaxInactiveInterval( 1800 );
+				request.getSession().setAttribute("perms", perms);
 				request.getSession().setAttribute("pagesNoFilter", Acesso.getPagesNoFilter() );
 				request.getSession().setAttribute("dirsNoFilter", Acesso.getDirectoriesNoFilter() );
 				request.getSession().setAttribute("pagesSystem", Acesso.getPages() );
@@ -57,23 +70,14 @@ public class AuthenticationService implements Serializable {
 		return false;
 	}
 	
-	public boolean loginConciliacao(String username, String password) {
-		try {
-			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password)).isAuthenticated();
-		} catch (AuthenticationException e) {
-            return false;
+	private Map<String, Boolean> buscarPermissoes( Usuario usuario ){
+		Map<String, Boolean> permissoes = new HashMap<String, Boolean>();
+		for( GrantedAuthority g : usuario.getAuthorities() ){
+			permissoes.put(g.getAuthority(), true); 
 		}
+		return permissoes;
 	}
-	
-	public boolean loginInclusaoRest(String username, String password) {
-		try {
-			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, Digest.MD5digest(password))).isAuthenticated();
-		} catch (AuthenticationException e) {
-            return false;
-		}
-	}
-	
-	
+
 	private void saveLogAcesso(Usuario usuario){
 		LogAcesso logAcesso = new LogAcesso();
 		logAcesso.setUsuario(usuario);
