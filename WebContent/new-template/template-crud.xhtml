@@ -9,21 +9,20 @@
 
 <h:head>
 
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<link rel="icon"
 		href="#{request.contextPath}/resources/img/favicon.png"
 		type="image/png" />
 
-	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/theme.css" media="screen" />
-	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/primefaces.css" media="screen" />
-	<link href="#{request.contextPath}/resources/css/template-bootstrap/bootstrap.css" rel="stylesheet" type="text/css" />
-	<link href="#{request.contextPath}/resources/css/template-bootstrap/estrutura.css" rel="stylesheet" type="text/css" />
-	<link href="#{request.contextPath}/resources/fonts/fonts.css" rel="stylesheet" type="text/css" />
-	<link href="#{request.contextPath}/resources/css/fuelux.min.css" rel="stylesheet" type="text/css" />
+	<ui:include src="commonCss.xhtml" />
 
-	<script type="text/javascript" src="#{request.contextPath}/resources/js/template-bootstrap/bootstrap.js" />
-	<script type="text/javascript" src="#{request.contextPath}/resources/js/jquery.mask.js" />
+	<script type="text/javascript"
+		src="#{request.contextPath}/resources/js/template-bootstrap/bootstrap.js" />
+	<script type="text/javascript"
+		src="#{request.contextPath}/resources/js/jquery.mask.js" />
+	<script src="#{request.contextPath}/resources/js/button.js"></script>
 	<h:outputScript library="js" name="util.js" target="form" />
 
 	<ui:insert name="pageScript">
@@ -67,87 +66,99 @@
 			
 				<h:form id="formConsulta" enctype="multipart/form-data">
 					<h:panelGroup id="pesquisa" rendered="#{bean['searching']}">
-						<fieldset>
-							<legend>
+					
+						<ui:insert name="tituloPrincipal">
+	
+						</ui:insert>
+
+						<div class="card-view">
+							<div class="card-view-content-header">
 								<ui:insert name="tituloFieldSetFiltro">
-									<h:outputText value="Campos da Consulta" />
+									<h4>
+										<h:outputText value="Campos da Consulta" />
+									</h4>
 								</ui:insert>
-							</legend>
-
-							<ui:insert name="camposFiltro">
-							</ui:insert>
-
-							<div>
+							</div>
+							<div class="card-view-content">
+								<ui:insert name="camposFiltro">
+								</ui:insert>
+							</div>
+							<div class="card-view-content-footer">
 								<ui:insert name="botoesFiltro">
-
 									<p:commandButton styleClass="btn btn-primary" value="Consultar"
 										ajax="false" onclick="carregando.show()"
 										update=":painelGlobal" oncomplete="carregando.hide();"
 										actionListener="#{bean['find']}" />
-
 								</ui:insert>
 							</div>
-						</fieldset>
-
-						<br />
+						</div>
 
 						<ui:insert name="tituloPainel">
 							<ui:param name="tituloPainel" value="Nenhum" />
 						</ui:insert>
-						<div class="result-filtro-container">
-							<ui:insert name="resultResumo" />
-							<p:panel header="#{tituloPainel}">
 							
-								<f:facet name="actions">
-									<div class="button-panel">
-										<ui:insert name="botoesInsertFiltro">
-											<p:commandButton value="Novo"
-												actionListener="#{bean['prepareInsert']}"
-												onclick="carregando.show();" styleClass="btn btn-primary"
-												update=":painelGlobal" ajax="false" />
-											<p:commandButton value="Excluir" styleClass="btn btn-primary"
-												style="display:none;" onclick="showIf()" icon="remIcon"
-												 />
-										</ui:insert>
-									</div>
-								</f:facet>
-								
+						<div class="card-view">
+							<div class="card-view-content-header">
+							
+							<ui:insert name="resultResumo" />
+								<h4>
+									<h:outputText value="#{tituloPainel}" />
+								</h4>
+								<div class="heading-elements">
+									<ui:insert name="botoesInsertFiltro">
+										<p:commandButton value="Novo"
+											actionListener="#{bean['prepareInsert']}"
+											onclick="carregando.show();" styleClass="btn btn-primary"
+											update=":painelGlobal"  ajax="false" />
+										<p:commandButton value="Excluir" styleClass="btn btn-primary"
+											style="display:none;" onclick="showIf()" icon="remIcon"  />
+									</ui:insert>
+								</div>
+							</div>
+							<div class="card-view-content">
 								<ui:insert name="resultFiltro" />
-	
-							</p:panel>
-						</div>
+							</div>
+						</div>				
 					</h:panelGroup>
 				</h:form>
 
 				<h:form id="formCadastro">
 					<h:panelGroup id="cadastro" rendered="#{bean['updating']}">
-						<ui:insert name="camposInsert">
-						</ui:insert>
-
-						<div class="margemtop">
-							<ui:insert name="botoesInsert">
-								<p></p>
-								<p:commandButton styleClass="btn btn-primary" value="Salvar"
-									actionListener="#{bean['save']}"
-									rendered="#{bean['inserting']}"
-									oncomplete="carregando.hide(); mensagemAviso.show();"
-									update=":painelGlobal" onclick="carregando.show();"
-									ajax="false" />
-
-								<p:commandButton styleClass="btn btn-primary" value="Atualizar"
-									actionListener="#{bean['update']}"
-									oncomplete="mensagemAviso.show();"
-									rendered="#{bean['editing']}" update=":painelGlobal"
-									ajax="false" />
-
-								<p:commandButton styleClass="btn btn-primary" value="Voltar"
-									actionListener="#{bean['cancel']}" immediate="true"
-									update=":painelGlobal" ajax="false" />
-								<p></p>
-							</ui:insert>
+						<div class="card-view">
+						
+							<div class="card-view-content-header">
+								<h4>
+									<ui:insert name="insertTitle">
+									</ui:insert>
+								</h4>
+							</div>
+							<div class="card-view-content">
+								<ui:insert name="camposInsert">
+								</ui:insert>
+							</div>
+							<div class="card-view-content-footer">
+								<ui:insert name="botoesInsert">
+									<p></p>
+									<p:commandButton styleClass="btn btn-primary" value="Salvar"
+										actionListener="#{bean['save']}"
+										rendered="#{bean['inserting']}"
+										oncomplete="carregando.hide(); mensagemAviso.show();"
+										update=":painelGlobal" onclick="carregando.show();"
+										ajax="false" />
+	
+									<p:commandButton styleClass="btn btn-primary" value="Atualizar"
+										actionListener="#{bean['update']}"
+										oncomplete="mensagemAviso.show();"
+										rendered="#{bean['editing']}" update=":painelGlobal"
+										ajax="false" />
+	
+									<p:commandButton styleClass="btn btn-primary" value="Voltar"
+										actionListener="#{bean['cancel']}" immediate="true"
+										update=":painelGlobal" ajax="false" />
+									<p></p>
+								</ui:insert>
+							</div>
 						</div>
-
-						<!-- </fieldset>  -->
 					</h:panelGroup>
 				</h:form>
 			</div>

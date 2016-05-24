@@ -1,0 +1,68 @@
+
+
+.login-table{
+	display: table;
+	width: 100%;
+    height: 100%;
+    background: #f2f2f2;
+    padding:10px;
+}
+
+.login-row{
+	display: table-row;
+	height:85%
+}
+
+.footer{
+	position:relative !important;
+}
+
+.rodape-row{
+	height:15%;
+	display: table-row;
+}
+
+.login-cell{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.login-card{
+	margin:auto;
+	max-width:370px;
+	background:#ffffff;
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .18);
+	-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .18);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .18);
+	border-radius:3px;
+}
+
+.login-card-top{
+	height:150px;
+	background: #FFA500;
+	border-radius:3px 3px 0 0 ;
+}
+
+.btn{
+	width: 100%;
+	transition:0.3s;
+}
+
+.form-control{
+	width: 100% !important;
+}
+
+.login-card-content{
+	padding:20px;
+}
+
+.forget-password:hover {
+    background: #eee;
+    transition:0.3s;
+}
+
+.logo{
+	background: url("../images/logo-login.png") no-repeat center;
+	width:100%;
+	height:100%;
+}

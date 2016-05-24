@@ -1,3 +1,4 @@
+
 @charset "utf-8";
 
 /* CSS Document */
@@ -24,7 +25,7 @@ select {font-size: 10px;	width: auto;	border: none;	border: 1px solid #CCCCCC;	p
 #topo #dados { position: absolute; margin: 55px 0px 0px 580px; width: 345px; font-size: 10px; font-weight: bold; }
 #topo #dados ul { margin: 0px; padding: 0px; list-style: none;}
 #topo #dados ul li { float: left; margin: 2px;}
-#topo #dados ul li.info { width: 155px; text-align: right; color: #00aba5;}
+#topo #dados ul li.info { width: 155px; text-align: right; color: #FFA500;}
 #topo #dados ul li.user { color: #525252;}
 
 /* FIM DE DADOS NO TOPO */
@@ -33,7 +34,7 @@ select {font-size: 10px;	width: auto;	border: none;	border: 1px solid #CCCCCC;	p
 
 #conteudo {	padding: 0px 10px;	color: #525252;	height: expression(this.scrollHeight <=   "310" ?   "310" :   "auto");	min-height: 310px; /* para ff, safari, chrome, etc */}
 #conteudo fieldset {	border: #CCCCCC 1px dashed;	padding: 10px;}
-#conteudo fieldset legend {	font-size: 11px;	font-weight: bold;	color: #00aba5;	background: #FFFFFF;	padding: 5px;	margin-bottom: 10px;}
+#conteudo fieldset legend {	font-size: 11px;	font-weight: bold;	color: #FFA500;	background: #FFFFFF;	padding: 5px;	margin-bottom: 10px;}
 #conteudo .colunaBusca {	font-size: 11px;}
 #conteudo tr input {	padding: 4px;	border: 1px solid #CCCCCC;	font-size: 10px;	font-weight: bold;	color: #666 !important;	text-transform: uppercase;	margin: 0px 2px;}
 #conteudo .btAba {background: url("../resources/img/bgBotaoAba.jpg");	border: 0px;	width: 88px;	height: 23px;	color: #FFF !important;	margin-right: 1px;	font-weight: bold;	font-family: Verdana, Geneva, sans-serif;	cursor: pointer;}
@@ -49,10 +50,10 @@ select {font-size: 10px;	width: auto;	border: none;	border: 1px solid #CCCCCC;	p
 #conteudo #login ul li a {color: #666;}
 #conteudo #login input.textLogin {	padding: 5px;	border: #CCC 1px solid;	color: #666;	font-size: 14px;	width: 180px;}
 #conteudo #login fieldset {	border: #CCCCCC 1px dashed;	padding: 10px;	margin: 10px;}
-#conteudo #login fieldset legend {	color: #00aba5;	font-weight: bold;	margin-right: 20px;	background: #FFFFFF;	padding: 3px;}
+#conteudo #login fieldset legend {	color: #FFA500;	font-weight: bold;	margin-right: 20px;	background: #FFFFFF;	padding: 3px;}
 
 /* FIM ÁREA DE LOGIN */
-#rodape {	padding-top: 10px;	text-align: center;	height: 50px;	line-height: 45px;	font-size: 10px;	background-image: url(../resources/img/borda-rodape.jpg);	background-repeat: repeat-x;	color: #00aba5;}
+#rodape {	padding-top: 10px;	text-align: center;	height: 50px;	line-height: 45px;	font-size: 10px;	background-image: url(../resources/img/borda-rodape.jpg);	background-repeat: repeat-x;	color: #FFA500;}
 
 .colunaAcao {	width: 60px;	text-align: center;}
 #conteudo .colunaAcao input {	border: none;}

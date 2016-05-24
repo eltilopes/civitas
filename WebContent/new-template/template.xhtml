@@ -9,21 +9,20 @@
 
 <h:head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<link rel="icon" href="#{request.contextPath}/resources/img/favicon.png" type="image/png" />
 
-	<link href="#{request.contextPath}/resources/css/template-bootstrap/bootstrap.css" rel="stylesheet" type="text/css" />
-	<link href="#{request.contextPath}/resources/css/template-bootstrap/estrutura.css" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/primefaces.css" media="screen" />
-	<link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/theme.css" media="screen" />
-	<link href="#{request.contextPath}/resources/fonts/fonts.css" rel="stylesheet" type="text/css" />
-	<link href="#{request.contextPath}/resources/css/fuelux.min.css" rel="stylesheet" type="text/css" />
+	<ui:include src="commonCss.xhtml" />
 	
 	<script type="text/javascript" src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
 	<script type="text/javascript" src="#{request.contextPath}/resources/js/template-bootstrap/bootstrap.js" />
 	<script type="text/javascript" src="#{request.contextPath}/resources/js/jquery.mask.js" />
+	
 	<h:outputScript library="js" name="util.js" />
 	<h:outputScript library="primefaces" name="jquery/jquery.js" />
+	
+	<script src="#{request.contextPath}/resources/js/button.js" ></script>
 
 	<ui:insert name="pageScript">
 	

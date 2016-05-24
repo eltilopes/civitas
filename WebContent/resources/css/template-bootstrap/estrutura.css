@@ -1,13 +1,22 @@
 
 /* ALTERE O QUE PRECISAR */
 /* Space out content a bit */
+html{
+	height:100%;	
+}
+
 body {
   padding:0;
   margin:0;
-  font-family: 'Open Sans', "Trebuchet MS", Arial, Helvetica, sans-serif
+  font-family: 'Roboto', "Trebuchet MS", Arial, Helvetica, sans-serif;
+  height:100%;
 }
 /* ALTERAR O QUE FOR PRECISO */
-.bordas_15_b{border-radius: 0px 0px 15px 15px;}
+/*
+.bordas_15_b{
+	border-radius: 0px 0px 4px 4px;
+}
+*/
 .hr{
   padding-top: 19px;
   color: #777;
@@ -91,6 +100,8 @@ body {
 }
 .header .users{
 	color:#000;
+	-webkit-box-shadow: none;
+	box-shadow: none;
 }
 
 .header .h3{font-size:16px; font-weight: normal; }
@@ -101,8 +112,12 @@ body {
 .footer {
   padding-top: 19px;
   color: #777;
-  border-top: 1px solid #e5e5e5;
+  border-top: none;
   margin-top: 40px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }
 
 /* Customize container */
@@ -135,6 +150,8 @@ body {
 .container {
     width: 95%;
     max-width:1400px;
+    min-height: 100%;
+    position: relative;
   }
   
 .container-narrow > hr {
@@ -171,6 +188,10 @@ body {
   }
   .footer{
 	text-align:center;
+	position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
   }
   /* Space out the masthead */
   .header {
@@ -194,21 +215,28 @@ body {
 	.font-mobile{}
 	.table-mobile{width: 100%; font-size: 100%}
 	.form-control{width: 100% !important;}
+	.row {
+    margin-right: 0px;
+    margin-left: 0px;
+	}
+	.header .horario {
+	    display: none;
+	}
 	
 }
-
-@media screen and (max-width: 600px) { /* MUITO PEQUENO */ 
+/*
+@media screen and (max-width: 600px) { 
 	.form-control{width: 95% !important; }
 }
 
-@media screen and (max-width: 500px) { /* MUITO PEQUENO */ 
+@media screen and (max-width: 500px) { 
 	.form-control{width: 85% !important; }
 }
 
-@media screen and (max-width: 400px) { /* MUITO PEQUENO */ 
+@media screen and (max-width: 400px) { 
 	.form-control{width: 75% !important; }
 }
-
+*/
 .input-pequeno{width: 30%;}
 .input-medio{width: 60%;}
 .input-grande{width: 90%;}
@@ -249,4 +277,8 @@ body {
 .html{
 	background:url('../../img/report-html.png') !important;
 	
+}
+
+.ui-chkbox-box{
+	background: #EEEDED !important;
 }
