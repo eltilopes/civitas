@@ -65,6 +65,7 @@ public class AuthenticationService implements Serializable {
 			}
 		} catch (AuthenticationException e) {
 			JSFUtil.addGlobalMessage("usuario_ou_senha_errado", FacesMessage.SEVERITY_WARN);
+			FacesUtils.getServletRequest().getSession().removeAttribute("usuario");
             return false;
 		}
 		return false;

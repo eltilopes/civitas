@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 import javax.persistence.NoResultException;
 
@@ -22,6 +23,7 @@ import br.com.civitas.arquitetura.base.vo.EmailVO;
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.arquitetura.util.Digest;
 import br.com.civitas.arquitetura.util.EmailUtil;
+import br.com.civitas.arquitetura.util.PropertiesUtils;
 import br.com.civitas.arquitetura.util.ResourceUtils;
 
 @Service
@@ -130,6 +132,62 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 		super.insert(usuario);
 		
 		return usuario;
+	}
+	
+	
+	public void enviarEmail(String enderecoEmail, String login, String senha) {
+		
+		EmailVO email = new EmailVO();
+		email.setDestino( enderecoEmail );
+		email.setRemetente( " <noreply@civitas.com>" );
+		email.setAssunto( " Cadastro no Controle de Acesso" );
+		
+		if(senha!=null){
+			email.setMensagem( this.gerarMensagemRecebimentoAcesso( login, senha ) );
+		}else{
+			email.setMensagem( this.geraMensagemAlteraPermissao(login));
+		}	
+		getEmailUtil().enviar( email );
+	}
+
+	public String geraMensagemAlteraPermissao(String usuario) {
+		Properties p = PropertiesUtils.getProperties("/conf.properties");
+		String nomeSistema =( String ) p.get("nmSistema");
+		String urlSistema  = ( String ) p.get("urlSistema");
+		
+		if(nomeSistema == null)
+			throw new NullPointerException("Propriedade nmSistema não configurado no arquivo conf.properties");
+		if(urlSistema == null)
+			throw new NullPointerException("Propriedade urlSistema não configurado no arquivo conf.properties");
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("usuario", usuario);
+		params.put("nomeSistema",nomeSistema);
+		params.put("urlSistema",urlSistema);
+		
+		return getResourcesUtils().getResource("alterar-permissao.html", params);
+	}
+	
+	public String gerarMensagemRecebimentoAcesso(String usuario, final String senha) {
+		
+		Properties p = PropertiesUtils.getProperties("/conf.properties");
+		String nomeSistema =( String ) p.get("nmSistema");
+		String urlSistema  = ( String ) p.get("urlSistema");
+		
+		if(nomeSistema == null)
+			throw new NullPointerException("Propriedade nmSistema não configurado no arquivo conf.properties");
+		if(urlSistema == null)
+			throw new NullPointerException("Propriedade urlSistema não configurado no arquivo conf.properties");
+		
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("usuario", usuario);
+		params.put("senha",senha);
+		params.put("nomeSistema",nomeSistema);
+		params.put("urlSistema",urlSistema);
+		
+		return getResourcesUtils().getResource("receber-acesso.html", params);
+		
 	}
 	
 	@Transactional( propagation = Propagation.REQUIRED, rollbackFor = {RuntimeException.class, Exception.class} )

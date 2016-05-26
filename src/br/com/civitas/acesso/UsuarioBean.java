@@ -107,7 +107,20 @@ public class UsuarioBean extends AbstractCrudBean<Usuario, UsuarioService> imple
 				for (Perfil perfil : getPerfis().getTarget()) {
 					getEntity().getPerfis().add(perfil);
 				}
-				getEntity().setSenha(geraSenha());
+				String senha = geraSenha();
+				getEntity().setSenha(Digest.MD5digest(senha));
+				
+				try {
+					getService().enviarEmail(getEntity().getEmail(), getEntity().getLogin(), senha);
+				} catch (Exception e) {
+					e.printStackTrace();
+					FacesUtils.addErrorMessage("Falha no envio do email.");
+					try {
+						getService().atualizarSenhaToLogin(getEntity());
+					} catch (Exception e2) {
+						e2.printStackTrace();	
+					}
+				}
 				super.executeSave();
 				
 			} catch (ApplicationException e) {
@@ -129,11 +142,7 @@ public class UsuarioBean extends AbstractCrudBean<Usuario, UsuarioService> imple
 			for (int x = 0; x < 6; x++) {
 				senha += carct[(int) (Math.random() * carct.length)];
 			}
-			System.out.println(senha);
-			System.out.println(senha);
-			System.out.println(senha);
-			System.out.println(senha);
-			return Digest.MD5digest(senha);
+			return senha;
 		}
 		
 		private void validar() {

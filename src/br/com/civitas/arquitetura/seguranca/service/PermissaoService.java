@@ -32,7 +32,7 @@ public class PermissaoService extends AbstractPersistence<Permissao> {
 		sql.append("SELECT DISTINCT p FROM Permissao p ");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		List <Permissao> permissoes = (List<Permissao>) query.list();
-		Collections.sort(permissoes, (Permissao p1, Permissao p2) -> p1.getDescricao().compareTo(p2.getDescricao()));
+		Collections.sort(permissoes, (Permissao p1, Permissao p2) -> p1.getChave().compareTo(p2.getChave()));
 		return permissoes;
 	}
 }
