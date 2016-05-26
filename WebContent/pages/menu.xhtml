@@ -61,18 +61,17 @@
 							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Opções<b class="caret"></b></a>
 								<ul class="dropdown-menu">
 								
-									<li><a href="#{request.contextPath}/pages/acesso/alterar-senha.jsf">Alterar Senha</a></li>
-									<h:panelGroup rendered="#{sessionScope.perms.grupoUsuarios.ativoBool}">
+									<h:panelGroup rendered="#{sessionScope.perms.PERFIL_R}">
 										<li>
-											<a href="#{request.contextPath}/acesso/grupo-de-usuarios.jsf">
-												Grupos de Usuários
+											<a href="#{request.contextPath}/pages/acesso/perfil.jsf">
+												Perfil
 											</a>
 										</li>
 									</h:panelGroup>
-									<h:panelGroup rendered="#{sessionScope.perms.modulos.ativoBool}">
+									<h:panelGroup rendered="#{sessionScope.perms.USUARIO_R}">
 										<li>
-											<a href="#{request.contextPath}/acesso/modulo.jsf">
-												Módulos
+											<a href="#{request.contextPath}/pages/acesso/usuario.jsf">
+												Usuários
 											</a>
 										</li>
 									</h:panelGroup>
@@ -83,20 +82,7 @@
 											</a>
 										</li>
 									</h:panelGroup>
-									<h:panelGroup rendered="#{sessionScope.perms.GRUPO_PERMISSAO_R}">
-										<li>
-											<a href="#{request.contextPath}/pages/acesso/grupoPermissao.jsf">
-												Grupo Permissões
-											</a>
-										</li>
-									</h:panelGroup>
-									<h:panelGroup rendered="#{sessionScope.perms.usuarios.ativoBool}">
-										<li>
-											<a href="#{request.contextPath}/acesso/usuario.jsf">
-												Usuários
-											</a>
-										</li>
-									</h:panelGroup>
+									<li><a href="#{request.contextPath}/pages/acesso/alterar-senha.jsf">Alterar Senha</a></li>
 								</ul>
 							</li>
 							

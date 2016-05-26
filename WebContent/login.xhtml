@@ -51,12 +51,14 @@
 								styleClass="form-control" title="Digite seu Usuário"
 								value="#{loginCivitasBean.usuario.login}"
 								autocomplete="off" />
+							<h:message for="usuario" tooltip="true"	styleClass="error-messages" />
 						</div>
 						<div class="form-group">
 							<h:outputLabel for="senha" value="Senha " />
 							<h:inputSecret id="senha" label="Senha" required="true"
 								styleClass="form-control" title="Digite sua Senha"
 								value="#{loginCivitasBean.usuario.senha}" />
+							<h:message for="senha" tooltip="true"	styleClass="error-messages" />
 						</div>
 						<div class="form-group">
 							<p:commandButton styleClass="btn btn-primary" value="ENTRAR"
@@ -66,7 +68,7 @@
 						<div class="form-group">
 							<p:commandLink value="Esqueceu a senha?"
 								styleClass="btn forget-password" action="esqueceuSenha"
-								ajax="false" />
+								ajax="false" immediate="true"/>
 						</div>
 					</h:panelGroup>
 				</h:form>

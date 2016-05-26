@@ -1,26 +1,36 @@
 package br.com.civitas.arquitetura.base.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.base.Permissao;
 import br.com.civitas.arquitetura.base.Usuario;
 import br.com.civitas.arquitetura.base.entity.ControleBloqueioUsuario;
+import br.com.civitas.arquitetura.base.vo.EmailVO;
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
+import br.com.civitas.arquitetura.util.Digest;
+import br.com.civitas.arquitetura.util.EmailUtil;
+import br.com.civitas.arquitetura.util.ResourceUtils;
 
 @Service
 public class UsuarioService extends AbstractPersistence<Usuario>{
 	
-	private static final long serialVersionUID = 3664773229681248350L;
+	private static final long serialVersionUID = 3498593952944611981L;
+
+	@Autowired EmailUtil emailUtil;
+	@Autowired ResourceUtils resourcesUtils;
 	
 	public static final String ID = "id";
 	public static final String NOME = "nome";
@@ -45,73 +55,6 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 									  .uniqueResult();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Usuario> findByFilter(Map<String, Object> filter, Integer first, Integer rows) {
-		
-		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT usu FROM Usuario usu ");
-		sql.append(" INNER JOIN usu.grupoEmpresa gp ");
-		sql.append(" LEFT JOIN FETCH usu.perfis per ");
-		sql = getRestricao(sql, filter);
-		sql.append(" ORDER BY gp.descricao ");
-		return getQuery(sql, filter, first, rows).getResultList();
-	}
-	
-	public Integer countByFilter(Map<String, Object> filter) {
-		
-		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT COUNT(usu) FROM Usuario usu ");
-		sql.append(" INNER JOIN usu.grupoEmpresa gp ");
-		sql = getRestricao(sql, filter);
-		return ((Number)getQuery(sql, filter, null, null).getSingleResult()).intValue();
-	}
-	
-	private StringBuilder getRestricao(StringBuilder sql, Map<String, Object> filter){
-		
-		
-		Object ativo = filter.get(ATIVO);
-		String login = (String) filter.get(LOGIN);
-		String nome = (String) filter.get(NOME);
-	
-		sql.append(" WHERE 1 = 1 ");
-		sql.append(!ativo.equals(NULL) ? " AND usu.ativo = :ativo " : "");
-		sql.append(StringUtils.isNotBlank(login) ? " AND UPPER(usu.login) like UPPER(:login) " : "");
-		sql.append(StringUtils.isNotBlank(nome) ? " AND UPPER(usu.nome) like UPPER(:nome) " : "");
-		return sql;
-	}
-	
-	private Query getQuery(StringBuilder sql, Map<String, Object> filter, Integer first, Integer rows){
-		
-		Object ativo = filter.get(ATIVO);
-		String login = (String) filter.get(LOGIN);
-		String nome = (String) filter.get(NOME);
-		
-		Query query = (Query) getSessionFactory().getCurrentSession().createQuery(sql.toString());
-		
-		if(!ativo.equals(NULL)) {
-			query.setParameter(ATIVO, Boolean.parseBoolean(ativo.toString()));
-		}
-		
-		if(StringUtils.isNotBlank(login)) {
-			query.setParameter(LOGIN, "%" + login + "%");
-		}
-		
-		if(StringUtils.isNotBlank(nome)) {
-			query.setParameter(NOME, "%" + nome + "%");
-		}
-
-		if(first != null){
-			query.setFirstResult(first);
-		}
-		
-		if(rows != null){
-			query.setMaxResults(rows);
-		}
-		
-		return query;
-		
-	}
-
 	public Usuario findByLoginAtivo(String login) {
 		try{
 			return (Usuario) getSessionFactory().getCurrentSession().createQuery("SELECT usu FROM Usuario usu WHERE usu.login = :login AND usu.ativo = :ativo")
@@ -143,25 +86,25 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 	public boolean isValidLogin(Usuario usuario){
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT usu from Usuario usu WHERE UPPER(usu.login) LIKE UPPER(:login) ");
-		Query query = (Query) getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 	    query.setParameter(LOGIN, usuario.getLogin());
-		return !query.getResultList().isEmpty();
+		return !query.list().isEmpty();
 	}
 	
 	public boolean validarSenha(Usuario usuario, String senha){
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT usu from Usuario usu WHERE UPPER(usu.login) LIKE UPPER(:login) AND senha = :senha ");
-		Query query = (Query) getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		Query query =  getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		query.setParameter(LOGIN, usuario.getLogin());
 		query.setParameter(SENHA, senha);
-		return !query.getResultList().isEmpty();
+		return !query.list().isEmpty();
 	}
 	
 	@Transactional
 	public boolean alterarSenha(Usuario usuario, String senha, Boolean alteraSenha){
 		StringBuilder sql = new StringBuilder();
 		sql.append(" UPDATE FROM Usuario SET alteraSenha = :alteraSenha, senha = :senha WHERE id = :id ");
-		Query query = (Query) getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		Query query =  getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		query.setParameter(ALTERA_SENHA, alteraSenha);
 		query.setParameter(SENHA, senha);
 		query.setParameter(ID, usuario.getId());
@@ -172,7 +115,7 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 	public boolean updateAtivo(Usuario usuario, Boolean value){
 		StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE FROM Usuario SET ativo = :ativo WHERE id = :id");
-		Query query = (Query) getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		Query query =  getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		query.setParameter(ATIVO, value ? true : false);
 		query.setParameter(ID, usuario.getId());
 		return query.executeUpdate() >= 1 ? true : false;
@@ -189,13 +132,45 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 		return usuario;
 	}
 	
+	@Transactional( propagation = Propagation.REQUIRED, rollbackFor = {RuntimeException.class, Exception.class} )
+	public void reiniciarSenha( Usuario usuario ){
+		usuario.setLogin( usuario.getLogin() != null ? usuario.getLogin().trim() : null );
+		usuario.setEmail( usuario.getEmail() != null ? usuario.getEmail().trim() : null );
+		List<Usuario> l = findByFilter( Usuario.class, usuario.notEmptyFields() );
+		
+		if(l.isEmpty()){
+			throw new ApplicationException( "Os dados informados não conferem!" );
+		} 
+		
+		usuario = l.get(0);
+		String senha = EmailUtil.geraSenha();
+		usuario.setSenha( Digest.MD5digest(senha) );
+		
+		atualizarSenhaToLogin(usuario);
+
+		// envio do e-mail
+		EmailVO email = new EmailVO();
+		email.setDestino( usuario.getEmail() );
+		email.setRemetente( "CÍVITAS  <administrador@civitas.com.br>" );
+		email.setAssunto( "CÍVITAS - Senha de Acesso" );
+		email.setMensagem( this.geraMensagemRedefinirSenha( usuario.getLogin(), senha ) );
+		
+		getEmailUtil().enviar( email );
+	}
+	
+	public String geraMensagemRedefinirSenha( String usuario, String senha ) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("usuario", usuario);
+		params.put("senha",senha);
+		return getResourcesUtils().getResource("redefinir-senha.html", params);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Permissao> findPermissaoByUsuario(Usuario usuario) {
 		StringBuilder jpQL = new StringBuilder();
 		jpQL.append("SELECT perm FROM Perfil per ");
 		jpQL.append("INNER JOIN per.permissoes perm ");
 		jpQL.append("INNER JOIN per.usuarios usu ");
-		jpQL.append("INNER JOIN usu.grupoEmpresa ge ");
 		jpQL.append("WHERE usu = :usuario");
 		return  getSessionFactory().getCurrentSession().createQuery(jpQL.toString()).setParameter(USUARIO, usuario)  .list();
 	}
@@ -234,13 +209,34 @@ public class UsuarioService extends AbstractPersistence<Usuario>{
 
 	@Transactional( propagation = Propagation.REQUIRED, rollbackFor = Exception.class )
 	public void atualizarSenhaToLogin(Usuario usuario) {
-		String senha = usuario.getSenha();
-//		getSessionFactory().getCurrentSession().create("update Usuario set senha = ? where id = ?", 
-//				br.com.civitas.helpers.utils.StringUtils.md5(senha), usuario.getId());
+		StringBuilder sql = new StringBuilder();
+		sql.append("UPDATE FROM Usuario u SET u.senha = :senha WHERE u.id = :id");
+		Query query =  getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		query.setParameter(SENHA, Digest.MD5digest(usuario.getSenha()));
+		query.setParameter(ID, usuario.getId());
+		query.executeUpdate();
 	}	
+	
 	@Override
-	protected Class getClazz() {
-		return null;
+	protected Class<Usuario> getClazz() {
+		return Usuario.class;
 	}
+
+	public EmailUtil getEmailUtil() {
+		return emailUtil;
+	}
+
+	public void setEmailUtil(EmailUtil emailUtil) {
+		this.emailUtil = emailUtil;
+	}
+
+	public ResourceUtils getResourcesUtils() {
+		return resourcesUtils;
+	}
+
+	public void setResourcesUtils(ResourceUtils resourcesUtils) {
+		this.resourcesUtils = resourcesUtils;
+	}
+	
 	
 }

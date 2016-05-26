@@ -41,20 +41,6 @@
 		<ui:define name="camposFiltro">
 			<fieldset>
 				<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Grupo Permissão " />
-							<h:selectOneMenu id="grupoSearch"
-											 value="#{bean.entitySearch.grupoPermissao}"
-											 converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.nome.toUpperCase()}"
-										value="#{bean.gruposPermissao}" />
-							</h:selectOneMenu>
-							<h:message for="grupoSearch" tooltip="true"
-							styleClass="error-messages" />
-						</div>
-					</div>
 					<div class="col-md-6 form-group">
 						<div class="form-group">
 							<h:outputLabel value="Chave: " style="font-weight: normal;"/>
@@ -93,10 +79,6 @@
 								</div>
 							</p:column>
        					
-       						<p:column headerText="Grupo" style="text-align:left;">
-       							<h:outputText value="#{permissao.grupoPermissao.nome}" />
-       						</p:column>
-       						
        						<p:column headerText="Chave" style="text-align:left;">
        							<h:outputText value="#{permissao.chave}" />
        						</p:column>
@@ -126,22 +108,6 @@
 		<ui:define name="camposInsert">
 			<fieldset>
 				<legend>Cadastro de Permissão</legend>
-				<div class="row" >
-					<div class="col-md-6 form-group">
-						<h:outputLabel value="Grupo Permissão:"/>
-						<p:selectOneMenu id="grupoInsert"
-										 value="#{bean.entity.grupoPermissao}" required="true"
-										 label="Estado" converter="entityConverter"
-										 styleClass="select-custom" filterMatchMode="contains" 
-										 effectSpeed="20" filter="true" panelStyle="width:180px">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.nome.toUpperCase()}"
-										value="#{bean.gruposPermissao}" />
-						</p:selectOneMenu>
-						<h:message for="grupoInsert" tooltip="true"
-							   styleClass="error-messages" />
-					</div>
-				</div>
 				<div class="row" >	
 					<div class="col-md-6 form-group">
 						<div class="form-group">
@@ -162,7 +128,5 @@
 				</div>	
 			</fieldset>
 		</ui:define>
-	
-		
     </ui:composition>
 </html>

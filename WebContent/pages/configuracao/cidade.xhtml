@@ -120,7 +120,7 @@
 			<legend>Cadastro de Cidade</legend>
 			<div class="row" >
 				<div class="col-md-6 form-group">
-					<h:outputLabel value="Estado:"/>
+					<h:outputLabel value="Estado:" style="font-weight: normal;"/>
 					<p:selectOneMenu id="estadoInsert"
 									 value="#{bean.entity.estado}" required="true"
 									 label="Estado" converter="entityConverter"
@@ -142,7 +142,7 @@
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group">
-			        <h:outputText value="Ativa " />
+			        <h:outputLabel value="Ativa: " style="font-weight: normal;" />
 			        <p:selectBooleanCheckbox onchange="carregando.show();" value="#{bean.entity.ativa}">
 						<p:ajax oncomplete="carregando.hide();" process="@this"/>
 					</p:selectBooleanCheckbox>

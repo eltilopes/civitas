@@ -5,12 +5,9 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -34,10 +31,6 @@ public class Permissao implements IEntity {
 
 	@Column(name = "ds_descricao", nullable = false, length = 80)
 	private String descricao;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="cd_grupo_permissao", nullable = false)
-	private GrupoPermissao grupoPermissao;
 
 	@Transient
 	private Boolean checado;
@@ -67,14 +60,6 @@ public class Permissao implements IEntity {
 		this.descricao = descricao;
 	}
 
-	public GrupoPermissao getGrupoPermissao() {
-		return grupoPermissao;
-	}
-
-	public void setGrupoPermissao(GrupoPermissao grupoPermissao) {
-		this.grupoPermissao = grupoPermissao;
-	}
-
 	public Boolean getChecado() {
 		return checado;
 	}
@@ -88,7 +73,6 @@ public class Permissao implements IEntity {
 		permissao.setChave(this.chave);
 		permissao.setChecado(this.checado);
 		permissao.setDescricao(this.descricao);
-		permissao.setGrupoPermissao(this.grupoPermissao);
 		permissao.setId(getId());
 		return permissao;
 	}
@@ -104,9 +88,6 @@ public class Permissao implements IEntity {
 		}
 		if (descricao != null && !descricao.trim().isEmpty()) {
 			map.put("descricao", descricao);
-		}
-		if (grupoPermissao != null && grupoPermissao.getId() != null ) {
-			map.put("grupoPermissao.id", grupoPermissao.getId() );
 		}
 		return map;
 	}

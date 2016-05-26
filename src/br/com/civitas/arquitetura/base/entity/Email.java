@@ -14,7 +14,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -33,36 +32,29 @@ public class Email  implements IEntity {
 	@Column(name = "ci_email")
 	private Long id;
 	
-	@NotNull
-	@Column(name = "dt_envio")
+	@Column(name = "dt_envio",nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataEnvio;
 
-	@NotNull
 	@Length(max = 255)
-	@Column(name = "ds_titulo")
+	@Column(name = "ds_titulo",nullable = false)
 	private String titulo;
 
-	@NotNull
-	@Column(name = "ds_corpo")
+	@Column(name = "ds_corpo",nullable = false)
 	private String corpo;
 
-	@NotNull
 	@Length(max = 255)
-	@Column(name = "nm_destinatario")
+	@Column(name = "nm_destinatario",nullable = false)
 	private String destinatario;
 
-	@NotNull
-	@Column(name = "nr_tipo_email")
+	@Column(name = "nr_tipo_email",nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private TipoEmail tipoEmail;
 
-	@NotNull
-	@Column(name = "fl_enviado")
+	@Column(name = "fl_enviado",nullable = false)
 	private Boolean enviado;
 	
-	@NotNull
-	@Column(name = "fl_reenviado")
+	@Column(name = "fl_reenviado",nullable = false)
 	private Integer reenviado;
 	
 	public Email() {

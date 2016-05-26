@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,9 +18,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.WordUtils;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.DateTime;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,37 +42,33 @@ public class Usuario implements IEntity,UserDetails {
 	@Column(name = "ci_usuario")
 	private Long id;
 	
-	@NotNull
-	@Column(name="nm_nome")
+	@Column(name="nm_nome",nullable = false)
 	private String nome;
 
-	@NotNull
-	@Column(name="fl_ativo")
+	@Column(name="fl_ativo",nullable = false)
 	private Boolean ativo;
 
-	@Column(name="ds_login",unique = true)
-	@NotNull
+	@Column(name="ds_login",unique = true,nullable = false)
 	private String login;
 
-	@NotNull
-	@Column(name="ds_senha")
+	@Column(name="ds_senha",nullable = false)
 	private String senha;
 
-	@Column(name = "fl_altera_senha")
-	@NotNull
+	@Column(name = "fl_altera_senha",nullable = false)
 	private Boolean alteraSenha;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "usuario_perfil", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+	@ManyToMany
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@JoinTable(name = "tb_usuario_perfil",
+		joinColumns = @JoinColumn(name = "cd_usuario", referencedColumnName = "ci_usuario") , 
+		inverseJoinColumns = @JoinColumn(name = "cd_perfil", referencedColumnName = "ci_perfil") )
 	private List<Perfil> perfis;
-
-	@NotNull
-	@Column(name="fl_root")
+	
+	@Column(name="fl_root",nullable = false)
 	private Boolean root;
 	
-	@NotNull
 	@Email(message="Email invalido")
-	@Column(name="ds_email")
+	@Column(name="ds_email",nullable = false)
 	private String email;
 
 	@Transient
@@ -123,11 +118,11 @@ public class Usuario implements IEntity,UserDetails {
 	}
 
 	public String getNome() {
-		return WordUtils.capitalizeFully(nome);
+		return nome;
 	}
 
 	public void setNome(String nome) {
-		this.nome = nome;
+		this.nome = nome.toUpperCase();
 	}
 
 	public Boolean getAtivo() {
@@ -143,7 +138,7 @@ public class Usuario implements IEntity,UserDetails {
 	}
 
 	public void setLogin(String login) {
-		this.login = login;
+		this.login = login.toUpperCase();
 	}
 
 	public String getSenha() {
@@ -295,9 +290,12 @@ public class Usuario implements IEntity,UserDetails {
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		Map<String, Object> map = new HashMap<String, Object>();
-		if(id != null ){
-			map.put("id", id);
-		}
+		if( nome != null && !nome.trim().isEmpty() )
+			map.put("nome", nome);
+		if( login != null && !login.trim().isEmpty() )
+			map.put("login", login);
+		if( email != null && !email.trim().isEmpty() )
+			map.put("email", email);
 		return map;
 	}
 

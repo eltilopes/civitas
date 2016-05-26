@@ -162,7 +162,7 @@ public class LogAcessoService extends  AbstractPersistence<LogAcesso> {
 	}
 
 	@Override
-	protected Class getClazz() {
+	protected Class<LogAcesso> getClazz() {
 		return LogAcesso.class;
 	}
 	

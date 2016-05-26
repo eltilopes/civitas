@@ -48,7 +48,29 @@
         </property>
 	</bean>
 	
-
+	<bean name="emailUtil" class="br.com.civitas.arquitetura.util.EmailUtil">
+		<property name="userName" value="sistemacivitas@gmail.com" />
+		<property name="password" value="civitassistema"/>
+		<property name="properties" >
+			<props>
+				<prop key="mail.smtp.host">smtp.gmail.com</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.port">465</prop>
+				<prop key="mail.smtp.socketFactory.port">465</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.mime.charset">UTF-8</prop>
+				<prop key="mail.transport.protocol">smtp</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean name="resourceUtils" class="br.com.civitas.arquitetura.util.ResourceUtils">
+		<property name="resourcesPath">
+		     <array>
+		        <value>/br/com/civitas/template/email/</value>
+		     </array>
+	   </property>
+	</bean>
 	
 	<bean id="entityManager" class="org.springframework.orm.hibernate3.HibernateTemplate">
 		<property name="sessionFactory" ref="sessionFactory" />

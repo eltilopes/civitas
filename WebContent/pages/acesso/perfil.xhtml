@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+      
+    <ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Perfil" />
+    	</ui:define>
+    	
+    	<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{perfilBean}" />
+		</ui:define>
+    	
+    	<ui:define name="tituloFieldSetFiltro">
+    		<h4> Pesquisa de Perfil </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Novo"
+							 actionListener="#{bean['prepareInsert']}" 
+							 rendered="#{sessionScope.perms.PERFIL_C}"
+							 onclick="carregando.show();" 
+							 styleClass="btn btn-primary"
+							 immediate="true"
+							 update=":painelGlobal"
+							 ajax="false"/>
+							 
+			<p:commandButton value="Excluir" 
+							 styleClass="btn btn-primary botaoExcluir"
+							 style="display:none;"
+							 rendered="#{sessionScope.perms.PERFIL_D}"
+							 onclick="showIf()"/>
+		</ui:define>
+		
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+							<p:inputText id="nomeSearch" styleClass="form-control" process="@this"  value="#{bean.entitySearch.nome}" />
+							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+		  <ui:param name="tituloPainel" value="Perfil" />
+		</ui:define>
+		
+		<ui:define name="resultFiltro">
+			<p:dataTable styleClass="table table-responsive table-mobile"
+   						 id="perfil"
+   						 rows="10"
+   						 pageLinks="3"
+   						 paginatorAlwaysVisible="false"
+   						 emptyMessage="Nenhuma Perfil foi encontrado."
+   						 value="#{bean.resultSearch}" 
+       					 var="perfil" 
+       					 paginator="#{bean.resultSearch.rowCount > 0}"
+       					 paginatorPosition="bottom"
+       					 rowStyleClass="bgLinha1,bgLinha2">
+       					 
+       					 	<p:column headerText="" style="width:60px; text-align:center;"  rendered="#{sessionScope.perms.PERFIL_U}" >
+								<div class="colunaAcao" >					    			
+									<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
+									    <i class="glyphicon glyphicon-edit" />
+									</h:commandLink>
+									<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+										showEffect="fade" trackMouse="true" />
+								</div>
+							</p:column>
+       					
+       						<p:column headerText="Nome" style="text-align:left;">
+       							<h:outputText value="#{perfil.nome}" />
+       						</p:column>
+       						
+							<p:column headerText="Ativo">
+								<h:outputText value="SIM" rendered="#{perfil.ativo == true}" />
+								<h:outputText value="NÃO" rendered="#{perfil.ativo == false}" />
+							</p:column>
+					
+							<p:column style="width:60px; text-align:center;" rendered="#{sessionScope.perms.PERFIL_D}">
+								<f:facet name="header">
+									<h:selectBooleanCheckbox
+										rendered="#{bean.resultSearch.rowCount > 0}"
+										styleClass="ui-checkBoxMain" />
+								</f:facet>
+				
+								<h:selectBooleanCheckbox styleClass="ui-checkBox"
+									valueChangeListener="#{bean.select}" />
+							</p:column>
+
+		</p:dataTable> 
+		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Perfil</h4>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+			<fieldset>
+				<legend>Cadastro de Perfil</legend>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<div class="form-group">
+							<h:outputLabel value="Nome: " style="font-weight: normal;"/>
+							<h:inputText id="nomeInsert" styleClass="form-control" required="true" value="#{bean.entity.nome}" />
+							<h:message for="nomeInsert" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+				        <h:outputLabel value="Ativo: " style="font-weight: normal;" />
+				        <p:selectBooleanCheckbox id="ativo" onchange="carregando.show();" value="#{bean.entity.ativo}">
+							<p:ajax oncomplete="carregando.hide();" process="@this"/>
+						</p:selectBooleanCheckbox>
+						<h:message for="ativo" tooltip="true"	styleClass="error-messages" />
+					</div>
+				</div>
+				
+				<p:panel id="panelAdicionarPermissoes" header="Adicionar Permissões" style="margin-bottom:20px">
+					<div class="row"> 
+						<div class="form-group">
+							<div class="col-md-10">
+								<h:outputText value="Permissões Disponíveis: " />
+								<h:selectOneMenu id="permissoesDisponiveis"  value="#{bean.permissaoAuxiliarInsert}" converter="entityConverter" 
+												 styleClass="form-control ui-inputfield">
+									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+									<f:selectItems var="p" itemValue="#{p}" itemLabel="#{p.descricao.toUpperCase()}"  value="#{bean.listaPermissaoDisponiveis}" />
+									<f:ajax  event="change"  render="panelAdicionarPermissoes"   process="permissoesDisponiveis" />
+								</h:selectOneMenu>
+								<h:message for="permissoesDisponiveis" styleClass="error-messages" />
+							</div>	
+							<div class="col-md-1">
+								<div class="form-group">
+									<br/>
+									<h:commandLink id="adicionarPermissao" actionListener="#{bean.adicionarPermissao}">
+										<i class="glyphicon glyphicon-plus-sign green-icon-big" style="color:#00A49E"/>
+										<p:ajax update=":painelGlobal,:formPanel:mensagemAviso" />
+									</h:commandLink>
+								</div>					
+							</div>	
+						</div>
+					</div>		
+					<br/>
+					<h:outputText value="Permissões Selecionadas: " />
+					<p:dataTable styleClass="table table-responsive table-mobile"  id="permissoes"   widgetVar="tabelaPermissoes"    
+								 emptyMessage="Nenhuma Permissão foi selecionada." value="#{bean.entity.permissoes}" var="perm"  rowStyleClass="bgLinha1,bgLinha2">
+								 
+						<p:column headerText="Descrição" style="text-align:left;" >
+							<h:outputText value="#{perm.descricao}" />
+						</p:column>
+	
+						<p:column headerText="Remover" style="text-align:center"  rendered="#{sessionScope.perms.PERMISSAO_D}"  >
+							<h:commandLink id="removerPermissao" action="#{bean.removerPermissao(perm)}" immediate="true" > 
+								<i class="glyphicon glyphicon-remove-sign red-icon" style="color:#AF514F"/>
+	 							<p:ajax update=":painelGlobal,:formPanel:mensagemAviso" />						
+	 						</h:commandLink>
+						</p:column>
+				 	</p:dataTable>
+				</p:panel>
+			</fieldset>
+		</ui:define>
+    </ui:composition>
+</html>
