@@ -61,7 +61,7 @@
 				
 				<ui:insert name="info"></ui:insert>
 			
-				<h:form id="formConsulta" enctype="multipart/form-data">
+				<h:form id="formConsulta" >
 					<h:panelGroup id="pesquisa" rendered="#{bean['searching']}">
 					
 						<ui:insert name="tituloPrincipal">
@@ -119,7 +119,7 @@
 					</h:panelGroup>
 				</h:form>
 
-				<h:form id="formCadastro">
+				<h:form id="formCadastro" enctype="multipart/form-data">
 					<h:panelGroup id="cadastro" rendered="#{bean['updating']}">
 						<div class="card-view">
 						

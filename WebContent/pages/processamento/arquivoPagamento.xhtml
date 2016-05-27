@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Arquivo Pagamento" />
+    	</ui:define>
+    	
+   		<ui:define name="pageScript">
+			<script type="text/javascript"
+				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{arquivoPagamentoBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Arquivo Pagamento
+		</ui:define>
+		
+		<script>
+			$(document).ready(function(){
+				$(".valor").mask('######.##0,00', {reverse: true});
+			});
+		</script>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Ano " />
+							<h:selectOneMenu id="anoSearch"
+											 value="#{bean.entitySearch.ano}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+										value="#{bean.anos}" />
+							</h:selectOneMenu>
+							<h:message for="anoSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Mês " />
+							<h:selectOneMenu id="mesSearch"
+											 value="#{bean.entitySearch.mes}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.meses}" />
+							</h:selectOneMenu>
+							<h:message for="mesSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Cidade " />
+							<h:selectOneMenu id="cidadeSearch"
+											 value="#{bean.entitySearch.cidade}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cidades}" />
+							</h:selectOneMenu>
+							<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4 form-group">
+						<h:outputText value="Tipo Arquivo " />
+						<h:selectOneMenu id="tipoArquivoSearch" 
+										 value="#{bean.entitySearch.tipoArquivo}" 
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoArquivoSearch" tooltip="true"
+							styleClass="error-messages" />	
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Arquivos de Pagamentos" />
+		</ui:define>
+	
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Processar Novo Arquivo"
+						 actionListener="#{bean.prepareProcessarArquivo()}" 
+						 rendered="#{sessionScope.perms.ARQUIVO_PAGAMENTO_C}"
+						 styleClass="btn btn-primary"
+						 update=":painelGlobal"
+						 ajax="false"/>
+		</ui:define>
+	
+		<ui:define name="resultFiltro" >
+			<p:dataTable id="arquivos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaArquivos" rows="10" emptyMessage="Nenhum Arquivo de Pagamento foi encontrado."
+			 		 value="#{bean.resultSearch}" var="arquivoPagamento" paginator="#{bean.resultSearch.rowCount > 0}"
+			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+		        
+		        <p:column style="width:16px">
+		            <p:rowToggler />
+		        </p:column>
+		        
+				<p:column headerText="Nome" style="text-align:left;" >
+	   				<h:outputText id="nome" value="#{arquivoPagamento.nomeArquivo}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Cidade" style="text-align:left;" >
+	   				<h:outputText id="cidade" value="#{arquivoPagamento.cidade.descricao.toUpperCase()}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Ano" style="text-align:left;" >
+	   				<h:outputText id="ano" value="#{arquivoPagamento.ano.ano}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Mês" style="text-align:left;" >
+	   				<h:outputText id="mes" value="#{arquivoPagamento.mes.descricao}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Tipo Arquivo" style="text-align:left;" >
+	   				<h:outputText id="tipoArquivo" value="#{arquivoPagamento.tipoArquivo.descricao}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Pagamentos" style="text-align:right;" >
+	   				<h:outputText id="pagamentos" value="#{arquivoPagamento.totalPagamentos}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Data Processamento" style="text-align:center;" >
+	   				<h:outputText id="dataProcessamento" value="#{arquivoPagamento.dataProcessamento}"   >
+	   					<f:convertDateTime pattern="dd/MM/yyyy" />
+	   				</h:outputText>	
+	   			</p:column>
+	   			
+	   			<p:rowExpansion>
+           			<p:dataTable  var="arquivoPagamento" value="#{arquivoPagamento}" >
+		           		<p:column headerText="Proventos" style="text-align:right;" >
+			   				<h:outputText id="totalProventos"  value="#{arquivoPagamento.totalProventos}" converter="valorNumericoMoedaConverter" />
+			   			</p:column>
+			   			
+						<p:column headerText="Líquido" style="text-align:right;" >
+			   				<h:outputText id="totalLiquido"  value="#{arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" />
+			   			</p:column>
+			   			
+						<p:column headerText="Desconto" style="text-align:right;" >
+			   				<h:outputText id="totalDescontos" value="#{arquivoPagamento.totalDescontos}"  converter="valorNumericoMoedaConverter" />
+			   			</p:column>
+			   			
+						<p:column headerText="Remuneração" style="text-align:right;" >
+			   				<h:outputText id="totalRemuneracao"  value="#{arquivoPagamento.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
+			   			</p:column>
+           			</p:dataTable>
+        		</p:rowExpansion>
+        		
+			</p:dataTable> 
+		</ui:define>
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Processar Arquivo </h4>
+		</ui:define>
+		
+		<ui:define name="botoesInsert">
+					<p:commandButton value="Processar"
+						 actionListener="#{bean.processarArquivo()}" 
+						 styleClass="btn btn-primary"
+						 update=":painelGlobal"
+						 ajax="false"/>
+					<p:commandButton styleClass="btn btn-primary" value="Voltar"
+						actionListener="#{bean['cancel']}" immediate="true"
+						update=":painelGlobal" ajax="false" />
+					<p></p>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Ano " />
+							<h:selectOneMenu id="anoInsert"
+											 value="#{bean.arquivo.ano}"
+											 converter="entityConverter" styleClass="form-control"
+											 required="true">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+										value="#{bean.anos}" />
+							</h:selectOneMenu>
+							<h:message for="anoInsert" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Mês " />
+							<h:selectOneMenu id="mesInsert"
+											 value="#{bean.arquivo.mes}"
+											 converter="entityConverter" styleClass="form-control"
+											 required="true">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.meses}" />
+							</h:selectOneMenu>
+							<h:message for="mesInsert" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Cidade " />
+							<h:selectOneMenu id="cidadeInsert"
+											 value="#{bean.arquivo.cidade}"
+											 converter="entityConverter" styleClass="form-control"
+											 required="true">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cidades}" />
+							</h:selectOneMenu>
+							<h:message for="cidadeInsert" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4 form-group">
+						<h:outputText value="Tipo Arquivo " />
+						<h:selectOneMenu id="tipoArquivoInsert" 
+										 value="#{bean.arquivo.tipoArquivo}" 
+										 required="true"
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoArquivoInsert" tooltip="true"
+							styleClass="error-messages" />	
+					</div>
+				</div>	
+				<div class="row">
+					<div class="col-md-8 form-group">
+						<h:outputLabel value="Selecione o Arquivo " />
+						<p:fileUpload id="file" required="true" value="#{bean.file}" styleClass="btn btn-primary"  allowTypes="/(\.|\/)(pdf)$/" process="@this" mode="simple" skinSimple="true"/>
+						<h:message for="file" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+    </ui:composition>
+</html>

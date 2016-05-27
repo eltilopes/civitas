@@ -21,21 +21,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
-import br.com.civitas.processamento.entity.Arquivo;
-import br.com.civitas.processamento.service.ArquivoService;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.service.ArquivoPagamentoService;
 
 @Service
 public class ValidarArquivoService {
 	
 	private static final String TIPO_ARQUIVO_PDF = "PDF";
 	private UploadedFile file;
-	private Arquivo arquivo;
+	private ArquivoPagamento arquivo;
 	private String nomeArquivoTemporario;
 	
 	@Autowired
-	private  ArquivoService arquivoService ;
+	private  ArquivoPagamentoService arquivoService ;
 	
-	public void validarArquivo(UploadedFile file, Arquivo arquivo) throws IOException{
+	public void validarArquivo(UploadedFile file, ArquivoPagamento arquivo) throws IOException{
 		this.file = file;
 		this.arquivo = arquivo;
 		validarTipoArquivo();

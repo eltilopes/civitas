@@ -7,34 +7,34 @@ import org.hibernate.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
-import br.com.civitas.processamento.entity.Arquivo;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
 
 @Service
-public class ArquivoService extends AbstractPersistence<Arquivo> {
+public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagamento> {
 
 	private static final long serialVersionUID = -7300710483142299659L;
 
 	@Override
-	protected Class<Arquivo> getClazz() {
-		return Arquivo.class;
+	protected Class<ArquivoPagamento> getClazz() {
+		return ArquivoPagamento.class;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<Arquivo> buscarTodos() {
+	public Collection<ArquivoPagamento> buscarTodos() {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT DISTINCT a FROM Arquivo a");
+		sql.append("SELECT DISTINCT a FROM ArquivoPagamento a");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
-		return (List<Arquivo>) query.list();
+		return (List<ArquivoPagamento>) query.list();
 	}
 
-	public Arquivo buscarPorArquivo(Arquivo arquivo) {
+	public ArquivoPagamento buscarPorArquivo(ArquivoPagamento arquivo) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT a FROM Arquivo a ");
+		sql.append(" SELECT a FROM ArquivoPagamento a ");
 		sql.append(" WHERE a.ano = :ano ");
 		sql.append(" AND a.mes = :mes  ");
 		sql.append(" AND a.cidade = :cidade  ");
 		sql.append(" AND a.tipoArquivo = :tipoArquivo  ");
-		return (Arquivo) getSessionFactory().getCurrentSession().createQuery(sql.toString())
+		return (ArquivoPagamento) getSessionFactory().getCurrentSession().createQuery(sql.toString())
 									  .setParameter("ano", arquivo.getAno())
 									  .setParameter("mes", arquivo.getMes())
 									  .setParameter("cidade", arquivo.getCidade())

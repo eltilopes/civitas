@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
-import br.com.civitas.processamento.entity.Arquivo;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.Pagamento;
 
@@ -24,7 +24,7 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	private EventoPagamentoService eventoPagamentoService;
 	
 	@Autowired
-	private ArquivoService arquivoService;
+	private ArquivoPagamentoService arquivoService;
 	
 	@Override
 	protected Class<Pagamento> getClazz() {
@@ -40,7 +40,7 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	}
 	
 	@Transactional
-	public void inserirPagamentos(List<Pagamento> pagamentos, List<Evento> eventos, Arquivo arquivo)  {
+	public void inserirPagamentos(List<Pagamento> pagamentos, List<Evento> eventos, ArquivoPagamento arquivo)  {
 		try {
 			arquivo = arquivoService.save(setResumoArquivo(pagamentos,eventos, arquivo));
 			for(Pagamento p : pagamentos){
@@ -54,7 +54,7 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		}
 	}
 	
-	private Arquivo setResumoArquivo(List<Pagamento> pagamentos, List<Evento> eventos, Arquivo arquivo) {
+	private ArquivoPagamento setResumoArquivo(List<Pagamento> pagamentos, List<Evento> eventos, ArquivoPagamento arquivo) {
 		for(Pagamento p : pagamentos){
 			arquivo.setTotalDescontos(arquivo.getTotalDescontos() + p.getTotalDescontos());
 			arquivo.setTotalLiquido(arquivo.getTotalLiquido() + p.getTotalLiquido());

@@ -1,6 +1,7 @@
 package br.com.civitas.processamento.entity;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -27,15 +28,15 @@ import br.com.civitas.processamento.enums.TipoArquivo;
 
 
 @Entity
-@Table(name = "tb_arquivo")
-public class Arquivo implements IEntity {
+@Table(name = "tb_arquivo_pagamento")
+public class ArquivoPagamento implements IEntity {
 
 	private static final long serialVersionUID = 7508490594204603372L;
 
 	@Id
-	@GeneratedValue(generator = "seq_arquivo", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "seq_arquivo", sequenceName = "seq_arquivo", allocationSize = 1)
-	@Column(name = "ci_arquivo")
+	@GeneratedValue(generator = "seq_arquivo_pagamento", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "seq_arquivo_pagamento", sequenceName = "seq_arquivo_pagamento", allocationSize = 1)
+	@Column(name = "ci_arquivo_pagamento")
 	private Long id;
 	
 	@Column(name = "nm_arquivo",nullable = false, length = 30)
@@ -79,7 +80,7 @@ public class Arquivo implements IEntity {
 	@Transient
 	private UploadedFile file;
 	
-	public Arquivo(){
+	public ArquivoPagamento(){
 		totalDescontos = 0D;
 		totalLiquido = 0D;
 		totalRemuneracao = 0D;
@@ -88,7 +89,7 @@ public class Arquivo implements IEntity {
 		dataProcessamento = new Date();
 	}
 
-	public Arquivo(String nomeArquivo){
+	public ArquivoPagamento(String nomeArquivo){
 		this.nomeArquivo = nomeArquivo;
 		totalDescontos = 0D;
 		totalLiquido = 0D;
@@ -196,8 +197,36 @@ public class Arquivo implements IEntity {
 
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(cidade != null && cidade.getId() != null ){
+			map.put("cidade.id",cidade.getId() );
+		}if(ano != null && ano.getId() != null ){
+			map.put("ano.id",ano.getId() );
+		}if(mes != null && mes.getId() != null ){
+			map.put("mes.id",mes.getId() );
+		}if(tipoArquivo != null  ){
+			map.put("tipoArquivo",tipoArquivo );
+		}
+		return map;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ArquivoPagamento other = (ArquivoPagamento) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	public UploadedFile getFile() {

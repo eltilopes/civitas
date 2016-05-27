@@ -22,7 +22,7 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.civitas.processamento.entity.Arquivo;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
@@ -42,7 +42,7 @@ public class ProcessarService {
 	private  MatriculaService matriculaService ;
 	
 	@Autowired
-	private  ArquivoService arquivoService ;
+	private  ArquivoPagamentoService arquivoService ;
 	
 	@Autowired
 	private  CargoService cargoService;
@@ -72,12 +72,12 @@ public class ProcessarService {
 	private double PROVENTOS = 0d;
 	private double DESCONTOS = 0d;
 	
-	public List<Pagamento> getPagamentos(Arquivo arquivo){
+	public List<Pagamento> getPagamentos(ArquivoPagamento arquivo){
 		processar(arquivo);
 		return pagamentos;
 	}
 	
-	private void processar(Arquivo arquivo) {
+	private void processar(ArquivoPagamento arquivo) {
 		try {
 			criarArquivoProcessamento(arquivo);
 			iniciarValores(arquivo);
@@ -123,7 +123,7 @@ public class ProcessarService {
 		}
 	}
 
-	private void criarArquivoProcessamento(Arquivo arquivo) throws IOException {
+	private void criarArquivoProcessamento(ArquivoPagamento arquivo) throws IOException {
 		nomeArquivoTemporario = "";
 		String filename = FilenameUtils.getName(arquivo.getFile().getFileName());
 	    InputStream input = arquivo.getFile().getInputstream();
@@ -142,7 +142,7 @@ public class ProcessarService {
 		
 	}
 
-	private void iniciarValores(Arquivo arquivo) {
+	private void iniciarValores(ArquivoPagamento arquivo) {
 		pagamento = null;
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
@@ -179,14 +179,14 @@ public class ProcessarService {
 		eventos = eventoService.buscarTodos();
 	}
 
-	private void localizarEvento(String linha, Arquivo arquivo) {
+	private void localizarEvento(String linha, ArquivoPagamento arquivo) {
 		verificarIdentificadorEvento(linha);
 		if(processamentoEventos && !(linha.contains(Identificador.INICIO_EVENTO.getDescricao()))){
 			getEvento(linha, arquivo);
 		}
 	}
 	
-	private  void getEvento(String linha, Arquivo arquivo) {
+	private  void getEvento(String linha, ArquivoPagamento arquivo) {
 		//TODO : melhorar a busca do evento
 		try {
 			existeEventoTemp = false;
@@ -245,7 +245,7 @@ public class ProcessarService {
 //		vinculoService.removeAll(vinculoService.buscarTodos());
 	}
 
-	private void localizarPagamentos(String linhaAtual, Arquivo arquivo) {
+	private void localizarPagamentos(String linhaAtual, ArquivoPagamento arquivo) {
 		localizarMatricula(linhaAtual, arquivo);
 		verificarIdentificador(linhaAtual, arquivo.getNomeArquivo());
 	}
@@ -363,7 +363,7 @@ public class ProcessarService {
 	}
 		
 
-	private  void localizarMatricula(String linhaAtual, Arquivo arquivo) {
+	private  void localizarMatricula(String linhaAtual, ArquivoPagamento arquivo) {
 		if(linhaAtual.contains(Identificador.CARGO.getDescricao())){
 			ultimaLinha = linhaAnterior;
 			processamentoPagamentoAtivo = true;
@@ -382,7 +382,7 @@ public class ProcessarService {
 //		}
 	}
 	
-	private  void novaMatricula(String numeroMatricula, String linhaAtual, Arquivo arquivo) {
+	private  void novaMatricula(String numeroMatricula, String linhaAtual, ArquivoPagamento arquivo) {
 		matricula = new Matricula();
 		matricula.setNumeroMatricula(numeroMatricula);
 		matricula.setCargo(getCargo(linhaAtual, arquivo));
@@ -407,7 +407,7 @@ public class ProcessarService {
 		
 	}
 
-	private Vinculo getVinculo(String linha, Arquivo arquivo) {
+	private Vinculo getVinculo(String linha, ArquivoPagamento arquivo) {
 		Vinculo vinculo = new Vinculo();
 		Vinculo vinculoAuxiliar = new Vinculo();
 		try {
@@ -450,7 +450,7 @@ public class ProcessarService {
 		return Integer.parseInt(cargaHoraria.trim());
 	}
 
-	private Cargo getCargo(String linhaAtual, Arquivo arquivo) {
+	private Cargo getCargo(String linhaAtual, ArquivoPagamento arquivo) {
 		Cargo cargo = new Cargo();
 		Cargo cargoAuxiliar = new Cargo();
 		try {

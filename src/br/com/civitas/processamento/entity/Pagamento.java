@@ -36,7 +36,7 @@ public class Pagamento implements IEntity {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="cd_arquivo",nullable=false)
-	private Arquivo arquivo;
+	private ArquivoPagamento arquivo;
 	
 	@Transient
 	private List<EventoPagamento> eventosPagamento;
@@ -113,11 +113,11 @@ public class Pagamento implements IEntity {
 		this.totalRemuneracao = totalRemuneracao;
 	}
 
-	public Arquivo getArquivo() {
+	public ArquivoPagamento getArquivo() {
 		return arquivo;
 	}
 
-	public void setArquivo(Arquivo arquivo) {
+	public void setArquivo(ArquivoPagamento arquivo) {
 		this.arquivo = arquivo;
 	}
 
