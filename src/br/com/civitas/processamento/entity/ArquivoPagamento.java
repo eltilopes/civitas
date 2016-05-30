@@ -207,7 +207,7 @@ public class ArquivoPagamento implements IEntity {
 		}if(mes != null && mes.getId() != null ){
 			map.put("mes.id",mes.getId() );
 		}if(tipoArquivo != null  ){
-			map.put("tipoArquivo",tipoArquivo );
+			map.put("tipoArquivo",tipoArquivo.getCodigo() );
 		}
 		return map;
 	}

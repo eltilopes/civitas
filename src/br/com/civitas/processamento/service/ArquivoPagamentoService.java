@@ -1,19 +1,31 @@
 package br.com.civitas.processamento.service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 import org.hibernate.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
+import br.com.civitas.arquitetura.report.Extensao;
+import br.com.civitas.arquitetura.report.ReportService;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagamento> {
 
 	private static final long serialVersionUID = -7300710483142299659L;
-
+	
+	@Autowired 
+	private ReportService reportService;
+	
 	@Override
 	protected Class<ArquivoPagamento> getClazz() {
 		return ArquivoPagamento.class;
@@ -41,5 +53,18 @@ public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagament
 									  .setParameter("tipoArquivo", arquivo.getTipoArquivo())
 									  .uniqueResult();
 	}
-	
+
+	public void imprimirRelatorio(ArquivoPagamento arquivo, List<ArquivoPagamento> arquivos, String nomeRelatorio){
+		FacesContext context = FacesContext.getCurrentInstance();
+		ServletContext sc = (ServletContext) context.getExternalContext().getContext();
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("ANO", arquivo.getAno() == null ? "TODOS" : arquivo.getAno().getAno() + "");
+		parameters.put("MES", arquivo.getMes() == null ? "TODOS" : arquivo.getMes().getDescricao());
+		parameters.put("CIDADE", arquivo.getCidade() == null ? "TODAS" : arquivo.getCidade().getDescricao().toUpperCase());
+		parameters.put("TIPO_ARQUIVO", arquivo.getTipoArquivo() == null ? "TODOS" : arquivo.getTipoArquivo().getDescricao());
+		parameters.put("LOGO_CIVITAS", sc.getRealPath("/resources/images/logo-login.png"));
+		parameters.put("JR_DATA_SOURCE", new JRBeanCollectionDataSource(arquivos));
+		
+		reportService.execute(parameters, sc.getRealPath("/report/" + nomeRelatorio), Extensao.PDF, false);
+	}
 }

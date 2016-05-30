@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="teste" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="58594238-4a88-4742-81ac-65eafea2517a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="robotto" hAlign="Left" vAlign="Middle" fontName="Roboto" fontSize="72" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+	<parameter name="ANO" class="java.lang.String"/>
+	<parameter name="LOGO_CIVITAS" class="java.lang.String"/>
+	<parameter name="CIDADE" class="java.lang.String"/>
+	<parameter name="MES" class="java.lang.String"/>
+	<parameter name="TIPO_ARQUIVO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="nomeArquivo" class="java.lang.String"/>
+	<field name="cidade.descricao" class="java.lang.String"/>
+	<field name="dataProcessamento" class="java.util.Date"/>
+	<variable name="nomeArquivo_1" class="java.lang.Integer" resetType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{nomeArquivo}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="104" splitType="Stretch">
+			<image>
+				<reportElement x="19" y="11" width="207" height="63" uuid="0e6a98b6-8e58-43e7-aea8-671200050f50"/>
+				<imageExpression><![CDATA[$P{LOGO_CIVITAS}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="390" y="78" width="165" height="20" uuid="16ca9bb3-fa21-420d-babe-8f18dea598dc"/>
+				<textElement>
+					<font fontName="Roboto" size="12" pdfEncoding="Cp1256" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Data Relatorio: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date())]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="244" y="11" width="292" height="52" uuid="47e9f324-39d6-4316-865f-d6add9cd3943"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Roboto" size="18" pdfEncoding="Cp1256" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new String("SISTEMA CIVTAS")]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="103" width="555" height="1" forecolor="#FFA500" uuid="5c47e763-cfc8-430a-bb38-b56ab0194f09"/>
+				<graphicElement>
+					<pen lineWidth="8.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="82" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="78" width="555" height="1" forecolor="#FFA500" uuid="fabc50b6-4cfc-4f2c-b4c6-0bdb74c6d59b"/>
+				<graphicElement>
+					<pen lineWidth="8.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="19" y="6" width="235" height="20" uuid="bfa79152-5af4-43fe-a609-1bd9f6343e57"/>
+				<textElement>
+					<font fontName="Roboto" size="12" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Consulta de Arquivos Pagamento:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="30" width="48" height="20" uuid="9d6e8433-b9c5-42aa-be95-754a6c12b804"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<text><![CDATA[Ano:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="50" width="48" height="20" uuid="342e6629-d10b-44ee-844f-3783a9bc27ab"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<text><![CDATA[Cidade:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="190" y="30" width="82" height="20" uuid="7223c995-e99d-40e0-ba7b-c65ee53581c8"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<text><![CDATA[Mês:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="190" y="50" width="82" height="20" uuid="308f5aea-cbcb-4ee6-a384-06e9b0f64182"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<text><![CDATA[Tipo Arquivo:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="67" y="30" width="123" height="20" uuid="0bea85e0-e76e-4016-9346-b996e2ce0c62"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ANO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="50" width="123" height="20" uuid="69dcb129-1fd4-4355-bc56-27178ace092b"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CIDADE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="30" width="135" height="20" uuid="303e7fdf-97d4-4ae4-b43c-34ed3c895a23"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{MES}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="50" width="135" height="20" uuid="e0cffd0c-790b-4a97-8419-de133e771267"/>
+				<textElement>
+					<font fontName="Roboto" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TIPO_ARQUIVO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="8" y="4" width="246" height="16" uuid="6261b123-3971-4fe6-9881-110559306894"/>
+				<textElement>
+					<font fontName="Roboto" size="10"/>
+				</textElement>
+				<text><![CDATA[Nome Arquivo
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="0" width="100" height="20" uuid="1714d2d7-2ad2-405e-b5d3-4cb7f6cfbe02"/>
+				<textElement>
+					<font fontName="Roboto" size="10"/>
+				</textElement>
+				<text><![CDATA[Cidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="372" y="0" width="100" height="20" uuid="a69b22a0-e376-45f3-b9d5-2dd4a17d54f5"/>
+				<textElement>
+					<font fontName="Roboto" size="10"/>
+				</textElement>
+				<text><![CDATA[Data Processamento]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="8" y="0" width="246" height="20" uuid="dd50c0b7-6edf-42ec-b282-921c47708737"/>
+				<textElement>
+					<font fontName="Roboto" size="10" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeArquivo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="0" width="100" height="20" uuid="8440c328-139b-47d7-b8a7-00299a4bb097"/>
+				<textElement>
+					<font fontName="Roboto" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cidade.descricao}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="372" y="1" width="100" height="20" uuid="d80fa226-967a-46e6-a000-03a808454d3e"/>
+				<textElement>
+					<font fontName="Roboto" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{dataProcessamento})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

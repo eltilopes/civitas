@@ -106,6 +106,14 @@
 						 styleClass="btn btn-primary"
 						 update=":painelGlobal"
 						 ajax="false"/>
+
+			<p:commandButton value="Relatório PDF"
+						 actionListener="#{bean.imprimirRelatorio()}" 
+						 rendered="#{sessionScope.perms.ARQUIVO_PAGAMENTO_C and bean.resultSearch.rowCount > 0}"
+						 styleClass="btn btn-primary"
+						 update=":painelGlobal"
+						 ajax="false"/>
+
 		</ui:define>
 	
 		<ui:define name="resultFiltro" >

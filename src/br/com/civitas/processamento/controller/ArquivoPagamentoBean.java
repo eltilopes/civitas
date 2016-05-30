@@ -80,6 +80,11 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		limpaListas();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void imprimirRelatorio() {
+		service.imprimirRelatorio(getEntitySearch(),(List<ArquivoPagamento>)getResultSearch().getWrappedData(), "relatorio_arquivo_pagamento.jasper");;
+	}
+	
 	public void processarArquivo() {
 		try {
 			arquivo.setNomeArquivo(file.getFileName());

@@ -39,12 +39,6 @@ public class ProcessarService {
 	private  PagamentoService pagamentoService;
 	
 	@Autowired
-	private  MatriculaService matriculaService ;
-	
-	@Autowired
-	private  ArquivoPagamentoService arquivoService ;
-	
-	@Autowired
 	private  CargoService cargoService;
 	
 	@Autowired
@@ -52,9 +46,6 @@ public class ProcessarService {
 	
 	@Autowired
 	private  EventoService eventoService ;
-	
-	@Autowired
-	private  EventoPagamentoService eventoPagamentoService ;
 	
 	private  Pagamento pagamento;
 	private  Matricula matricula;
@@ -490,20 +481,10 @@ public class ProcessarService {
 		this.pagamentoService = pagamentoService;
 	}
 
-	public void setMatriculaService(MatriculaService matriculaService) {
-		this.matriculaService = matriculaService;
-	}
-
 	public void setEventoService(EventoService eventoService) {
 		this.eventoService = eventoService;
 	}
 
-	public void setEventoPagamentoService(EventoPagamentoService eventoPagamentoService) {
-		this.eventoPagamentoService = eventoPagamentoService;
-	}
-
-	
-	
 }
 
 
