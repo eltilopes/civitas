@@ -48,10 +48,9 @@ public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento impl
 	private  String ultimaLinha = "";
 	private  String linhaAnterior = "";
 	
-	public List<Pagamento> getPagamentos(ArquivoPagamento arquivo) throws IOException{
+	public void processar(ArquivoPagamento arquivo) throws IOException{
 		setArquivo(arquivo);
 		processar();
-		return pagamentos;
 	}
 	
 	private void processar() throws IOException {

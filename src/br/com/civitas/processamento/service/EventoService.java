@@ -7,7 +7,9 @@ import org.hibernate.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
+import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.enums.TipoArquivo;
 
 @Service
 public class EventoService extends AbstractPersistence<Evento> {
@@ -34,6 +36,19 @@ public class EventoService extends AbstractPersistence<Evento> {
 		sql.append("WHERE UPPER(e.chave) IN (:chaves) " );
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString()).setParameterList("chaves", chaves);
 		return (List<Evento>) query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Evento> buscarTipoArquivoCidade(Cidade cidade, TipoArquivo tipoArquivo) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT e FROM Evento e ");
+		sql.append(" WHERE e.cidade = :cidade  ");
+		sql.append(" AND e.tipoArquivo = :tipoArquivo  ");
+		
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+									  .setParameter("cidade", cidade)
+									  .setParameter("tipoArquivo", tipoArquivo)
+									  .list();
 	}
 
 }

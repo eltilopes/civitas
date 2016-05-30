@@ -1,7 +1,7 @@
 package br.com.civitas.processamento.controller;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +18,6 @@ import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Mes;
-import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.factory.FactoryEnuns;
 import br.com.civitas.processamento.service.AnoService;
@@ -26,7 +25,6 @@ import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.EventoService;
 import br.com.civitas.processamento.service.MesService;
-import br.com.civitas.processamento.service.ProcessarArquivoLayoutService;
 import br.com.civitas.processamento.utils.ValidarArquivoService;
 
 @ManagedBean
@@ -34,9 +32,6 @@ import br.com.civitas.processamento.utils.ValidarArquivoService;
 public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, ArquivoPagamentoService> implements Serializable {
 
 	private static final long serialVersionUID = -7387329115854340573L;
-
-	@ManagedProperty("#{processarService}")
-	private ProcessarArquivoLayoutService processarService;
 
 	@ManagedProperty("#{eventoService}")
 	private EventoService eventoService;
@@ -57,13 +52,10 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private ValidarArquivoService validarArquivoService ;
 
 	private ArquivoPagamento arquivo;
-	private ArquivoPagamento arquivoProcessado;
 	private List<Cidade> cidades;
 	private List<Ano> anos;
 	private List<Mes> meses;
 	private List<TipoArquivo> tiposArquivos;
-	private boolean exibirResumoArquivo;
-	private List<Pagamento> pagamentos;
 	private UploadedFile file;
 
 	@PostConstruct
@@ -87,14 +79,11 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	
 	public void processarArquivo() {
 		try {
-			arquivo.setNomeArquivo(file.getFileName());
+			arquivo.setNomeArquivo(new String(file.getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
 			arquivo.setFile(file);
 			validarArquivoService.validarArquivo(file, arquivo);
-			pagamentos = new ArrayList<Pagamento>();
-			pagamentos = service.processarArquivo(arquivo);
-			arquivoProcessado = arquivo;
+			service.processarArquivo(arquivo);
 			arquivo = new ArquivoPagamento();
-			exibirResumoArquivo = true;
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (ApplicationException e) {
 			arquivo = new ArquivoPagamento();
@@ -104,18 +93,6 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			e.printStackTrace();
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
 		}
-	}
-
-	public List<Pagamento> getPagamentos() {
-		return pagamentos;
-	}
-
-	public void setPagamentos(List<Pagamento> pagamentos) {
-		this.pagamentos = pagamentos;
-	}
-
-	public void setProcessarService(ProcessarArquivoLayoutService processarService) {
-		this.processarService = processarService;
 	}
 
 	public void setEventoService(EventoService eventoService) {
@@ -175,28 +152,12 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		this.arquivo = arquivo;
 	}
 
-	public boolean isExibirResumoArquivo() {
-		return exibirResumoArquivo;
-	}
-
-	public void setExibirResumoArquivo(boolean exibirResumoArquivo) {
-		this.exibirResumoArquivo = exibirResumoArquivo;
-	}
-
 	public List<TipoArquivo> getTiposArquivos() {
 		return tiposArquivos;
 	}
 
 	public void setTiposArquivos(List<TipoArquivo> tiposArquivos) {
 		this.tiposArquivos = tiposArquivos;
-	}
-
-	public ArquivoPagamento getArquivoProcessado() {
-		return arquivoProcessado;
-	}
-
-	public void setArquivoProcessado(ArquivoPagamento arquivoProcessado) {
-		this.arquivoProcessado = arquivoProcessado;
 	}
 
 	public UploadedFile getFile() {

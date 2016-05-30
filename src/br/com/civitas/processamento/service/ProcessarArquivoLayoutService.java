@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,17 +40,14 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  List<Matricula> matriculas;
 	private  List<Cargo> cargos;
 	private  List<Vinculo> vinculos;
-	private  List<Evento> eventos = new ArrayList<Evento>();
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
-	private  boolean existeEventoTemp = false;
 	private  String ultimaLinha = "";
 	private  String linhaAnterior = "";
 	
-	public List<Pagamento> getPagamentos(ArquivoPagamento arquivo) throws IOException{
+	public void processar(ArquivoPagamento arquivo) throws IOException{
 		setArquivo(arquivo);
 		processar();
-		return pagamentos;
 	}
 	
 	private void processar() throws IOException {
@@ -72,7 +68,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		pagamento.getMatricula().setVinculo(getVinculo(ultimaLinha, getArquivo()));
 		pagamentos.add(pagamento);
 		br.close();
-		pagamentoService.inserirPagamentos(pagamentos,eventos, getArquivo());
+		pagamentoService.inserirPagamentos(pagamentos,getEventos(), getArquivo());
 	}
 
 	private void carregarEventos() throws IOException{
@@ -82,9 +78,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			localizarEvento(linha, getArquivo());
 		}
 		brEvento.close();
-		eventos = eventos.stream().distinct().collect(Collectors.toList());
-		//TODO: ajustar a busca e insercao de eventos
-		eventoService.saveOrUpdateAll(eventos);
 	}
 	
 
@@ -95,10 +88,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matriculas = new ArrayList<Matricula>();
 		cargos = cargoService.buscarTipoArquivoCidade(getArquivo().getCidade(), getArquivo().getTipoArquivo());
 		vinculos = vinculoService.buscarPorCidade(getArquivo().getCidade());
-		eventos = new ArrayList<Evento>();
+		setEventos(eventoService.buscarTipoArquivoCidade(getArquivo().getCidade(), getArquivo().getTipoArquivo()));
 		processamentoPagamentoAtivo = false;
 		processamentoEventos = false;
-		existeEventoTemp = false;
 		ultimaLinha = "";
 		linhaAnterior = "";
 	}
@@ -106,32 +98,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private void localizarEvento(String linha, ArquivoPagamento arquivo) {
 		verificarIdentificadorEvento(linha);
 		if(processamentoEventos && !(linha.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao()))){
-			getEvento(linha, arquivo);
-		}
-	}
-	
-	private  void getEvento(String linha, ArquivoPagamento arquivo) {
-		//TODO : melhorar a busca do evento
-		try {
-			existeEventoTemp = false;
-			String chaveEvento = getChaveEvento(linha);
-			eventos.forEach((e) -> {
-				if(e.getChave().equals(chaveEvento)){
-					existeEventoTemp = true;
-				}
-			});
-			
-			eventos.forEach((e) -> {
-				if(e.getChave().equals(chaveEvento)){
-					existeEventoTemp = true;
-				}
-			});
-			if(!existeEventoTemp){
-				eventos.add(new Evento(chaveEvento, arquivo.getCidade(), arquivo.getTipoArquivo()));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(linha);
+			getEvento(linha, getChaveEvento(linha));
 		}
 	}
 
@@ -166,7 +133,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  void verificarIdentificador(String linha, String nomeArquivo) {
 		
 		//TODO tirar os valores do codigo e colocar no banco amarrado a um tipo de arquivo os valores tipo PEB
-		eventos.forEach((e) -> {
+		getEventos().forEach((e) -> {
 			if(processamentoPagamentoAtivo && !linha.contains(IdentificadorArquivoLayout.CARGO.getDescricao())
 					&& !linha.contains(IdentificadorArquivoLayout.DATA_ADMISSAO.getDescricao())
 					&& !linha.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())
@@ -255,7 +222,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private Evento getEvento(IdentificadorArquivoLayout irrf) {
-		for(Evento e : eventos ){
+		for(Evento e : getEventos() ){
 			if(e.getChave().contains(irrf.getDescricao())){
 				return e;
 			}
