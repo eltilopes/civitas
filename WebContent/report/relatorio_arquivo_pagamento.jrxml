@@ -37,24 +37,24 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="244" y="11" width="292" height="52" uuid="47e9f324-39d6-4316-865f-d6add9cd3943"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Roboto" size="18" pdfEncoding="Cp1256" isPdfEmbedded="true"/>
+					<font fontName="Roboto" size="24" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new String("SISTEMA CIVTAS")]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="103" width="555" height="1" forecolor="#FFA500" uuid="5c47e763-cfc8-430a-bb38-b56ab0194f09"/>
 				<graphicElement>
-					<pen lineWidth="8.0"/>
+					<pen lineWidth="5.0"/>
 				</graphicElement>
 			</line>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="82" splitType="Stretch">
+		<band height="77" splitType="Stretch">
 			<line>
-				<reportElement x="0" y="78" width="555" height="1" forecolor="#FFA500" uuid="fabc50b6-4cfc-4f2c-b4c6-0bdb74c6d59b"/>
+				<reportElement x="0" y="73" width="555" height="1" forecolor="#FFA500" uuid="fabc50b6-4cfc-4f2c-b4c6-0bdb74c6d59b"/>
 				<graphicElement>
-					<pen lineWidth="8.0"/>
+					<pen lineWidth="5.0"/>
 				</graphicElement>
 			</line>
 			<staticText>

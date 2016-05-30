@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.service.ArquivoPagamentoService;
 
 @Service
@@ -57,70 +58,72 @@ public class ValidarArquivoService {
 	}
 	
 	private void validarArquivoCidadeMes() throws IOException{
-		criarArquivoProcessamento();
-		PDDocument document = null;
-		document = PDDocument.load(new File(nomeArquivoTemporario));
-		document.getClass();
-		boolean primeiraLinha = true;
-		boolean segundaLinha = false;
-		boolean lancarExcessaoCidade = false;
-		boolean lancarExcessaoMes = false;
-		boolean lancarExcessaoAno = false;
-		String erroCidade = "";
-		String erroMes = "";
-		String erroAno = "";
-		int numeroLinha = 1;
-		if (!document.isEncrypted()) {
-			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-			stripper.setSortByPosition(true);
-			PDFTextStripper Tstripper = new PDFTextStripper();
-			String conteudoArquivo = Tstripper.getText(document);
-			String nomeArquivoTemporario = this.nomeArquivoTemporario.substring(0, this.nomeArquivoTemporario.length() -3 ) + "txt";
-			BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
-			buffWrite.append(conteudoArquivo);
-			buffWrite.close();
-			FileReader frEvento = new FileReader(nomeArquivoTemporario);
-			BufferedReader brEvento = new BufferedReader(frEvento);
-			while (brEvento.ready() && !segundaLinha) {
-				String linha = brEvento.readLine();
-				if(!linha.toUpperCase().contains(arquivo.getCidade().getDescricao().toUpperCase()) && primeiraLinha){
-					lancarExcessaoCidade = true;
-					erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
-				}	
-				primeiraLinha = false;
-				if(!linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) ){
-					lancarExcessaoMes = true;
-					erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
-				}else{
-					lancarExcessaoMes = false;
-				}
-				if(!linha.toUpperCase().contains("" + arquivo.getAno().getAno()) ){
-					lancarExcessaoAno = true;
-					System.lineSeparator();   
-					erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+		if(arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_LAYOUT)){
+			criarArquivoProcessamento();
+			PDDocument document = null;
+			document = PDDocument.load(new File(nomeArquivoTemporario));
+			document.getClass();
+			boolean primeiraLinha = true;
+			boolean segundaLinha = false;
+			boolean lancarExcessaoCidade = false;
+			boolean lancarExcessaoMes = false;
+			boolean lancarExcessaoAno = false;
+			String erroCidade = "";
+			String erroMes = "";
+			String erroAno = "";
+			int numeroLinha = 1;
+			if (!document.isEncrypted()) {
+				PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+				stripper.setSortByPosition(true);
+				PDFTextStripper Tstripper = new PDFTextStripper();
+				String conteudoArquivo = Tstripper.getText(document);
+				String nomeArquivoTemporario = this.nomeArquivoTemporario.substring(0, this.nomeArquivoTemporario.length() -3 ) + "txt";
+				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
+				buffWrite.append(conteudoArquivo);
+				buffWrite.close();
+				FileReader frEvento = new FileReader(nomeArquivoTemporario);
+				BufferedReader brEvento = new BufferedReader(frEvento);
+				while (brEvento.ready() && !segundaLinha) {
+					String linha = brEvento.readLine();
+					if(!linha.toUpperCase().contains(arquivo.getCidade().getDescricao().toUpperCase()) && primeiraLinha){
+						lancarExcessaoCidade = true;
+						erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+					}	
+					primeiraLinha = false;
+					if(!linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) ){
+						lancarExcessaoMes = true;
+						erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
 					}else{
-					lancarExcessaoAno = false;
+						lancarExcessaoMes = false;
+					}
+					if(!linha.toUpperCase().contains("" + arquivo.getAno().getAno()) ){
+						lancarExcessaoAno = true;
+						System.lineSeparator();   
+						erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+						}else{
+						lancarExcessaoAno = false;
+					}
+					if(numeroLinha==2){
+						segundaLinha = true;
+					}
+					numeroLinha++;
+					
 				}
-				if(numeroLinha==2){
-					segundaLinha = true;
-				}
-				numeroLinha++;
-				
+				brEvento.close();
+				File f = new File(nomeArquivoTemporario);  
+				f.delete();
 			}
-			brEvento.close();
-			File f = new File(nomeArquivoTemporario);  
-			f.delete();
-		}
-		document.close();
-		if(lancarExcessaoCidade){
-			throw new ApplicationException(erroCidade);
-		}
-		if(lancarExcessaoMes){
-			throw new ApplicationException(erroMes);
-		}
-		if(lancarExcessaoAno){
-			throw new ApplicationException(erroAno);
-		}
+			document.close();
+			if(lancarExcessaoCidade){
+				throw new ApplicationException(erroCidade);
+			}
+			if(lancarExcessaoMes){
+				throw new ApplicationException(erroMes);
+			}
+			if(lancarExcessaoAno){
+				throw new ApplicationException(erroAno);
+			}
+		}	
 	}
 		private void criarArquivoProcessamento() throws IOException {
 			nomeArquivoTemporario = "";

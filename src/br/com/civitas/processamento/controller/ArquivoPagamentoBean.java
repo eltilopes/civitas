@@ -26,7 +26,7 @@ import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.EventoService;
 import br.com.civitas.processamento.service.MesService;
-import br.com.civitas.processamento.service.ProcessarService;
+import br.com.civitas.processamento.service.ProcessarArquivoLayoutService;
 import br.com.civitas.processamento.utils.ValidarArquivoService;
 
 @ManagedBean
@@ -36,7 +36,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private static final long serialVersionUID = -7387329115854340573L;
 
 	@ManagedProperty("#{processarService}")
-	private ProcessarService processarService;
+	private ProcessarArquivoLayoutService processarService;
 
 	@ManagedProperty("#{eventoService}")
 	private EventoService eventoService;
@@ -91,7 +91,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			arquivo.setFile(file);
 			validarArquivoService.validarArquivo(file, arquivo);
 			pagamentos = new ArrayList<Pagamento>();
-			pagamentos = processarService.getPagamentos(arquivo);
+			pagamentos = service.processarArquivo(arquivo);
 			arquivoProcessado = arquivo;
 			arquivo = new ArquivoPagamento();
 			exibirResumoArquivo = true;
@@ -114,7 +114,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		this.pagamentos = pagamentos;
 	}
 
-	public void setProcessarService(ProcessarService processarService) {
+	public void setProcessarService(ProcessarArquivoLayoutService processarService) {
 		this.processarService = processarService;
 	}
 

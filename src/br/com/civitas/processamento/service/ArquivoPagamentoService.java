@@ -16,12 +16,20 @@ import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.arquitetura.report.Extensao;
 import br.com.civitas.arquitetura.report.ReportService;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.Pagamento;
+import br.com.civitas.processamento.factory.FactoryProcessarArquivoPagamento;
+import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagamento> {
 
 	private static final long serialVersionUID = -7300710483142299659L;
+	
+	private IProcessarArquivoPagamento processarArquivoPagamento;
+	
+	@Autowired
+	private FactoryProcessarArquivoPagamento factoryProcessarArquivoPagamento;
 	
 	@Autowired 
 	private ReportService reportService;
@@ -31,6 +39,11 @@ public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagament
 		return ArquivoPagamento.class;
 	}
 
+	public List<Pagamento> processarArquivo(ArquivoPagamento arquivoPagamento) throws Exception{
+		processarArquivoPagamento = factoryProcessarArquivoPagamento.getInstanciaProcessamento(arquivoPagamento.getTipoArquivo());
+		return processarArquivoPagamento.getPagamentos(arquivoPagamento);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Collection<ArquivoPagamento> buscarTodos() {
 		StringBuilder sql = new StringBuilder();

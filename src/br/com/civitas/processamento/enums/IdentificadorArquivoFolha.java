@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public enum IdentificadorArquivoLayout {
+public enum IdentificadorArquivoFolha {
 
 		// 0 - IDENTIFICADOR
-		INICIO_EVENTO("PROVENTOS VALORREF DESCONTOS VALORREF"),
-		FIM_EVENTO("LÍQUIDO: DESCONTOS:REMUNERAÇÃO: PROVENTOS:"), 
+		INICIO_EVENTO("VENCIMENTO BASE"),
+		FIM_EVENTO("------------------------------------------------------------------------------------------------------------------------------------"), 
 		ESPACO_NA_LINHA(" ")	,	
 		VIRGULA(","), 
 		PORCENTAGEM("%"), 
@@ -30,11 +30,11 @@ public enum IdentificadorArquivoLayout {
 		private String descricao;
 		
 		public List<String> getDescricoes(){
-			IdentificadorArquivoLayout[] list = IdentificadorArquivoLayout.values(); 
+			IdentificadorArquivoFolha[] list = IdentificadorArquivoFolha.values(); 
 			return Arrays.asList(list).stream().map(i -> i.getDescricao()).collect(Collectors.toCollection(ArrayList<String> :: new));
 		}
 		
-		private IdentificadorArquivoLayout(String descricao){
+		private IdentificadorArquivoFolha(String descricao){
 			this.descricao  = descricao;
 		}
 		

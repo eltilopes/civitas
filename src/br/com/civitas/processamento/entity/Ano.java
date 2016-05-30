@@ -24,8 +24,8 @@ public class Ano implements IEntity {
 	@Column(name = "ci_ano")
 	private Long id;
 	
-	@Column(name = "nr_ano",nullable = false, length = 30)
-	private int ano;
+	@Column(name = "nr_ano",nullable = false)
+	private Integer ano;
 	
 	public Long getId() {
 		return id;
@@ -33,10 +33,10 @@ public class Ano implements IEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public int getAno() {
+	public Integer getAno() {
 		return ano;
 	}
-	public void setAno(int ano) {
+	public void setAno(Integer ano) {
 		this.ano = ano;
 	}
 	@Override

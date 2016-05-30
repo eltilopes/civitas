@@ -2,7 +2,9 @@ package br.com.civitas.processamento.enums;
 
 public enum TipoArquivo {
 
-		NENHUM("NENHUM ARQUIVO", 0), ARQUIVO_LAYOUT("ARQUIVO LAYOUT", 1);
+		NENHUM("NENHUM ARQUIVO", 0), 
+		ARQUIVO_LAYOUT("ARQUIVO LAYOUT", 1),
+		FOLHA_PAGAMENTO("FOLHA PAGAMENTO", 2);
 	
 		private String descricao;
 		private int codigo;
