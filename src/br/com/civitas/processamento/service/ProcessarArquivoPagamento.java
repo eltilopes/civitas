@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.utils.DiretorioProcessamento;
 
 public abstract class ProcessarArquivoPagamento {
@@ -28,13 +31,21 @@ public abstract class ProcessarArquivoPagamento {
 	@Autowired
 	private  EventoService eventoService ;
 	
+	@Autowired
+	private  CargoService cargoService;
+	
+	@Autowired
+	private  VinculoService vinculoService;
+	
 	private String nomeArquivoTemporario;
-	private FileReader arquivoEvento;
-	private FileReader arquivoPagamento;
-	private ArquivoPagamento arquivo;
+	private FileReader fileReaderEvento;
+	private FileReader filReaderPagamento;
+	private ArquivoPagamento arquivoPagamento;
 	private PDDocument document;
 	
 	private  List<Evento> eventos ;
+	private  List<Cargo> cargos ;
+	private  List<Vinculo> vinculos ;
 
 	public void iniciarArquivos( ) {
 		try {
@@ -46,12 +57,12 @@ public abstract class ProcessarArquivoPagamento {
 				stripper.setSortByPosition(true);
 				PDFTextStripper Tstripper = new PDFTextStripper();
 				String conteudoArquivo = Tstripper.getText(document);
-				String nomeArquivoTemporario = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivo.getNomeArquivo().substring(0, arquivo.getNomeArquivo().length() -3 ) + "txt";
+				String nomeArquivoTemporario = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivoPagamento.getNomeArquivo().substring(0, arquivoPagamento.getNomeArquivo().length() -3 ) + "txt";
 				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
 				buffWrite.append(conteudoArquivo);
 				buffWrite.close();
-				arquivoEvento = new FileReader(nomeArquivoTemporario);
-				arquivoPagamento = new FileReader(nomeArquivoTemporario);
+				fileReaderEvento = new FileReader(nomeArquivoTemporario);
+				filReaderPagamento = new FileReader(nomeArquivoTemporario);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,8 +71,8 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private void criarArquivoProcessamento() throws IOException {
 		nomeArquivoTemporario = "";
-		String filename = FilenameUtils.getName(arquivo.getFile().getFileName());
-	    InputStream input = arquivo.getFile().getInputstream();
+		String filename = FilenameUtils.getName(new String(arquivoPagamento.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
+	    InputStream input = arquivoPagamento.getFile().getInputstream();
 	    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
 	    OutputStream output = new FileOutputStream(file);
 	    nomeArquivoTemporario = file.getAbsolutePath();
@@ -77,11 +88,22 @@ public abstract class ProcessarArquivoPagamento {
 	}
 
 	public void finalizarArquivos( ) throws IOException {
-		arquivoEvento.close();
-		arquivoPagamento.close();
-		File f = new File(nomeArquivoTemporario);  
-		f.delete();
+		fileReaderEvento.close();
+		filReaderPagamento.close();
+		String filename = FilenameUtils.getName(new String(arquivoPagamento.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
+	    InputStream input = arquivoPagamento.getFile().getInputstream();
+	    File file = new File(DiretorioProcessamento.getDiretorioProcessado(), filename);
+	    OutputStream output = new FileOutputStream(file);
+		IOUtils.copy(input, output);
+		IOUtils.closeQuietly(input);
+        IOUtils.closeQuietly(output);
 		document.close();
+		String nomeArquivo = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivoPagamento.getNomeArquivo().substring(0, arquivoPagamento.getNomeArquivo().length() -3 ) + "txt";
+		File fileTxt = new File(nomeArquivo);  
+		fileTxt.delete();
+		nomeArquivo = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivoPagamento.getNomeArquivo();
+		File filePdf = new File(nomeArquivo);  
+		filePdf.delete();
 	}
 
 	public  void getEvento(String linha, String chave) {
@@ -89,8 +111,8 @@ public abstract class ProcessarArquivoPagamento {
 		Evento eventoAuxiliar = new Evento();
 		try {
 			evento.setChave(chave);
-			evento.setCidade(arquivo.getCidade());;
-			evento.setTipoArquivo(arquivo.getTipoArquivo());
+			evento.setCidade(arquivoPagamento.getCidade());;
+			evento.setTipoArquivo(arquivoPagamento.getTipoArquivo());
 			eventoAuxiliar = getEvento(evento);
 			if(Objects.isNull(eventoAuxiliar)){
 				evento.setNome(evento.getChave());
@@ -115,28 +137,85 @@ public abstract class ProcessarArquivoPagamento {
 		}
 		return null;
 	}
-	public FileReader getArquivoEvento() {
-		return arquivoEvento;
+	
+	public Cargo getCargo(Cargo cargo, String linha) {
+		Cargo cargoAuxiliar = new Cargo();
+		try {
+			cargoAuxiliar = getCargo(cargo);
+			if(Objects.isNull(cargoAuxiliar)){
+				cargo = cargoService.save(cargo);
+				cargos.add(cargo);
+			}else{
+				cargo = cargoAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Cargo. Linha: " + linha);
+		}
+		return cargo;
 	}
 
-	public void setArquivoEvento(FileReader arquivoEvento) {
-		this.arquivoEvento = arquivoEvento;
+	private Cargo getCargo(Cargo cargo) {
+		for(Cargo c : cargos){
+			if(c.getCidade().getId().equals(cargo.getCidade().getId()) && 
+					   c.getTipoArquivo().getCodigo()==cargo.getTipoArquivo().getCodigo() && 
+					   c.getNumero().equals(cargo.getNumero())){
+				cargo = c;
+				return cargo;
+			}
+		}
+		return null;
+	}
+	
+	public Vinculo getVinculo(Vinculo vinculo, String linha) throws ApplicationException {
+		Vinculo vinculoAuxiliar = new Vinculo();
+		try {
+			vinculoAuxiliar = getVinculo(vinculo);
+			if(Objects.isNull(vinculoAuxiliar)){
+				vinculo = vinculoService.save(vinculo);
+				vinculos.add(vinculo);
+			}else{
+				vinculo = vinculoAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar o Vínculo. Linha: " + linha);
+		}
+		return vinculo;
 	}
 
-	public FileReader getArquivoPagamento() {
+	private Vinculo getVinculo(Vinculo vinculo) {
+		for(Vinculo v :vinculos){
+			if(v.getCidade().getId().equals(vinculo.getCidade().getId()) 
+					&& v.getNumero().equals(vinculo.getNumero())
+					&& v.getDescricao().equals(vinculo.getDescricao())){
+				vinculo = v;
+				return vinculo;
+			}
+		}
+		return null;
+	}
+	
+	public FileReader getFileReaderEvento() {
+		return fileReaderEvento;
+	}
+
+	public void setFileReaderEvento(FileReader fileReaderEvento) {
+		this.fileReaderEvento = fileReaderEvento;
+	}
+
+	public FileReader getFilReaderPagamento() {
+		return filReaderPagamento;
+	}
+
+	public void setFilReaderPagamento(FileReader filReaderPagamento) {
+		this.filReaderPagamento = filReaderPagamento;
+	}
+
+	public ArquivoPagamento getArquivoPagamento() {
 		return arquivoPagamento;
 	}
 
-	public void setArquivoPagamento(FileReader arquivoPagamento) {
+	public void setArquivoPagamento(ArquivoPagamento arquivoPagamento) {
 		this.arquivoPagamento = arquivoPagamento;
-	}
-
-	public ArquivoPagamento getArquivo() {
-		return arquivo;
-	}
-
-	public void setArquivo(ArquivoPagamento arquivo) {
-		this.arquivo = arquivo;
 	}
 
 	public List<Evento> getEventos() {
@@ -147,4 +226,20 @@ public abstract class ProcessarArquivoPagamento {
 		this.eventos = eventos;
 	}
 
+	public List<Cargo> getCargos() {
+		return cargos;
+	}
+
+	public void setCargos(List<Cargo> cargos) {
+		this.cargos = cargos;
+	}
+
+	public List<Vinculo> getVinculos() {
+		return vinculos;
+	}
+
+	public void setVinculos(List<Vinculo> vinculos) {
+		this.vinculos = vinculos;
+	}
+	
 }

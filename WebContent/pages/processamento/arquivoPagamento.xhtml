@@ -260,8 +260,8 @@
 					</div>
 				</div>	
 				<div class="row">
-					<div class="col-md-8 form-group">
-						<h:outputLabel value="Selecione o Arquivo " />
+					<div class="col-md-12 form-group">
+						<h:outputText value="Selecione o Arquivo " />
 						<p:fileUpload id="file" required="true" value="#{bean.file}" styleClass="btn btn-primary"  allowTypes="/(\.|\/)(pdf)$/" process="@this" mode="simple" skinSimple="true"/>
 						<h:message for="file" tooltip="true" styleClass="error-messages" />
 					</div>

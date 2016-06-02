@@ -1,6 +1,7 @@
 package br.com.civitas.processamento.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -123,8 +124,13 @@ public class Pagamento implements IEntity {
 
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		// TODO notEmptyFields pagamentos
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(arquivo != null && arquivo.getId() != null ){
+			map.put("arquivo.id",arquivo.getId());
+		}
+		return map;
 	}
 
 }

@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.text.Normalizer;
 import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
@@ -85,7 +87,7 @@ public class ValidarArquivoService {
 				BufferedReader brEvento = new BufferedReader(frEvento);
 				while (brEvento.ready() && !segundaLinha) {
 					String linha = brEvento.readLine();
-					if(!linha.toUpperCase().contains(arquivo.getCidade().getDescricao().toUpperCase()) && primeiraLinha){
+					if(!linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase())) && primeiraLinha){
 						lancarExcessaoCidade = true;
 						erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
 					}	
@@ -110,8 +112,10 @@ public class ValidarArquivoService {
 					
 				}
 				brEvento.close();
-				File f = new File(nomeArquivoTemporario);  
-				f.delete();
+				File fileTxt = new File(nomeArquivoTemporario);  
+				fileTxt.delete();
+				File filePdf = new File(nomeArquivoTemporario);  
+				filePdf.delete();
 			}
 			document.close();
 			if(lancarExcessaoCidade){
@@ -125,22 +129,26 @@ public class ValidarArquivoService {
 			}
 		}	
 	}
-		private void criarArquivoProcessamento() throws IOException {
-			nomeArquivoTemporario = "";
-			String filename = FilenameUtils.getName(arquivo.getFile().getFileName());
-		    InputStream input = arquivo.getFile().getInputstream();
-		    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
-		    OutputStream output = new FileOutputStream(file);
-		    nomeArquivoTemporario = file.getAbsolutePath();
-		    try {
-		        IOUtils.copy(input, output);
-		    } catch(Exception e){
-		    	e.printStackTrace();
-		    	nomeArquivoTemporario = null;
-		    } finally {
-		        IOUtils.closeQuietly(input);
-		        IOUtils.closeQuietly(output);
-		    }
-			
-		}
+	
+	private void criarArquivoProcessamento() throws IOException {
+		nomeArquivoTemporario = "";
+		String filename = FilenameUtils.getName(new String(arquivo.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
+	    InputStream input = arquivo.getFile().getInputstream();
+	    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
+	    OutputStream output = new FileOutputStream(file);
+	    nomeArquivoTemporario = file.getAbsolutePath();
+	    try {
+	        IOUtils.copy(input, output);
+	    } catch(Exception e){
+	    	e.printStackTrace();
+	    	nomeArquivoTemporario = null;
+	    } finally {
+	        IOUtils.closeQuietly(input);
+	        IOUtils.closeQuietly(output);
+	    }
+	}
+	
+	public static String removerAcentos(String str) {
+	    return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+	}
 }

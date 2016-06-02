@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import br.com.civitas.arquitetura.base.Usuario;
 import br.com.civitas.arquitetura.entity.IEntity;
 
 @Entity

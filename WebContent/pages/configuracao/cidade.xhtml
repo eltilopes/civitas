@@ -37,10 +37,10 @@
 							styleClass="error-messages" />
 						</div>
 					</div>
-					<div class="col-md-6 form-group">
+					<div class="col-md-6 ">
 						<div class="form-group">
-							<h:outputLabel value="Nome: " style="font-weight: normal;"/>
-							<p:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
+							<h:outputText value="Nome: " style="font-weight: normal;"/>
+							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
 							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
 						</div>
 					</div>
@@ -120,7 +120,7 @@
 			<legend>Cadastro de Cidade</legend>
 			<div class="row" >
 				<div class="col-md-6 form-group">
-					<h:outputLabel value="Estado:" style="font-weight: normal;"/>
+					<h:outputText value="Estado:" style="font-weight: normal;"/>
 					<p:selectOneMenu id="estadoInsert"
 									 value="#{bean.entity.estado}" required="true"
 									 label="Estado" converter="entityConverter"
@@ -130,22 +130,23 @@
 						<f:selectItems value="#{bean.estados}" var="estado" 
 								   itemLabel="#{estado.descricao.toUpperCase()}" itemValue="#{estado}" />
 					</p:selectOneMenu>
-					<h:message for="estadoInsert" tooltip="true"
-						   styleClass="error-messages" />
+					<h:message for="estadoInsert" tooltip="true" styleClass="error-messages" />
 				</div>
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group">
-					<h:outputLabel value="Nome: " style="font-weight: normal;"/>
-					<p:inputText id="nome" styleClass="form-control"  value="#{bean.entity.descricao}" />
+					<h:outputText value="Nome: " style="font-weight: normal;"/>
+					<h:inputText id="nomeInsert" styleClass="form-control"  value="#{bean.entity.descricao}" />
+					<h:message for="nomeInsert" tooltip="true" styleClass="error-messages" />
 				</div>
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group">
-			        <h:outputLabel value="Ativa: " style="font-weight: normal;" />
-			        <p:selectBooleanCheckbox onchange="carregando.show();" value="#{bean.entity.ativa}">
+			        <h:outputText  value="Ativa: " style="font-weight: normal;" />
+			        <p:selectBooleanCheckbox id="ativaInsert" onchange="carregando.show();" value="#{bean.entity.ativa}">
 						<p:ajax oncomplete="carregando.hide();" process="@this"/>
 					</p:selectBooleanCheckbox>
+					<h:message for="ativaInsert" tooltip="true" styleClass="error-messages" />
 				</div>
 			</div>
 		</fieldset>

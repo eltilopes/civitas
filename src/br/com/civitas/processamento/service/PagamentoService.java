@@ -1,6 +1,7 @@
 package br.com.civitas.processamento.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,34 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		sql.append("SELECT DISTINCT p FROM Pagamento p");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		return (List<Pagamento>) query.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT p FROM Pagamento p ");
+		sql.append("INNER JOIN FETCH p.arquivo ap ");
+		sql.append("INNER JOIN FETCH p.matricula m ");
+		sql.append("INNER JOIN FETCH m.cargo ca ");
+		sql.append("INNER JOIN FETCH m.vinculo v ");
+		sql.append("INNER JOIN FETCH ap.cidade c ");
+		sql.append("INNER JOIN FETCH ap.mes m ");
+		sql.append("INNER JOIN FETCH ap.ano a ");
+		sql.append("WHERE 1 = 1 ");
+		sql.append(Objects.nonNull(arquivoPagamento.getCidade()) ? "AND c = :cidade " : "");
+		sql.append(Objects.nonNull(arquivoPagamento.getMes()) ? "AND m = :mes " : "");
+		sql.append(Objects.nonNull(arquivoPagamento.getAno()) ? "AND a = :ano " : "");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		if(Objects.nonNull(arquivoPagamento.getCidade())){
+			query.setParameter("cidade", arquivoPagamento.getCidade());
+		}
+		if(Objects.nonNull(arquivoPagamento.getMes())){
+			query.setParameter("mes", arquivoPagamento.getMes());
+		}
+		if(Objects.nonNull(arquivoPagamento.getAno())){
+			query.setParameter("ano", arquivoPagamento.getAno());
+		}
+		return query.list();
 	}
 	
 	@Transactional
