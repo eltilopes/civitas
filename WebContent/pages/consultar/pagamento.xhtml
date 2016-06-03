@@ -113,6 +113,12 @@
 	   				<h:outputText id="vinculo" value="#{pag.matricula.vinculo.descricao}" />
 	   			</p:column>
 	   			
+	   			<p:column headerText="Admissão" style="text-align:center;" >
+	   				<h:outputText id="dataAdmissao" value="#{pag.matricula.dataAdmissao}"   >
+	   					<f:convertDateTime pattern="dd/MM/yyyy" />
+	   				</h:outputText>	
+	   			</p:column>
+	   			
 				<p:column headerText="CH" style="text-align:left;" >
 	   				<h:outputText id="cargaHoraria" value="#{pag.matricula.cargaHoraria}" />
 	   			</p:column>

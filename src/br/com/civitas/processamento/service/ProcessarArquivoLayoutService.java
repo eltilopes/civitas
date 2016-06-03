@@ -2,7 +2,10 @@ package br.com.civitas.processamento.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -227,9 +230,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(linhaAtual.toUpperCase().contains("WASHINGTON LUIZ GOMES")){
-			System.out.println(linhaAtual);
-		}
 		if(linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao())){
 			ultimaLinha = linhaAnterior;
 			if(linhaAtual.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())){
@@ -242,14 +242,22 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			pagamento = new Pagamento();
 			novaMatricula(numeroMatricula, linhaAtual);
 		}
-//		if(linhaAtual.contains(Identificador.DATA_ADMISSAO.getDescricao())){
-//		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-//		java.sql.Date data = new java.sql.Date(format.parse(dataStr).getTime());
-//			matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
-//			matricula.setContaCorrente(getContaCorrente(linhaAtual));;
-//		}
+		if(linhaAtual.contains(IdentificadorArquivoLayout.DATA_ADMISSAO.getDescricao())){
+			matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
+		}
 	}
 	
+	private Date getDataAdmissao(String linhaAtual) {
+		try {
+			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			return (Date)formatter.parse(linhaAtual.substring(
+					linhaAtual.indexOf(IdentificadorArquivoLayout.DATA_ADMISSAO.getDescricao()) -10
+					,linhaAtual.indexOf(IdentificadorArquivoLayout.DATA_ADMISSAO.getDescricao())));
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar a Data de Admissão. Linha: " + linhaAtual);
+		}
+	}
+
 	private String getNumeroMatricula() throws Exception {
 		String numeroMatricula = linhaAnterior.substring(0,8);
 		Integer numero = 0;
@@ -273,7 +281,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matricula.setVinculo(getVinculo(getVinculo(linhaAnterior), linhaAnterior));
 		matricula.setCargaHoraria(getCargaHoraria());
 		matricula.setNomeFuncionario(getNomeFuncionario(linhaAnterior));;
-		matricula.setObservacao(linhaAnterior);
 		matriculas.add(matricula);
 		pagamento.setMatricula(matricula);
 	}

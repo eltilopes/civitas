@@ -16,6 +16,7 @@ import br.com.civitas.arquitetura.util.FacesUtils;
 import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cidade;
+import br.com.civitas.processamento.entity.LogErroProcessador;
 import br.com.civitas.processamento.entity.Mes;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.factory.FactoryEnuns;
@@ -23,6 +24,7 @@ import br.com.civitas.processamento.service.AnoService;
 import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.EventoService;
+import br.com.civitas.processamento.service.LogErroProcessadorService;
 import br.com.civitas.processamento.service.MesService;
 import br.com.civitas.processamento.utils.ValidarArquivoService;
 
@@ -49,6 +51,9 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	@ManagedProperty("#{validarArquivoService}")
 	private ValidarArquivoService validarArquivoService ;
+
+	@ManagedProperty("#{logErroProcessadorService}")
+	private LogErroProcessadorService logErroProcessadorService ;
 
 	private ArquivoPagamento arquivo;
 	private List<Cidade> cidades;
@@ -86,6 +91,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (Exception e) {
 			arquivo = new ArquivoPagamento();
+			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
 		}
 	}
@@ -132,6 +138,10 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	public void setValidarArquivoService(ValidarArquivoService validarArquivoService) {
 		this.validarArquivoService = validarArquivoService;
+	}
+
+	public void setLogErroProcessadorService(LogErroProcessadorService logErroProcessadorService) {
+		this.logErroProcessadorService = logErroProcessadorService;
 	}
 
 	public void setService(ArquivoPagamentoService service) {
