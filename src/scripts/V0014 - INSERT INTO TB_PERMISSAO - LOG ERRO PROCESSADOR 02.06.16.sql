@@ -1,0 +1,2 @@
+﻿INSERT INTO TB_PERMISSAO VALUES
+    (nextval('seq_permissao') , 'LOG_ERRO_PROCESSADOR_R', 'LER LOG ERRO PROCESSADOR');   

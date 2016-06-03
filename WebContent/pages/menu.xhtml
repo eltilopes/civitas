@@ -51,6 +51,11 @@
 												<a href="#{request.contextPath}/pages/consultar/pagamento.jsf">Pagamento</a>
 											</li>
 										</h:panelGroup>
+										<h:panelGroup rendered="#{sessionScope.perms.LOG_ERRO_PROCESSADOR_R}">
+											<li>
+												<a href="#{request.contextPath}/pages/consultar/logErroProcessador.jsf">Log Erro Processador</a>
+											</li>
+										</h:panelGroup>
 									</ul>
 								</li>
 							</h:panelGroup>

@@ -44,12 +44,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  String ultimaLinha = "";
 	private  String linhaAnterior = "";
 	
-	public void processar(ArquivoPagamento arquivoPagamento) throws IOException{
+	public void processar(ArquivoPagamento arquivoPagamento) throws Exception{
 		setArquivoPagamento(arquivoPagamento);
 		processar();
 	}
 	
-	private void processar() throws IOException {
+	private void processar() throws Exception {
 		iniciarArquivos();
 		iniciarValores();
 		carregarEventos();
@@ -57,7 +57,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		finalizarArquivos();
 	}
 
-	private void carregarPagamentos() throws IOException {
+	private void carregarPagamentos() throws Exception {
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine(); 
@@ -123,7 +123,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		}
 	}
 
-	private void localizarPagamentos(String linhaAtual) throws ApplicationException {
+	private void localizarPagamentos(String linhaAtual) throws Exception {
 		localizarMatricula(linhaAtual);
 		verificarIdentificador(linhaAtual, getArquivoPagamento().getNomeArquivo());
 	}
@@ -226,13 +226,16 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 		
 
-	private  void localizarMatricula(String linhaAtual) throws ApplicationException {
+	private  void localizarMatricula(String linhaAtual) throws Exception {
+		if(linhaAtual.toUpperCase().contains("WASHINGTON LUIZ GOMES")){
+			System.out.println(linhaAtual);
+		}
 		if(linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao())){
 			ultimaLinha = linhaAnterior;
 			if(linhaAtual.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())){
 				processamentoPagamentoAtivo = true;
 			}
-			String numeroMatricula = linhaAnterior.substring(0,8);
+			String numeroMatricula = getNumeroMatricula();
 			if(Objects.nonNull(pagamento) && Objects.nonNull(matricula) && !matricula.getNumeroMatricula().equals(numeroMatricula)){
 				pagamentos.add(pagamento);
 			}
@@ -247,6 +250,22 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 //		}
 	}
 	
+	private String getNumeroMatricula() throws Exception {
+		String numeroMatricula = linhaAnterior.substring(0,8);
+		Integer numero = 0;
+		try {
+			numero = Integer.parseInt(numeroMatricula.replace("-", ""));
+		} catch (Exception e) {
+			try {
+				numero =  numeroMatricula.hashCode();
+				numeroMatricula = numero.toString().replace("-", "").substring(0, 8);
+			} catch (Exception e2) {
+				numeroMatricula = numero.toString().replace("-", "");
+			}
+		}
+		return numeroMatricula;
+	}
+
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setNumeroMatricula(numeroMatricula);
@@ -278,8 +297,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private String getNomeFuncionario(String linha) throws ApplicationException {
 		String nome= "";
 		try {
+			Integer posicaoInicial = getPosicaoInicialNomeFuncionario(linha);
 			nome = linha.subSequence(
-				linha.indexOf(matricula.getNumeroMatricula()) + matricula.getNumeroMatricula().length(),
+				posicaoInicial,
 				linha.indexOf(matricula.getVinculo().getDescricao())
 			).toString().trim();
 		} catch (Exception e) {
@@ -287,6 +307,10 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		}
 		return nome ;
 		
+	}
+
+	private Integer getPosicaoInicialNomeFuncionario(String linha) {
+		return linha.indexOf(matricula.getNumeroMatricula()) == -1 ? 0 : linha.indexOf(matricula.getNumeroMatricula()) + matricula.getNumeroMatricula().length();
 	}
 
 	private Vinculo getVinculo(String linha) throws ApplicationException {

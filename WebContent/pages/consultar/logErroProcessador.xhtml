@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Log Erro Processador" />
+    	</ui:define>
+    	
+   		<ui:define name="pageScript">
+			<script type="text/javascript"
+				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{logErroProcessadorBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Log Erro Processador
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-6 ">
+						<div class="form-group">
+							<h:outputText value="Nome Arquivo: " style="font-weight: normal;"/>
+							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.nomeArquivo}" />
+							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Log Erro Processador" />
+		</ui:define>
+	
+		<ui:define name="botoesInsertFiltro">
+
+		</ui:define>
+	
+		<ui:define name="resultFiltro" >
+			<p:dataTable id="arquivos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaLogs" rows="10" emptyMessage="Nenhum Log Erro Processador foi encontrado."
+			 		 value="#{bean.resultSearch}" var="log" paginator="#{bean.resultSearch.rowCount > 0}"
+			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+		        
+		        
+				<p:column headerText="Nome Arquivo" style="text-align:left;" >
+	   				<h:outputText id="nomeArquivo" value="#{log.nomeArquivo}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Erro" style="text-align:left;" >
+	   				<h:outputText id="erro" value="#{log.erro.toUpperCase()}" />
+	   			</p:column>
+	   			
+				<p:column headerText="Data" style="text-align:center;" >
+	   				<h:outputText id="data" value="#{log.data}"   >
+	   					<f:convertDateTime pattern="dd/MM/yyyy" />
+	   				</h:outputText>	
+	   			</p:column>
+	   			
+			</p:dataTable> 
+		</ui:define>
+		
+    </ui:composition>
+</html>
