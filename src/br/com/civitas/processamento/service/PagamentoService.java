@@ -10,8 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.Pagamento;
+import br.com.civitas.processamento.entity.Secretaria;
+import br.com.civitas.processamento.entity.Setor;
 
 @Service
 public class PagamentoService extends AbstractPersistence<Pagamento> {
@@ -41,12 +44,14 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento) {
+	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, Cargo cargo, Secretaria secretaria, Setor setor) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT p FROM Pagamento p ");
 		sql.append("INNER JOIN FETCH p.arquivo ap ");
 		sql.append("INNER JOIN FETCH p.matricula m ");
 		sql.append("INNER JOIN FETCH m.cargo ca ");
+		sql.append("INNER JOIN FETCH m.secretaria sec ");
+		sql.append("INNER JOIN FETCH m.setor setor ");
 		sql.append("INNER JOIN FETCH m.vinculo v ");
 		sql.append("INNER JOIN FETCH ap.cidade c ");
 		sql.append("INNER JOIN FETCH ap.mes m ");
@@ -55,6 +60,9 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		sql.append(Objects.nonNull(arquivoPagamento.getCidade()) ? "AND c = :cidade " : "");
 		sql.append(Objects.nonNull(arquivoPagamento.getMes()) ? "AND m = :mes " : "");
 		sql.append(Objects.nonNull(arquivoPagamento.getAno()) ? "AND a = :ano " : "");
+		sql.append(Objects.nonNull(cargo) ? "AND ca = :cargo " : "");
+		sql.append(Objects.nonNull(secretaria) ? "AND sec = :secretaria " : "");
+		sql.append(Objects.nonNull(setor) ? "AND setor = :setor " : "");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		if(Objects.nonNull(arquivoPagamento.getCidade())){
 			query.setParameter("cidade", arquivoPagamento.getCidade());
@@ -64,6 +72,15 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		}
 		if(Objects.nonNull(arquivoPagamento.getAno())){
 			query.setParameter("ano", arquivoPagamento.getAno());
+		}
+		if(Objects.nonNull(cargo)){
+			query.setParameter("cargo", cargo);
+		}
+		if(Objects.nonNull(secretaria)){
+			query.setParameter("secretaria", secretaria);
+		}
+		if(Objects.nonNull(setor)){
+			query.setParameter("setor", setor);
 		}
 		return query.list();
 	}

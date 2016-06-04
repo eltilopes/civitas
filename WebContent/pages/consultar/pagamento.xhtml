@@ -66,17 +66,64 @@
 					<div class="col-md-4">
 							<div class="form-group">
 							<h:outputText value="Cidade " />
-							<h:selectOneMenu id="cidadeSearch"
+							<p:selectOneMenu id="cidadeSearch"
 											 value="#{bean.entitySearch.arquivo.cidade}"
 											 converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
 										value="#{bean.cidades}" />
-							</h:selectOneMenu>
+								<p:ajax event="change" update=":painelGlobal" listener="#{bean.carregarPorCidade}"  oncomplete="carregando.hide()"/>
+							</p:selectOneMenu>
 							<h:message for="cidadeSearch" tooltip="true"
 							styleClass="error-messages" />
 						</div>
 					</div>
+				</div>	
+				<div class="row">
+					<h:panelGroup id="panelPorCidade" rendered="#{bean.entitySearch.arquivo.cidade != null}">
+						<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Secretaria " />
+							<h:selectOneMenu id="secretariaSearch"
+											 value="#{bean.secretaria}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao}"
+										value="#{bean.secretarias}" />
+							</h:selectOneMenu>
+							<h:message for="secretariaSearch" tooltip="true"
+							styleClass="error-messages" />
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputText value="Setor " />
+								<h:selectOneMenu id="setorSearch"
+												 value="#{bean.setor}"
+												 converter="entityConverter" styleClass="form-control">
+									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+											value="#{bean.setores}" />
+								</h:selectOneMenu>
+								<h:message for="setorSearch" tooltip="true"
+								styleClass="error-messages" />
+							</div>
+						</div>
+						<div class="col-md-3">
+								<div class="form-group">
+								<h:outputText value="Cargo " />
+								<h:selectOneMenu id="cargoSearch"
+												 value="#{bean.cargo}"
+												 converter="entityConverter" styleClass="form-control">
+									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+											value="#{bean.cargos}" />
+								</h:selectOneMenu>
+								<h:message for="cargoSearch" tooltip="true"
+								styleClass="error-messages" />
+							</div>
+						</div>
+					</h:panelGroup>	
 				</div>	
 			</fieldset>		
 		</ui:define>	
@@ -96,46 +143,33 @@
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 		        
-		        
-				<p:column headerText="Matrícula" style="text-align:left;" >
-	   				<h:outputText id="matricula" value="#{pag.matricula.numeroMatricula}" />
-	   			</p:column>
-	   			
-				<p:column headerText="Nome" style="text-align:left;" >
+				<p:column headerText="Nome Funcionário" style="text-align:left;" sortBy="#{pag.matricula.nomeFuncionario}">
 	   				<h:outputText id="nome" value="#{pag.matricula.nomeFuncionario}" />
 	   			</p:column>
 	   			
-				<p:column headerText="Função" style="text-align:left;" >
-	   				<h:outputText id="funcao" value="#{pag.matricula.cargo.descricao}" />
-	   			</p:column>
-
-				<p:column headerText="Vínculo" style="text-align:left;" >
-	   				<h:outputText id="vinculo" value="#{pag.matricula.vinculo.descricao}" />
-	   			</p:column>
-	   			
-	   			<p:column headerText="Admissão" style="text-align:center;" >
+	   			<p:column headerText="Admissão" style="text-align:center;" sortBy="#{pag.matricula.dataAdmissao}" >
 	   				<h:outputText id="dataAdmissao" value="#{pag.matricula.dataAdmissao}"   >
 	   					<f:convertDateTime pattern="dd/MM/yyyy" />
 	   				</h:outputText>	
 	   			</p:column>
-	   			
-				<p:column headerText="CH" style="text-align:left;" >
+
+				<p:column headerText="Secretaria" style="text-align:left;" sortBy="#{pag.matricula.secretaria.descricao}" >
+	   				<h:outputText id="secretaria" value="#{pag.matricula.secretaria.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="Setor" style="text-align:left;" sortBy="#{pag.matricula.setor.descricao}" >
+	   				<h:outputText id="setor" value="#{pag.matricula.setor.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="Função" style="text-align:left;" sortBy="#{pag.matricula.cargo.descricao}">
+	   				<h:outputText id="funcao" value="#{pag.matricula.cargo.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="CH" style="text-align:left;"  sortBy="#{pag.matricula.cargaHoraria}" >
 	   				<h:outputText id="cargaHoraria" value="#{pag.matricula.cargaHoraria}" />
 	   			</p:column>
-				
-				<p:column headerText="Proventos" style="text-align:right;" >
-	   				<h:outputText id="totalProventos"  value="#{pag.totalProventos}" converter="valorNumericoMoedaConverter" />
-	   			</p:column>
 	   			
-				<p:column headerText="Líquido" style="text-align:right;" >
-	   				<h:outputText id="totalLiquido"  value="#{pag.totalLiquido}" converter="valorNumericoMoedaConverter" />
-	   			</p:column>
-	   			
-				<p:column headerText="Desconto" style="text-align:right;" >
-	   				<h:outputText id="totalDescontos" value="#{pag.totalDescontos}"  converter="valorNumericoMoedaConverter" />
-	   			</p:column>
-	   			
-				<p:column headerText="Remuneração" style="text-align:right;" >
+				<p:column headerText="Remuneração" style="text-align:right;" sortBy="#{pag.totalRemuneracao}" >
 	   				<h:outputText id="totalRemuneracao"  value="#{pag.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
 	   			</p:column>
 	   			

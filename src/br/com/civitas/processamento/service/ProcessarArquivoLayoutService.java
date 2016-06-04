@@ -19,6 +19,8 @@ import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Matricula;
 import br.com.civitas.processamento.entity.Pagamento;
+import br.com.civitas.processamento.entity.Secretaria;
+import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.enums.IdentificadorArquivoLayout;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
@@ -33,6 +35,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  CargoService cargoService;
 	
 	@Autowired
+	private  SecretariaService secretariaService;
+	
+	@Autowired
+	private  SetorService setorService;
+	
+	@Autowired
 	private  VinculoService vinculoService;
 	
 	@Autowired
@@ -40,6 +48,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	
 	private  Pagamento pagamento;
 	private  Matricula matricula;
+	private  Secretaria secretaria;
+	private  Setor setor;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
 	private  boolean processamentoPagamentoAtivo = false;
@@ -88,6 +98,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
+		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setSecretarias(secretariaService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setCargos(cargoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setVinculos(vinculoService.buscarPorCidade(getArquivoPagamento().getCidade()));
 		setEventos(eventoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -127,10 +139,54 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
+		localizarSecretariaSetor(linhaAtual);
 		localizarMatricula(linhaAtual);
 		verificarIdentificador(linhaAtual, getArquivoPagamento().getNomeArquivo());
 	}
 	
+	private void localizarSecretariaSetor(String linhaAtual) {
+		if(linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_SETOR.getDescricao())){
+			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
+			setor = getSetor(getSetor(linhaAtual), linhaAtual);
+		}
+	}
+
+	private Secretaria getSecretaria(String linhaAtual) throws ApplicationException {
+		Secretaria secretaria = new Secretaria();
+		try {
+			String descricao = linhaAtual.substring(
+												linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
+												linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
+			descricao = descricao.substring(
+					0,	descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).trim();
+			secretaria.setCidade(getArquivoPagamento().getCidade());
+			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+			secretaria.setDescricao(descricao);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar a Secretaria. Linha: " + linhaAtual);
+		}
+		return secretaria;
+	}
+	
+	private Setor getSetor(String linhaAtual) throws ApplicationException {
+		Setor setor = new Setor();
+		try {
+			String descricao = linhaAtual.substring(
+					linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
+			descricao = descricao.substring(
+					descricao.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
+					descricao.length() - 3).trim();
+			setor.setCidade(getArquivoPagamento().getCidade());
+			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+			setor.setDescricao(descricao);
+			
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar o Setor. Linha: " + linhaAtual);
+		}
+		return setor;
+	}
+
 	private  void verificarIdentificador(String linha, String nomeArquivo) {
 		getEventos().forEach((e) -> {
 			if(processamentoPagamentoAtivo && !linha.contains(IdentificadorArquivoLayout.CARGO.getDescricao())
@@ -276,6 +332,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
+		matricula.setSecretaria(secretaria);
+		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);
 		matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
 		matricula.setVinculo(getVinculo(getVinculo(linhaAnterior), linhaAnterior));

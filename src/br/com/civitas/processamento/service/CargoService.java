@@ -58,4 +58,14 @@ public class CargoService extends AbstractPersistence<Cargo> {
 									  .list();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Cargo> buscarCidade(Cidade cidade) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT c FROM Cargo c ");
+		sql.append(" WHERE c.cidade = :cidade  ");
+		sql.append(" ORDER BY c.descricao ASC ");
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+				.setParameter("cidade", cidade)
+				.list();
+	}
 }

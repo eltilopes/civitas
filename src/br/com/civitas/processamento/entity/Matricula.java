@@ -35,6 +35,14 @@ public class Matricula implements IEntity {
 	private Cargo cargo;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="cd_secretaria",nullable=false)
+	private Secretaria secretaria;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="cd_setor",nullable=false)
+	private Setor setor ;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="cd_vinculo",nullable=false)
 	private Vinculo vinculo;
 	
@@ -81,6 +89,22 @@ public class Matricula implements IEntity {
 
 	public void setCargo(Cargo cargo) {
 		this.cargo = cargo;
+	}
+
+	public Secretaria getSecretaria() {
+		return secretaria;
+	}
+
+	public void setSecretaria(Secretaria secretaria) {
+		this.secretaria = secretaria;
+	}
+
+	public Setor getSetor() {
+		return setor;
+	}
+
+	public void setSetor(Setor setor) {
+		this.setor = setor;
 	}
 
 	public Vinculo getVinculo() {

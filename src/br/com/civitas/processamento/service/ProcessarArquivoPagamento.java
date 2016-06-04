@@ -23,6 +23,8 @@ import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.Secretaria;
+import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.utils.DiretorioProcessamento;
 
@@ -35,6 +37,12 @@ public abstract class ProcessarArquivoPagamento {
 	private  CargoService cargoService;
 	
 	@Autowired
+	private  SecretariaService secretariaService;
+	
+	@Autowired
+	private  SetorService setorService;
+	
+	@Autowired
 	private  VinculoService vinculoService;
 	
 	private String nomeArquivoTemporario;
@@ -45,6 +53,8 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private  List<Evento> eventos ;
 	private  List<Cargo> cargos ;
+	private  List<Secretaria> secretarias ;
+	private  List<Setor> setores ;
 	private  List<Vinculo> vinculos ;
 
 	public void iniciarArquivos( ) {
@@ -166,6 +176,62 @@ public abstract class ProcessarArquivoPagamento {
 		return null;
 	}
 	
+	public Secretaria getSecretaria(Secretaria secretaria, String linha) {
+		Secretaria secretariaAuxiliar = new Secretaria();
+		try {
+			secretariaAuxiliar = getSecretaria(secretaria);
+			if(Objects.isNull(secretariaAuxiliar)){
+				secretaria = secretariaService.save(secretaria);
+				secretarias.add(secretaria);
+			}else{
+				secretaria = secretariaAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Secretaria. Linha: " + linha);
+		}
+		return secretaria;
+	}
+	private Secretaria getSecretaria(Secretaria secretaria) {
+		for(Secretaria s : secretarias){
+			if(s.getCidade().getId().equals(secretaria.getCidade().getId()) && 
+					s.getTipoArquivo().getCodigo()==secretaria.getTipoArquivo().getCodigo() && 
+					s.getDescricao().equals(secretaria.getDescricao())){
+				secretaria = s;
+				return secretaria;
+			}
+		}
+		return null;
+	}
+	
+	public Setor getSetor(Setor setor, String linha) {
+		Setor setorAuxiliar = new Setor();
+		try {
+			setorAuxiliar = getSetor(setor);
+			if(Objects.isNull(setorAuxiliar)){
+				setor = setorService.save(setor);
+				setores.add(setor);
+			}else{
+				setor = setorAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Setor. Linha: " + linha);
+		}
+		return setor;
+	}
+	
+	
+	private Setor getSetor(Setor setor) {
+		for(Setor s : setores){
+			if(s.getCidade().getId().equals(setor.getCidade().getId()) && 
+					s.getTipoArquivo().getCodigo()==setor.getTipoArquivo().getCodigo() && 
+					s.getDescricao().equals(setor.getDescricao())){
+				setor = s;
+				return setor;
+			}
+		}
+		return null;
+	}
+	
 	public Vinculo getVinculo(Vinculo vinculo, String linha) throws ApplicationException {
 		Vinculo vinculoAuxiliar = new Vinculo();
 		try {
@@ -232,6 +298,22 @@ public abstract class ProcessarArquivoPagamento {
 
 	public void setCargos(List<Cargo> cargos) {
 		this.cargos = cargos;
+	}
+
+	public List<Setor> getSetores() {
+		return setores;
+	}
+
+	public void setSetores(List<Setor> setores) {
+		this.setores = setores;
+	}
+
+	public List<Secretaria> getSecretarias() {
+		return secretarias;
+	}
+
+	public void setSecretarias(List<Secretaria> secretarias) {
+		this.secretarias = secretarias;
 	}
 
 	public List<Vinculo> getVinculos() {
