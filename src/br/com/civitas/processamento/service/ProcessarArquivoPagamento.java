@@ -20,11 +20,14 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.civitas.arquitetura.ApplicationException;
+import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
+import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.utils.DiretorioProcessamento;
 
@@ -43,6 +46,12 @@ public abstract class ProcessarArquivoPagamento {
 	private  SetorService setorService;
 	
 	@Autowired
+	private  UnidadeTrabalhoService unidadeTrabalhoService;
+	
+	@Autowired
+	private  NivelPagamentoService nivelPagamentoService;
+	
+	@Autowired
 	private  VinculoService vinculoService;
 	
 	private String nomeArquivoTemporario;
@@ -54,6 +63,8 @@ public abstract class ProcessarArquivoPagamento {
 	private  List<Evento> eventos ;
 	private  List<Cargo> cargos ;
 	private  List<Secretaria> secretarias ;
+	private  List<UnidadeTrabalho> unidadesTrabalho;
+	private  List<NivelPagamento> niveisPagamento ;
 	private  List<Setor> setores ;
 	private  List<Vinculo> vinculos ;
 
@@ -191,6 +202,7 @@ public abstract class ProcessarArquivoPagamento {
 		}
 		return secretaria;
 	}
+	
 	private Secretaria getSecretaria(Secretaria secretaria) {
 		for(Secretaria s : secretarias){
 			if(s.getCidade().getId().equals(secretaria.getCidade().getId()) && 
@@ -198,6 +210,68 @@ public abstract class ProcessarArquivoPagamento {
 					s.getDescricao().equals(secretaria.getDescricao())){
 				secretaria = s;
 				return secretaria;
+			}
+		}
+		return null;
+	}
+	
+	public UnidadeTrabalho getUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho, String linha) {
+		UnidadeTrabalho unidadeTrabalhoAuxiliar = new UnidadeTrabalho();
+		try {
+			unidadeTrabalhoAuxiliar = getUnidadeTrabalho(unidadeTrabalho);
+			if(Objects.isNull(unidadeTrabalhoAuxiliar)){
+				unidadeTrabalho = unidadeTrabalhoService.save(unidadeTrabalho);
+				unidadesTrabalho.add(unidadeTrabalho);
+			}else{
+				unidadeTrabalho = unidadeTrabalhoAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Unidade Trabalho. Linha: " + linha);
+		}
+		return unidadeTrabalho;
+	}
+	
+	private UnidadeTrabalho getUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
+		for(UnidadeTrabalho ut : unidadesTrabalho){
+			if(ut.getCidade().getId().equals(unidadeTrabalho.getCidade().getId()) && 
+					ut.getTipoArquivo().getCodigo()==unidadeTrabalho.getTipoArquivo().getCodigo() && 
+					ut.getDescricao().equals(unidadeTrabalho.getDescricao()) &&
+					ut.getCodigo().equals(unidadeTrabalho.getCodigo())){
+				unidadeTrabalho = ut;
+				return unidadeTrabalho;
+			}
+		}
+		return null;
+	}
+	
+	public NivelPagamento getNivelPagamento(NivelPagamento nivelPagamento, String linha) {
+		NivelPagamento nivelPagamentoAuxiliar = new NivelPagamento();
+		if(StringUtils.notNullOrEmpty(nivelPagamento.getDescricao()) &&
+				StringUtils.notNullOrEmpty(nivelPagamento.getCodigo())){
+			try {
+				nivelPagamentoAuxiliar = getNivelPagamento(nivelPagamento);
+				if(Objects.isNull(nivelPagamentoAuxiliar)){
+					nivelPagamento = nivelPagamentoService.save(nivelPagamento);
+					niveisPagamento.add(nivelPagamento);
+				}else{
+					nivelPagamento = nivelPagamentoAuxiliar;
+				}
+			} catch (Exception e) {
+				throw new ApplicationException("Erro ao pegar Nivel Pagamento. Linha: " + linha);
+			}
+			return nivelPagamento;
+		}
+		return null;
+	}
+	
+	private NivelPagamento getNivelPagamento(NivelPagamento nivelPagamento) {
+		for(NivelPagamento np : niveisPagamento){
+			if(np.getCidade().getId().equals(nivelPagamento.getCidade().getId()) && 
+					np.getTipoArquivo().getCodigo()==nivelPagamento.getTipoArquivo().getCodigo() && 
+					np.getDescricao().equals(nivelPagamento.getDescricao()) &&
+					np.getCodigo().equals(nivelPagamento.getCodigo())){
+				nivelPagamento = np;
+				return nivelPagamento;
 			}
 		}
 		return null;
@@ -322,6 +396,22 @@ public abstract class ProcessarArquivoPagamento {
 
 	public void setVinculos(List<Vinculo> vinculos) {
 		this.vinculos = vinculos;
+	}
+
+	public List<UnidadeTrabalho> getUnidadesTrabalho() {
+		return unidadesTrabalho;
+	}
+
+	public void setUnidadesTrabalho(List<UnidadeTrabalho> unidadesTrabalho) {
+		this.unidadesTrabalho = unidadesTrabalho;
+	}
+
+	public List<NivelPagamento> getNiveisPagamento() {
+		return niveisPagamento;
+	}
+
+	public void setNiveisPagamento(List<NivelPagamento> niveisPagamento) {
+		this.niveisPagamento = niveisPagamento;
 	}
 	
 }

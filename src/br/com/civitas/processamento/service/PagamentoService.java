@@ -12,9 +12,11 @@ import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
+import br.com.civitas.processamento.entity.UnidadeTrabalho;
 
 @Service
 public class PagamentoService extends AbstractPersistence<Pagamento> {
@@ -44,11 +46,14 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, Cargo cargo, Secretaria secretaria, Setor setor) {
+	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, Cargo cargo, Secretaria secretaria, 
+			Setor setor, UnidadeTrabalho unidadeTrabalho, NivelPagamento nivelPagamento) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT p FROM Pagamento p ");
 		sql.append("INNER JOIN FETCH p.arquivo ap ");
 		sql.append("INNER JOIN FETCH p.matricula m ");
+		sql.append("INNER JOIN FETCH m.unidadeTrabalho ut ");
+		sql.append("INNER JOIN FETCH m.nivelPagamento np ");
 		sql.append("INNER JOIN FETCH m.cargo ca ");
 		sql.append("INNER JOIN FETCH m.secretaria sec ");
 		sql.append("INNER JOIN FETCH m.setor setor ");
@@ -63,6 +68,8 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		sql.append(Objects.nonNull(cargo) ? "AND ca = :cargo " : "");
 		sql.append(Objects.nonNull(secretaria) ? "AND sec = :secretaria " : "");
 		sql.append(Objects.nonNull(setor) ? "AND setor = :setor " : "");
+		sql.append(Objects.nonNull(unidadeTrabalho) ? "AND ut = :unidadeTrabalho " : "");
+		sql.append(Objects.nonNull(nivelPagamento) ? "AND np = :nivelPagamento " : "");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		if(Objects.nonNull(arquivoPagamento.getCidade())){
 			query.setParameter("cidade", arquivoPagamento.getCidade());
@@ -81,6 +88,12 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		}
 		if(Objects.nonNull(setor)){
 			query.setParameter("setor", setor);
+		}
+		if(Objects.nonNull(unidadeTrabalho)){
+			query.setParameter("unidadeTrabalho", unidadeTrabalho);
+		}
+		if(Objects.nonNull(nivelPagamento)){
+			query.setParameter("nivelPagamento", nivelPagamento);
 		}
 		return query.list();
 	}

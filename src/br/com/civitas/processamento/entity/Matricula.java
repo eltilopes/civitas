@@ -39,6 +39,14 @@ public class Matricula implements IEntity {
 	private Secretaria secretaria;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="cd_unidade_trabalho")
+	private UnidadeTrabalho unidadeTrabalho;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="cd_nivel_pagamento")
+	private NivelPagamento nivelPagamento;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="cd_setor",nullable=false)
 	private Setor setor ;
 	
@@ -115,8 +123,24 @@ public class Matricula implements IEntity {
 		this.vinculo = vinculo;
 	}
 
+	public NivelPagamento getNivelPagamento() {
+		return nivelPagamento;
+	}
+
+	public void setNivelPagamento(NivelPagamento nivelPagamento) {
+		this.nivelPagamento = nivelPagamento;
+	}
+
 	public int getCargaHoraria() {
 		return cargaHoraria;
+	}
+
+	public UnidadeTrabalho getUnidadeTrabalho() {
+		return unidadeTrabalho;
+	}
+
+	public void setUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
+		this.unidadeTrabalho = unidadeTrabalho;
 	}
 
 	public void setCargaHoraria(int cargaHoraria) {

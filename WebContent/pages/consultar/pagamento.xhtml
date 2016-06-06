@@ -79,8 +79,8 @@
 						</div>
 					</div>
 				</div>	
-				<div class="row">
-					<h:panelGroup id="panelPorCidade" rendered="#{bean.entitySearch.arquivo.cidade != null}">
+				<h:panelGroup id="panelPorCidade" rendered="#{bean.entitySearch.arquivo.cidade != null}">
+					<div class="row">
 						<div class="col-md-4">
 							<div class="form-group">
 							<h:outputText value="Secretaria " />
@@ -109,7 +109,7 @@
 								styleClass="error-messages" />
 							</div>
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-4">
 								<div class="form-group">
 								<h:outputText value="Cargo " />
 								<h:selectOneMenu id="cargoSearch"
@@ -123,8 +123,38 @@
 								styleClass="error-messages" />
 							</div>
 						</div>
-					</h:panelGroup>	
-				</div>	
+					</div>
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Unidade Trabalho " />
+							<h:selectOneMenu id="unidadeTrabalhoSearch"
+											 value="#{bean.unidadeTrabalho}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.unidadesTrabalho}" />
+							</h:selectOneMenu>
+							<h:message for="unidadeTrabalhoSearch" tooltip="true"
+							styleClass="error-messages" />
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Nível Pagamento " />
+							<h:selectOneMenu id="nivelPagamentoSearch"
+											 value="#{bean.nivelPagamento}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.niveisPagamento}" />
+							</h:selectOneMenu>
+							<h:message for="nivelPagamentoSearch" tooltip="true"
+							styleClass="error-messages" />
+							</div>
+						</div>
+					</div>	
+				</h:panelGroup>	
 			</fieldset>		
 		</ui:define>	
 		
@@ -155,6 +185,14 @@
 
 				<p:column headerText="Secretaria" style="text-align:left;" sortBy="#{pag.matricula.secretaria.descricao}" >
 	   				<h:outputText id="secretaria" value="#{pag.matricula.secretaria.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="Unid. Trabalho" style="text-align:left;" sortBy="#{pag.matricula.unidadeTrabalho.descricao}" >
+	   				<h:outputText id="unidadeTrabalho" value="#{pag.matricula.unidadeTrabalho.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="Nível Pag." style="text-align:left;" sortBy="#{pag.matricula.nivelPagamento.descricao}" >
+	   				<h:outputText id="nivelPagamento" value="#{pag.matricula.nivelPagamento.descricao}" />
 	   			</p:column>
 
 				<p:column headerText="Setor" style="text-align:left;" sortBy="#{pag.matricula.setor.descricao}" >

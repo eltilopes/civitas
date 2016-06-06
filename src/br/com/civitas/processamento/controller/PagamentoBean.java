@@ -18,16 +18,20 @@ import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Mes;
+import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
+import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.service.AnoService;
 import br.com.civitas.processamento.service.CargoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.MesService;
+import br.com.civitas.processamento.service.NivelPagamentoService;
 import br.com.civitas.processamento.service.PagamentoService;
 import br.com.civitas.processamento.service.SecretariaService;
 import br.com.civitas.processamento.service.SetorService;
+import br.com.civitas.processamento.service.UnidadeTrabalhoService;
 
 @ManagedBean
 @ViewScoped
@@ -53,19 +57,29 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	@ManagedProperty("#{setorService}")
 	private SetorService setorService;
 	
+	@ManagedProperty("#{unidadeTrabalhoService}")
+	private UnidadeTrabalhoService unidadeTrabalhoService;
+	
+	@ManagedProperty("#{nivelPagamentoService}")
+	private NivelPagamentoService nivelPagamentoService;
+	
 	@ManagedProperty("#{cargoService}")
 	private CargoService cargoService;
 
 	private List<Cidade> cidades;
 	private List<Ano> anos;
 	private List<Mes> meses;
+	private List<Cargo> cargos;
 	private List<Setor> setores;
 	private List<Secretaria> secretarias;
-	private List<Cargo> cargos;
+	private List<UnidadeTrabalho> unidadesTrabalho;
+	private List<NivelPagamento> niveisPagamento;
 
 	private Setor setor;
 	private Secretaria secretaria;
 	private Cargo cargo;
+	private UnidadeTrabalho unidadeTrabalho;
+	private NivelPagamento nivelPagamento;
 
 	@PostConstruct
 	public void init() {
@@ -86,6 +100,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			setSecretarias(secretariaService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setSetores(setorService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setUnidadesTrabalho(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setNiveisPagamento(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 		}
 	}
 	
@@ -95,7 +112,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		try{
 			limpaListas();
 			List<Pagamento> list = null;
-			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor);
+			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor, unidadeTrabalho, nivelPagamento);
 			if( list.isEmpty() ){
 				throw new ApplicationException( "Consulta sem resultados." );
 			}
@@ -200,6 +217,18 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.cargo = cargo;
 	}
 
+	public UnidadeTrabalho getUnidadeTrabalho() {
+		return unidadeTrabalho;
+	}
+
+	public void setUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
+		this.unidadeTrabalho = unidadeTrabalho;
+	}
+
+	public void setUnidadeTrabalhoService(UnidadeTrabalhoService unidadeTrabalhoService) {
+		this.unidadeTrabalhoService = unidadeTrabalhoService;
+	}
+
 	public void setSecretariaService(SecretariaService secretariaService) {
 		this.secretariaService = secretariaService;
 	}
@@ -210,6 +239,34 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void setCargoService(CargoService cargoService) {
 		this.cargoService = cargoService;
+	}
+
+	public List<UnidadeTrabalho> getUnidadesTrabalho() {
+		return unidadesTrabalho;
+	}
+
+	public void setUnidadesTrabalho(List<UnidadeTrabalho> unidadesTrabalho) {
+		this.unidadesTrabalho = unidadesTrabalho;
+	}
+
+	public List<NivelPagamento> getNiveisPagamento() {
+		return niveisPagamento;
+	}
+
+	public void setNiveisPagamento(List<NivelPagamento> niveisPagamento) {
+		this.niveisPagamento = niveisPagamento;
+	}
+
+	public void setNivelPagamentoService(NivelPagamentoService nivelPagamentoService) {
+		this.nivelPagamentoService = nivelPagamentoService;
+	}
+
+	public NivelPagamento getNivelPagamento() {
+		return nivelPagamento;
+	}
+
+	public void setNivelPagamento(NivelPagamento nivelPagamento) {
+		this.nivelPagamento = nivelPagamento;
 	}
 
 }

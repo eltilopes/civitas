@@ -89,19 +89,19 @@ public class ValidarArquivoService {
 					String linha = brEvento.readLine();
 					if(!linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase())) && primeiraLinha){
 						lancarExcessaoCidade = true;
-						erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+						erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! ";
 					}	
 					primeiraLinha = false;
 					if(!linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) ){
 						lancarExcessaoMes = true;
-						erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+						erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! ";
 					}else{
 						lancarExcessaoMes = false;
 					}
 					if(!linha.toUpperCase().contains("" + arquivo.getAno().getAno()) ){
 						lancarExcessaoAno = true;
 						System.lineSeparator();   
-						erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! "+System.getProperty("line.separator")+" Linha do Arquivo : '" + linha + "'.";
+						erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! ";
 						}else{
 						lancarExcessaoAno = false;
 					}

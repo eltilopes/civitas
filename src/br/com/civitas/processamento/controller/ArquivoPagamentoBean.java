@@ -11,6 +11,7 @@ import javax.faces.bean.ViewScoped;
 
 import org.primefaces.model.UploadedFile;
 
+import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
 import br.com.civitas.processamento.entity.Ano;
@@ -89,9 +90,13 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			service.processarArquivo(arquivo);
 			arquivo = new ArquivoPagamento();
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
-		} catch (Exception e) {
+		} catch (ApplicationException e) {
+			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			arquivo = new ArquivoPagamento();
-//			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
+			FacesUtils.addErrorMessage(e.getMessage());
+		}catch (Exception e) {
+			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
+			arquivo = new ArquivoPagamento();
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
 		}
 	}
