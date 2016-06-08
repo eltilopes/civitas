@@ -19,6 +19,7 @@ public enum IdentificadorArquivoLayout {
 		CARGO("CARGO: CARGO 2:"),	
 		NOME_CARGO("CARGO"),	
 		AGRUPAMENTO_SETOR("<< AGRUPAMENTO: SETOR >>"),	
+		AGRUPAMENTO_GERAL("<< AGRUPAMENTO: GERAL >>"),	
 		CONTA_CORRENTE("C/C:"),	
 		NIVEL("NIVEL"),	
 		DAS_3("DAS-3"),	

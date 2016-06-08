@@ -47,7 +47,11 @@ public class Matricula implements IEntity {
 	private NivelPagamento nivelPagamento;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="cd_setor",nullable=false)
+	@JoinColumn(name="cd_carga_horaria_pagamento")
+	private CargaHorariaPagamento cargaHorariaPagamento;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="cd_setor")
 	private Setor setor ;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -129,6 +133,14 @@ public class Matricula implements IEntity {
 
 	public void setNivelPagamento(NivelPagamento nivelPagamento) {
 		this.nivelPagamento = nivelPagamento;
+	}
+
+	public CargaHorariaPagamento getCargaHorariaPagamento() {
+		return cargaHorariaPagamento;
+	}
+
+	public void setCargaHorariaPagamento(CargaHorariaPagamento cargaHorariaPagamento) {
+		this.cargaHorariaPagamento = cargaHorariaPagamento;
 	}
 
 	public int getCargaHoraria() {

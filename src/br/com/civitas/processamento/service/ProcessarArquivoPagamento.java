@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.NivelPagamento;
@@ -52,6 +53,9 @@ public abstract class ProcessarArquivoPagamento {
 	private  NivelPagamentoService nivelPagamentoService;
 	
 	@Autowired
+	private  CargaHorariaPagamentoService cargaHorariaPagamentoService;
+	
+	@Autowired
 	private  VinculoService vinculoService;
 	
 	private String nomeArquivoTemporario;
@@ -65,6 +69,7 @@ public abstract class ProcessarArquivoPagamento {
 	private  List<Secretaria> secretarias ;
 	private  List<UnidadeTrabalho> unidadesTrabalho;
 	private  List<NivelPagamento> niveisPagamento ;
+	private  List<CargaHorariaPagamento> cargasHorariaPagamento ;
 	private  List<Setor> setores ;
 	private  List<Vinculo> vinculos ;
 
@@ -244,6 +249,39 @@ public abstract class ProcessarArquivoPagamento {
 		return null;
 	}
 	
+	public CargaHorariaPagamento getCargaHorariaPagamento(CargaHorariaPagamento cargaHorariaPagamento, String linha) {
+		CargaHorariaPagamento cargaHorariaPagamentoAuxiliar = new CargaHorariaPagamento();
+		if(StringUtils.notNullOrEmpty(cargaHorariaPagamento.getDescricao()) &&
+				StringUtils.notNullOrEmpty(cargaHorariaPagamento.getCodigo())){
+			try {
+				cargaHorariaPagamentoAuxiliar = getCargaHorariaPagamento(cargaHorariaPagamento);
+				if(Objects.isNull(cargaHorariaPagamentoAuxiliar)){
+					cargaHorariaPagamento = cargaHorariaPagamentoService.save(cargaHorariaPagamento);
+					cargasHorariaPagamento.add(cargaHorariaPagamento);
+				}else{
+					cargaHorariaPagamento = cargaHorariaPagamentoAuxiliar;
+				}
+			} catch (Exception e) {
+				throw new ApplicationException("Erro ao pegar Carga Horária Pagamento. Linha: " + linha);
+			}
+			return cargaHorariaPagamento;
+		}
+		return null;
+	}
+	
+	private CargaHorariaPagamento getCargaHorariaPagamento(CargaHorariaPagamento cargaHorariaPagamento) {
+		for(CargaHorariaPagamento chp : cargasHorariaPagamento){
+			if(chp.getCidade().getId().equals(cargaHorariaPagamento.getCidade().getId()) && 
+					chp.getTipoArquivo().getCodigo()==cargaHorariaPagamento.getTipoArquivo().getCodigo() && 
+					chp.getDescricao().equals(cargaHorariaPagamento.getDescricao()) &&
+					chp.getCodigo().equals(cargaHorariaPagamento.getCodigo())){
+				cargaHorariaPagamento = chp;
+				return cargaHorariaPagamento;
+			}
+		}
+		return null;
+	}
+	
 	public NivelPagamento getNivelPagamento(NivelPagamento nivelPagamento, String linha) {
 		NivelPagamento nivelPagamentoAuxiliar = new NivelPagamento();
 		if(StringUtils.notNullOrEmpty(nivelPagamento.getDescricao()) &&
@@ -412,6 +450,14 @@ public abstract class ProcessarArquivoPagamento {
 
 	public void setNiveisPagamento(List<NivelPagamento> niveisPagamento) {
 		this.niveisPagamento = niveisPagamento;
+	}
+
+	public List<CargaHorariaPagamento> getCargasHorariaPagamento() {
+		return cargasHorariaPagamento;
+	}
+
+	public void setCargasHorariaPagamento(List<CargaHorariaPagamento> cargasHorariaPagamento) {
+		this.cargasHorariaPagamento = cargasHorariaPagamento;
 	}
 	
 }

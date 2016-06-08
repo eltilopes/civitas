@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
@@ -46,6 +47,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  NivelPagamentoService nivelPagamentoService;
 	
 	@Autowired
+	private  CargaHorariaPagamentoService cargaHorariaPagamentoService;
+	
+	@Autowired
 	private  SetorService setorService;
 	
 	@Autowired
@@ -59,6 +63,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  Secretaria secretaria;
 	private  UnidadeTrabalho unidadeTrabalho;
 	private  NivelPagamento nivelPagamento;
+	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
@@ -109,6 +114,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
 		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setSecretarias(secretariaService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -162,6 +168,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		if(linhaAtual.contains(IdentificadorArquivoLayout.NIVEL.getDescricao()) 
 				&& !linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())){
 			nivelPagamento = getNivelPagamento(getNivelPagamento(linhaAtual), linhaAtual);
+			cargaHorariaPagamento = getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual);
 		}
 	}
 
@@ -172,12 +179,31 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarSecretariaSetor(String linhaAtual) {
-		if(linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_SETOR.getDescricao())){
+		if(linhaAtual.contains(IdentificadorArquivoLayout.PAGINA.getDescricao())){
 			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
 			setor = getSetor(getSetor(linhaAtual), linhaAtual);
+		}else if(linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())){
+			secretaria = getSecretaria(getSecretaria(linhaAnterior), linhaAnterior);
 		}
 	}
 
+	private CargaHorariaPagamento getCargaHorariaPagamento(String linhaAtual) throws ApplicationException {
+		CargaHorariaPagamento cargaHorariaPagamento = new CargaHorariaPagamento();
+		try {
+			String codigo = linhaAtual.substring(
+					0,linhaAtual.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao())).trim();
+			String descricao = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()) + IdentificadorArquivoLayout.HIFEN.getDescricao().length(), 
+					linhaAtual.indexOf(nivelPagamento.getCodigo())).trim();
+			cargaHorariaPagamento.setCidade(getArquivoPagamento().getCidade());
+			cargaHorariaPagamento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+			cargaHorariaPagamento.setDescricao(descricao); 
+			cargaHorariaPagamento.setCodigo(codigo); 
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar a Nivel Pagamento. Linha: " + linhaAtual);
+		}
+		return cargaHorariaPagamento;
+	}
+	
 	private NivelPagamento getNivelPagamento(String linhaAtual) throws ApplicationException {
 		NivelPagamento nivelPagamento = new NivelPagamento();
 		try {
@@ -232,11 +258,22 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private Secretaria getSecretaria(String linhaAtual) throws ApplicationException {
 		Secretaria secretaria = new Secretaria();
 		try {
-			String descricao = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
-					linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
-			descricao = descricao.substring(
-					0,	descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).trim();
+			String descricao = "";
+			if(linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_SETOR.getDescricao())){
+				descricao = linhaAtual.substring(
+						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
+						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
+				descricao = descricao.substring(
+						0,	descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).trim();
+			}else if(linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())){
+				descricao = linhaAtual.substring(
+						linhaAtual.indexOf(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao()) + IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao().length(),
+						linhaAtual.length()); 
+				descricao = descricao.substring(
+						descricao.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()) + 1,
+						descricao.length()).trim();
+			}
+			
 			secretaria.setCidade(getArquivoPagamento().getCidade());
 			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			secretaria.setDescricao(descricao);
@@ -413,6 +450,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matricula.setSecretaria(secretaria);
 		matricula.setUnidadeTrabalho(unidadeTrabalho);
 		matricula.setNivelPagamento(nivelPagamento);
+		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);
 		matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));

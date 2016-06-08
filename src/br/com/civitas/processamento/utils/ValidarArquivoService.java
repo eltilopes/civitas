@@ -65,67 +65,63 @@ public class ValidarArquivoService {
 			PDDocument document = null;
 			document = PDDocument.load(new File(nomeArquivoTemporario));
 			document.getClass();
-			boolean primeiraLinha = true;
-			boolean segundaLinha = false;
-			boolean lancarExcessaoCidade = false;
-			boolean lancarExcessaoMes = false;
-			boolean lancarExcessaoAno = false;
-			String erroCidade = "";
-			String erroMes = "";
-			String erroAno = "";
+			boolean terceiraLinha = false;
+			boolean lancarExcessaoCidade = true;
+			boolean lancarExcessaoMes = true;
+			boolean lancarExcessaoTipoArquivo = true;
+			boolean lancarExcessaoAno = true;
+			String nomeArquivoTemporario = "" ;
 			int numeroLinha = 1;
 			if (!document.isEncrypted()) {
 				PDFTextStripperByArea stripper = new PDFTextStripperByArea();
 				stripper.setSortByPosition(true);
 				PDFTextStripper Tstripper = new PDFTextStripper();
 				String conteudoArquivo = Tstripper.getText(document);
-				String nomeArquivoTemporario = this.nomeArquivoTemporario.substring(0, this.nomeArquivoTemporario.length() -3 ) + "txt";
+				nomeArquivoTemporario = this.nomeArquivoTemporario.substring(0, this.nomeArquivoTemporario.length() -3 ) + "txt";
 				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
 				buffWrite.append(conteudoArquivo);
 				buffWrite.close();
 				FileReader frEvento = new FileReader(nomeArquivoTemporario);
 				BufferedReader brEvento = new BufferedReader(frEvento);
-				while (brEvento.ready() && !segundaLinha) {
+				while (brEvento.ready() && !terceiraLinha) {
 					String linha = brEvento.readLine();
-					if(!linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase())) && primeiraLinha){
-						lancarExcessaoCidade = true;
-						erroCidade = "Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! ";
+					if(linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase())) && lancarExcessaoCidade){
+						lancarExcessaoCidade = false;
 					}	
-					primeiraLinha = false;
-					if(!linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) ){
-						lancarExcessaoMes = true;
-						erroMes = "Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! ";
-					}else{
+					if(linha.toUpperCase().contains(TipoArquivo.ARQUIVO_LAYOUT.getChaveValidacao().toUpperCase()) && lancarExcessaoTipoArquivo){
+						lancarExcessaoTipoArquivo = false;
+					}	
+					if(linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) && lancarExcessaoMes){
 						lancarExcessaoMes = false;
 					}
-					if(!linha.toUpperCase().contains("" + arquivo.getAno().getAno()) ){
-						lancarExcessaoAno = true;
-						System.lineSeparator();   
-						erroAno = "Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! ";
-						}else{
+					if(linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno){
 						lancarExcessaoAno = false;
 					}
-					if(numeroLinha==2){
-						segundaLinha = true;
+					if(numeroLinha==3){
+						terceiraLinha = true;
 					}
 					numeroLinha++;
 					
 				}
 				brEvento.close();
-				File fileTxt = new File(nomeArquivoTemporario);  
-				fileTxt.delete();
-				File filePdf = new File(nomeArquivoTemporario);  
-				filePdf.delete();
+				
 			}
 			document.close();
+			File fileTxt = new File(nomeArquivoTemporario);  
+			fileTxt.delete();
+			File filePdf = new File(this.nomeArquivoTemporario);  
+			filePdf.delete();
+			if(lancarExcessaoTipoArquivo){
+				throw new ApplicationException("Arquivo não pertence ao Tipo de Arquivo informado! '" + arquivo.getTipoArquivo().getDescricao().toUpperCase() + "' ! ");
+			}
 			if(lancarExcessaoCidade){
-				throw new ApplicationException(erroCidade);
+				throw new ApplicationException("Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! ");
 			}
 			if(lancarExcessaoMes){
-				throw new ApplicationException(erroMes);
+				throw new ApplicationException("Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! ");
 			}
 			if(lancarExcessaoAno){
-				throw new ApplicationException(erroAno);
+				throw new ApplicationException("Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! ");
 			}
 		}	
 	}

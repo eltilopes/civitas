@@ -153,6 +153,20 @@
 							styleClass="error-messages" />
 							</div>
 						</div>
+						<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Carga Horária Pagamento " />
+							<h:selectOneMenu id="cargaHorariaPagamentoSearch"
+											 value="#{bean.cargaHorariaPagamento}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cargasHorariaPagamento}" />
+							</h:selectOneMenu>
+							<h:message for="cargaHorariaPagamentoSearch" tooltip="true"
+							styleClass="error-messages" />
+							</div>
+						</div>
 					</div>	
 				</h:panelGroup>	
 			</fieldset>		
@@ -193,6 +207,10 @@
 
 				<p:column headerText="Nível Pag." style="text-align:left;" sortBy="#{pag.matricula.nivelPagamento.descricao}" >
 	   				<h:outputText id="nivelPagamento" value="#{pag.matricula.nivelPagamento.descricao}" />
+	   			</p:column>
+
+				<p:column headerText="Carga Hor. Pag." style="text-align:left;" sortBy="#{pag.matricula.cargaHorariaPagamento.descricao}" >
+	   				<h:outputText id="cargaHorariaPagamento" value="#{pag.matricula.cargaHorariaPagamento.descricao}" />
 	   			</p:column>
 
 				<p:column headerText="Setor" style="text-align:left;" sortBy="#{pag.matricula.setor.descricao}" >

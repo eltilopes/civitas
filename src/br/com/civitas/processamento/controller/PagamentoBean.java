@@ -15,6 +15,7 @@ import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
 import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Mes;
@@ -24,6 +25,7 @@ import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.service.AnoService;
+import br.com.civitas.processamento.service.CargaHorariaPagamentoService;
 import br.com.civitas.processamento.service.CargoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.MesService;
@@ -63,6 +65,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	@ManagedProperty("#{nivelPagamentoService}")
 	private NivelPagamentoService nivelPagamentoService;
 	
+	@ManagedProperty("#{cargaHorariaPagamentoService}")
+	private CargaHorariaPagamentoService cargaHorariaPagamentoService;
+	
 	@ManagedProperty("#{cargoService}")
 	private CargoService cargoService;
 
@@ -74,12 +79,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<Secretaria> secretarias;
 	private List<UnidadeTrabalho> unidadesTrabalho;
 	private List<NivelPagamento> niveisPagamento;
+	private List<CargaHorariaPagamento> cargasHorariaPagamento;
 
 	private Setor setor;
 	private Secretaria secretaria;
 	private Cargo cargo;
 	private UnidadeTrabalho unidadeTrabalho;
 	private NivelPagamento nivelPagamento;
+	private CargaHorariaPagamento cargaHorariaPagamento;
 
 	@PostConstruct
 	public void init() {
@@ -103,6 +110,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setUnidadesTrabalho(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setNiveisPagamento(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 		}
 	}
 	
@@ -112,7 +120,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		try{
 			limpaListas();
 			List<Pagamento> list = null;
-			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor, unidadeTrabalho, nivelPagamento);
+			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor, unidadeTrabalho, nivelPagamento, cargaHorariaPagamento);
 			if( list.isEmpty() ){
 				throw new ApplicationException( "Consulta sem resultados." );
 			}
@@ -167,6 +175,18 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	public void setService(PagamentoService service) {
 		super.setService(service);
 		this.service = service;
+	}
+
+	public CargaHorariaPagamento getCargaHorariaPagamento() {
+		return cargaHorariaPagamento;
+	}
+
+	public void setCargaHorariaPagamento(CargaHorariaPagamento cargaHorariaPagamento) {
+		this.cargaHorariaPagamento = cargaHorariaPagamento;
+	}
+
+	public void setCargaHorariaPagamentoService(CargaHorariaPagamentoService cargaHorariaPagamentoService) {
+		this.cargaHorariaPagamentoService = cargaHorariaPagamentoService;
 	}
 
 	public List<Setor> getSetores() {
@@ -267,6 +287,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void setNivelPagamento(NivelPagamento nivelPagamento) {
 		this.nivelPagamento = nivelPagamento;
+	}
+
+	public List<CargaHorariaPagamento> getCargasHorariaPagamento() {
+		return cargasHorariaPagamento;
+	}
+
+	public void setCargasHorariaPagamento(List<CargaHorariaPagamento> cargasHorariaPagamento) {
+		this.cargasHorariaPagamento = cargasHorariaPagamento;
 	}
 
 }

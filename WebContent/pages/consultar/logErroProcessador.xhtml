@@ -56,15 +56,15 @@
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 		        
 		        
-				<p:column headerText="Nome Arquivo" style="text-align:left;" >
+				<p:column headerText="Nome Arquivo" style="text-align:left;" sortBy="#{log.nomeArquivo}">
 	   				<h:outputText id="nomeArquivo" value="#{log.nomeArquivo}" />
 	   			</p:column>
 	   			
-				<p:column headerText="Erro" style="text-align:left;" >
+				<p:column headerText="Erro" style="text-align:left;" sortBy="#{log.erro}">
 	   				<h:outputText id="erro" value="#{log.erro.toUpperCase()}" />
 	   			</p:column>
 	   			
-				<p:column headerText="Data" style="text-align:center;" >
+				<p:column headerText="Data" style="text-align:center;" sortBy="#{log.data}">
 	   				<h:outputText id="data" value="#{log.data}"   >
 	   					<f:convertDateTime pattern="dd/MM/yyyy" />
 	   				</h:outputText>	

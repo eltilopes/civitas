@@ -2,12 +2,14 @@ package br.com.civitas.processamento.controller;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionEvent;
 
 import org.primefaces.model.UploadedFile;
 
@@ -71,6 +73,12 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		tiposArquivos = FactoryEnuns.listaTipoArquivo();
 	}
 
+	@Override
+	public void find(ActionEvent event) {
+		super.find(event);
+		Collections.sort(getOriginalResult(), (ArquivoPagamento a1, ArquivoPagamento a2) -> a2.getDataProcessamento().compareTo(a1.getDataProcessamento()));
+	}
+	
 	public void prepareProcessarArquivo() {
 		arquivo = new ArquivoPagamento();
 		setCurrentState(STATE_INSERT);
@@ -88,16 +96,15 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			arquivo.setFile(file);
 			validarArquivoService.validarArquivo(file, arquivo);
 			service.processarArquivo(arquivo);
-			arquivo = new ArquivoPagamento();
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (ApplicationException e) {
 			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
-			arquivo = new ArquivoPagamento();
 			FacesUtils.addErrorMessage(e.getMessage());
 		}catch (Exception e) {
 			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
-			arquivo = new ArquivoPagamento();
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
+		}finally {
+			arquivo = new ArquivoPagamento();
 		}
 	}
 
