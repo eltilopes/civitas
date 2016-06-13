@@ -303,6 +303,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void verificarIdentificador(String linha, String nomeArquivo) {
+		getDiasTrabalhados(linha);
 		getEventos().forEach((e) -> {
 			if(processamentoPagamentoAtivo && !linha.contains(IdentificadorArquivoLayout.CARGO.getDescricao())
 					&& getChaveEvento(linha).contains(e.getChave())){
@@ -355,6 +356,15 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			throw new ApplicationException("Erro ao pegar o Evento Pagamento. Linha: " + linha);
 		}
 		return eventoPagamento;
+	}
+
+	private void getDiasTrabalhados(String linhaAtual) {
+		if(linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao())){
+			String dias = linhaAtual.substring(
+					linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
+			dias = dias.substring(0, dias.indexOf("d") + 1).trim();
+			pagamento.setDiasTrabalhados(dias);
+		}
 	}
 
 	private String retirarValorEntreParenteses(String linha) {

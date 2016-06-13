@@ -225,6 +225,10 @@
 	   				<h:outputText id="cargaHoraria" value="#{pag.matricula.cargaHoraria}" />
 	   			</p:column>
 	   			
+				<p:column headerText="Dias Trabalhados" style="text-align:left;"  sortBy="#{pag.diasTrabalhados}" >
+	   				<h:outputText id="diasTrabalhados" value="#{pag.diasTrabalhados}" />
+	   			</p:column>
+	   			
 				<p:column headerText="Remuneração" style="text-align:right;" sortBy="#{pag.totalRemuneracao}" >
 	   				<h:outputText id="totalRemuneracao"  value="#{pag.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
 	   			</p:column>

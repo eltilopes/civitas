@@ -152,6 +152,22 @@ public abstract class ProcessarArquivoPagamento {
 		}
 	}
 	
+	public  void getEvento(Evento evento,String linha) {
+		Evento eventoAuxiliar = new Evento();
+		try {
+			eventoAuxiliar = getEvento(evento);
+			if(Objects.isNull(eventoAuxiliar)){
+				evento.setNome(evento.getChave());
+				evento= eventoService.save(evento);
+				eventos.add(evento);
+			}else{
+				evento = eventoAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Evento. Linha: " + linha);
+		}
+	}
+	
 	private Evento getEvento(Evento evento) {
 		for(Evento e : eventos){
 			if(e.getCidade().getId().equals(evento.getCidade().getId()) 

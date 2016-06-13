@@ -1,0 +1,1 @@
+ALTER TABLE tb_pagamento ADD COLUMN nr_dias_trabalhados character varying;

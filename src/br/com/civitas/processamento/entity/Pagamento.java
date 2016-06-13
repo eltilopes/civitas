@@ -53,6 +53,9 @@ public class Pagamento implements IEntity {
 	
 	@Column(name = "nr_total_remuneracao", nullable = false)  
 	private Double totalRemuneracao = 0d;
+
+	@Column(name = "nr_dias_trabalhados")
+	private String diasTrabalhados;
 	
 	public Pagamento(){
 		eventosPagamento = new ArrayList<EventoPagamento>();
@@ -120,6 +123,14 @@ public class Pagamento implements IEntity {
 
 	public void setArquivo(ArquivoPagamento arquivo) {
 		this.arquivo = arquivo;
+	}
+
+	public String getDiasTrabalhados() {
+		return diasTrabalhados;
+	}
+
+	public void setDiasTrabalhados(String diasTrabalhados) {
+		this.diasTrabalhados = diasTrabalhados;
 	}
 
 	@Override

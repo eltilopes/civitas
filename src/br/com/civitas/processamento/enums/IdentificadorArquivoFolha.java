@@ -1,38 +1,28 @@
 package br.com.civitas.processamento.enums;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public enum IdentificadorArquivoFolha {
 
-		// 0 - IDENTIFICADOR
 		INICIO_EVENTO("VENCIMENTO BASE"),
-		FIM_EVENTO("------------------------------------------------------------------------------------------------------------------------------------"), 
+		FIM_EVENTO("VANTAGENS..:"), 
+		INICIO_RESUMO_SETOR("RESUMO DO SETOR:"),
+		FIM_RESUMO_SETOR("TOTAL DE SERVIDORES:"), 
+		INICIO_RESUMO_GERAL("RESUMO GERAL"),
+		FIM_RESUMO_GERAL("SISTEMA DE RECURSOS HUMANOS E FOLHA DE PAGAMENTO"), 
+		SECRETARIA("SEC.:"), 
+		SETOR("SETOR:"), 
+		VENCIMENTO_BASE("VENCIMENTO BASE"), 
+		VANTAGEM("VANTAGENS..:"), 
+		DESCONTO("DESCONTOS..:"), 
 		ESPACO_NA_LINHA(" ")	,	
+		BARRA("/")	,	
+		PERCENTUAL("%")	,	
 		VIRGULA(","), 
-		PORCENTAGEM("%"), 
-		CARGO("CARGO: CARGO 2:"),	
-		CONTA_CORRENTE("C/C:"),	
-		VINCULO("VÍNCULO:"),
-		DATA_INICIO_FIM("DATA INÍCIO: DATA FIM:"),		
-		PEB_I("PEB I"),		
-		IRRF("I R R F"),	
-		CARGA_HORARIA("C.H.:"),
-		PENSAO_ALIMENTICIA("PENSAO ALIM."),		
-		AREA_ATUACAO("ÁREA DE ATUAÇÃO:"),		
-		ADICIONAL_FERIAS("ADICIONAL DE FERIAS"),		
-		UNIDADE_TRABALHO("U.TRAB.:"),		
-		TOTAIS_PAGAMENTO("LÍQUIDO: DESCONTOS:REMUNERAÇÃO: PROVENTOS:"),		
-		DATA_ADMISSAO("ADM:");
+		INICIO_PAGAMENTOS("COD. SERVIDOR/CARGO FUNÇÃO/LOTAÇÃO NATUREZA/CC  ADMISSÃO"), 
+		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
+		SEPARADOR_ARQUIVO("------------------------------------------------------------------------------------------------------------------------------------"), 
+		IDENTIFICADOR_UNIDADE_TRABALHO("00000");
 	
 		private String descricao;
-		
-		public List<String> getDescricoes(){
-			IdentificadorArquivoFolha[] list = IdentificadorArquivoFolha.values(); 
-			return Arrays.asList(list).stream().map(i -> i.getDescricao()).collect(Collectors.toCollection(ArrayList<String> :: new));
-		}
 		
 		private IdentificadorArquivoFolha(String descricao){
 			this.descricao  = descricao;
