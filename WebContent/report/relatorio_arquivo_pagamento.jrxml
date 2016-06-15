@@ -37,7 +37,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="244" y="11" width="292" height="52" uuid="47e9f324-39d6-4316-865f-d6add9cd3943"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Roboto" size="24" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
+					<font fontName="SansSerif" size="24" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new String("SISTEMA CIVTAS")]]></textFieldExpression>
 			</textField>

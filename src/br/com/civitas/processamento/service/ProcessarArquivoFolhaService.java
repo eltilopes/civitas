@@ -61,7 +61,6 @@ public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento impl
 	private  Pagamento pagamento;
 	private  Matricula matricula;
 	private  Secretaria secretaria;
-	private  UnidadeTrabalho unidadeTrabalho;
 	private  NivelPagamento nivelPagamento;
 	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
@@ -111,7 +110,6 @@ public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento impl
 	private void iniciarValores( ) {
 		pagamento = null;
 		matricula = null;
-		unidadeTrabalho = null;
 		secretaria = null;
 		setor = null;
 		nivelPagamento = null;
@@ -301,10 +299,10 @@ public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento impl
 
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if( processamentoPagamentoAtivo && linhaAtual.substring(0, 5).equals(IdentificadorArquivoFolha.IDENTIFICADOR_UNIDADE_TRABALHO.getDescricao())){
-			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
+			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
 		}else if(palavraSomenteNumeros(linhaAtual.substring(0, 6))){
 			int posicaoInicialUnidadeTrabalho = verificarPosicaoSegundoEvento(linhaAtual);
-			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(" " + linhaAtual.substring(posicaoInicialUnidadeTrabalho)), linhaAtual);
+			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(" " + linhaAtual.substring(posicaoInicialUnidadeTrabalho)), linhaAtual));
 		}
 	}
 
@@ -451,7 +449,6 @@ public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento impl
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);
-		matricula.setUnidadeTrabalho(unidadeTrabalho);
 		matricula.setNivelPagamento(nivelPagamento);
 		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);

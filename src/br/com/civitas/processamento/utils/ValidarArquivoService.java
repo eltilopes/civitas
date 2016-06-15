@@ -3,6 +3,7 @@ package br.com.civitas.processamento.utils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -29,21 +30,37 @@ import br.com.civitas.processamento.service.ArquivoPagamentoService;
 
 @Service
 public class ValidarArquivoService {
-	
+
 	private static final String TIPO_ARQUIVO_PDF = "PDF";
 	private UploadedFile file;
 	private ArquivoPagamento arquivo;
-	private String nomeArquivoTemporario;
+	private String nomeArquivoPdfTemporario;
+	private String nomeArquivoTxtTemporario;
 	
+	private boolean terceiraLinha;
+	private boolean lancarExcessaoCidade;
+	private boolean lancarExcessaoMes;
+	private boolean lancarExcessaoTipoArquivo;
+	private boolean lancarExcessaoAno;
+
 	@Autowired
-	private  ArquivoPagamentoService arquivoService ;
-	
-	public void validarArquivo(UploadedFile file, ArquivoPagamento arquivo) throws IOException{
-		this.file = file;
-		this.arquivo = arquivo;
+	private ArquivoPagamentoService arquivoService;
+
+	public void validarArquivo(UploadedFile file, ArquivoPagamento arquivo) throws IOException {
+		iniciarValores(file, arquivo);
 		validarTipoArquivo();
 		validarArquivoJaProcessado();
-		validarArquivoCidadeMes();
+		validarArquivoCidadeMesAno();
+	}
+
+	private void iniciarValores(UploadedFile file, ArquivoPagamento arquivo) {
+		this.file = file;
+		this.arquivo = arquivo;
+		terceiraLinha = false;
+		lancarExcessaoCidade = true;
+		lancarExcessaoMes = true;
+		lancarExcessaoTipoArquivo = true;
+		lancarExcessaoAno = true;
 	}
 
 	private void validarTipoArquivo() {
@@ -58,93 +75,104 @@ public class ValidarArquivoService {
 			throw new ApplicationException("Arquivo já Processado!");
 		}
 	}
-	
-	private void validarArquivoCidadeMes() throws IOException{
-		if(arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_LAYOUT)){
-			criarArquivoProcessamento();
-			PDDocument document = null;
-			document = PDDocument.load(new File(nomeArquivoTemporario));
-			document.getClass();
-			boolean terceiraLinha = false;
-			boolean lancarExcessaoCidade = true;
-			boolean lancarExcessaoMes = true;
-			boolean lancarExcessaoTipoArquivo = true;
-			boolean lancarExcessaoAno = true;
-			String nomeArquivoTemporario = "" ;
-			int numeroLinha = 1;
-			if (!document.isEncrypted()) {
-				PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-				stripper.setSortByPosition(true);
-				PDFTextStripper Tstripper = new PDFTextStripper();
-				String conteudoArquivo = Tstripper.getText(document);
-				nomeArquivoTemporario = this.nomeArquivoTemporario.substring(0, this.nomeArquivoTemporario.length() -3 ) + "txt";
-				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
-				buffWrite.append(conteudoArquivo);
-				buffWrite.close();
-				FileReader frEvento = new FileReader(nomeArquivoTemporario);
-				BufferedReader brEvento = new BufferedReader(frEvento);
-				while (brEvento.ready() && !terceiraLinha) {
-					String linha = brEvento.readLine();
-					if(linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase())) && lancarExcessaoCidade){
-						lancarExcessaoCidade = false;
-					}	
-					if(linha.toUpperCase().contains(TipoArquivo.ARQUIVO_LAYOUT.getChaveValidacao().toUpperCase()) && lancarExcessaoTipoArquivo){
-						lancarExcessaoTipoArquivo = false;
-					}	
-					if(linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) && lancarExcessaoMes){
-						lancarExcessaoMes = false;
-					}
-					if(linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno){
-						lancarExcessaoAno = false;
-					}
-					if(numeroLinha==3){
-						terceiraLinha = true;
-					}
-					numeroLinha++;
-					
-				}
-				brEvento.close();
-				
+
+	private void validarArquivoCidadeMesAno() throws IOException {
+		criarArquivoProcessamento();
+		PDDocument document = null;
+		document = PDDocument.load(new File(nomeArquivoPdfTemporario));
+		document.getClass();
+		int numeroLinha = 1;
+		if (!document.isEncrypted()) {
+			BufferedReader brEvento = prepararArquivoValidacao(document);
+			while (brEvento.ready() && !terceiraLinha) {
+				String linha = brEvento.readLine();
+				validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
+				if (numeroLinha == 3) terceiraLinha = true;
+				numeroLinha++;
 			}
-			document.close();
-			File fileTxt = new File(nomeArquivoTemporario);  
-			fileTxt.delete();
-			File filePdf = new File(this.nomeArquivoTemporario);  
-			filePdf.delete();
-			if(lancarExcessaoTipoArquivo){
-				throw new ApplicationException("Arquivo não pertence ao Tipo de Arquivo informado! '" + arquivo.getTipoArquivo().getDescricao().toUpperCase() + "' ! ");
-			}
-			if(lancarExcessaoCidade){
-				throw new ApplicationException("Arquivo não é da cidade '"  + arquivo.getCidade().getDescricao().toUpperCase() + "' ! ");
-			}
-			if(lancarExcessaoMes){
-				throw new ApplicationException("Arquivo não é do mês '"  + arquivo.getMes().getDescricao().toUpperCase() + "' ! ");
-			}
-			if(lancarExcessaoAno){
-				throw new ApplicationException("Arquivo não é do ano '"  + arquivo.getAno().getAno() + "' ! ");
-			}
-		}	
+			brEvento.close();
+		}
+		document.close();
+		deletarArquivos();
+		tratarExcecoes();
 	}
-	
+
+	private void validarArquivoCidadeMesAno(String linha, TipoArquivo tipoArquivo) {
+		if (linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase()))
+				&& lancarExcessaoCidade) {
+			lancarExcessaoCidade = false;
+		}
+		if (linha.toUpperCase().contains(tipoArquivo.getChaveValidacao().toUpperCase())
+				&& lancarExcessaoTipoArquivo) {
+			lancarExcessaoTipoArquivo = false;
+		}
+		if (linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) && lancarExcessaoMes) {
+			lancarExcessaoMes = false;
+		}
+		if (linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno) {
+			lancarExcessaoAno = false;
+		}
+	}
+
+	private BufferedReader prepararArquivoValidacao(PDDocument document) throws IOException, FileNotFoundException {
+		PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+		stripper.setSortByPosition(true);
+		PDFTextStripper Tstripper = new PDFTextStripper();
+		String conteudoArquivo = Tstripper.getText(document);
+		nomeArquivoTxtTemporario = this.nomeArquivoPdfTemporario.substring(0, this.nomeArquivoPdfTemporario.length() - 3) + "txt";
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTxtTemporario));
+		buffWrite.append(conteudoArquivo);
+		buffWrite.close();
+		FileReader frEvento = new FileReader(nomeArquivoTxtTemporario);
+		BufferedReader brEvento = new BufferedReader(frEvento);
+		return brEvento;
+	}
+
+	private void deletarArquivos() {
+		File fileTxt = new File(nomeArquivoTxtTemporario);
+		fileTxt.delete();
+		File filePdf = new File(nomeArquivoPdfTemporario);
+		filePdf.delete();
+	}
+
+	private void tratarExcecoes() {
+		if (lancarExcessaoTipoArquivo) {
+			throw new ApplicationException("Arquivo não pertence ao Tipo de Arquivo informado! '"
+					+ arquivo.getTipoArquivo().getDescricao().toUpperCase() + "' ! ");
+		}
+		if (lancarExcessaoCidade) {
+			throw new ApplicationException(
+					"Arquivo não é da cidade '" + arquivo.getCidade().getDescricao().toUpperCase() + "' ! ");
+		}
+		if (lancarExcessaoMes) {
+			throw new ApplicationException(
+					"Arquivo não é do mês '" + arquivo.getMes().getDescricao().toUpperCase() + "' ! ");
+		}
+		if (lancarExcessaoAno) {
+			throw new ApplicationException("Arquivo não é do ano '" + arquivo.getAno().getAno() + "' ! ");
+		}
+	}
+
 	private void criarArquivoProcessamento() throws IOException {
-		nomeArquivoTemporario = "";
-		String filename = FilenameUtils.getName(new String(arquivo.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
-	    InputStream input = arquivo.getFile().getInputstream();
-	    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
-	    OutputStream output = new FileOutputStream(file);
-	    nomeArquivoTemporario = file.getAbsolutePath();
-	    try {
-	        IOUtils.copy(input, output);
-	    } catch(Exception e){
-	    	e.printStackTrace();
-	    	nomeArquivoTemporario = null;
-	    } finally {
-	        IOUtils.closeQuietly(input);
-	        IOUtils.closeQuietly(output);
-	    }
+		nomeArquivoPdfTemporario = "";
+		String filename = FilenameUtils
+				.getName(new String(arquivo.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
+		InputStream input = arquivo.getFile().getInputstream();
+		File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
+		OutputStream output = new FileOutputStream(file);
+		nomeArquivoPdfTemporario = file.getAbsolutePath();
+		try {
+			IOUtils.copy(input, output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			nomeArquivoPdfTemporario = null;
+		} finally {
+			IOUtils.closeQuietly(input);
+			IOUtils.closeQuietly(output);
+		}
 	}
-	
+
 	public static String removerAcentos(String str) {
-	    return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+		return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
 }
