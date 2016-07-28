@@ -113,6 +113,11 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
+		unidadeTrabalho = null;
+		nivelPagamento = null;
+		secretaria = null;
+		setor = null;
+		cargaHorariaPagamento = null;
 		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -156,11 +161,20 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		}
 	}
 
+	private void verificarIdentificadorPagamento(String linha) {
+		if(linha.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())){
+			processamentoPagamentoAtivo = true;
+		}
+		if((linha.contains(IdentificadorArquivoLayout.FIM_EVENTO.getDescricao()))){
+			processamentoPagamentoAtivo = false;
+		}
+	}
+
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		localizarSecretariaSetor(linhaAtual);
 		localizarNivelGrupoPagamento(linhaAtual);
-		localizarUnidadeTrabalho(linhaAtual);
 		localizarMatricula(linhaAtual);
+		localizarUnidadeTrabalho(linhaAtual);
 		verificarIdentificador(linhaAtual, getArquivoPagamento().getNomeArquivo());
 	}
 	
@@ -175,6 +189,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())){
 			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
+			matricula.setUnidadeTrabalho(unidadeTrabalho);
 		}
 	}
 
@@ -304,12 +319,14 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private  void verificarIdentificador(String linha, String nomeArquivo) {
 		getDiasTrabalhados(linha);
-		getEventos().forEach((e) -> {
+		verificarIdentificadorPagamento(linha);
+		for(Evento e : getEventos()){
 			if(processamentoPagamentoAtivo && !linha.contains(IdentificadorArquivoLayout.CARGO.getDescricao())
+					&& !linha.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())
 					&& getChaveEvento(linha).contains(e.getChave())){
 				pagamento.getEventosPagamento().add(getEventoPagamento(linha, e));
 			}
-		});
+		}
 		if(linha.contains(IdentificadorArquivoLayout.TOTAIS_PAGAMENTO.getDescricao())){
 			setTotaisPagamento(linha);
 			processamentoPagamentoAtivo = false;
@@ -458,7 +475,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);
-		matricula.setUnidadeTrabalho(unidadeTrabalho);
 		matricula.setNivelPagamento(nivelPagamento);
 		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);

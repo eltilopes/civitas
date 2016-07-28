@@ -25,11 +25,11 @@ import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.entity.Vinculo;
-import br.com.civitas.processamento.enums.IdentificadorArquivoFolhaPagamento;
+import br.com.civitas.processamento.enums.IdentificadorArquivoFolha;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 
 @Service
-public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagamento implements IProcessarArquivoPagamento{
+public class ProcessarArquivoFolhaService extends ProcessarArquivoPagamento implements IProcessarArquivoPagamento{
 
 	@Autowired
 	private  PagamentoService pagamentoService;
@@ -62,6 +62,7 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private  Matricula matricula;
 	private  Secretaria secretaria;
 	private  NivelPagamento nivelPagamento;
+	private  UnidadeTrabalho unidadeTrabalho;
 	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
@@ -70,6 +71,7 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private  boolean processamentoEventos = false;
 	private  boolean resumoSetor = false;
 	private  String linhaAnterior = "";
+
 	
 	public void processar(ArquivoPagamento arquivoPagamento) throws Exception{
 		setArquivoPagamento(arquivoPagamento);
@@ -133,7 +135,7 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private void localizarEvento(String linha) {
 		verificarIdentificadorEvento(linha);
 		verificarIdentificadorResumoSetor(linha);
-		if(processamentoEventos && !resumoSetor && !linha.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())){
+		if(processamentoEventos && !resumoSetor && !linha.contains(IdentificadorArquivoFolha.SEPARADOR_ARQUIVO.getDescricao())){
 			List<Evento> eventosNaLinha = getEventoNaLinha(linha);
 			for(Evento e : eventosNaLinha){
 				getEvento(e, linha);
@@ -148,11 +150,11 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 			List<String> eventosLinha = carregarEventosLinha(linha, posicaoSegundoEvento);
 			for(String linhaEvento : eventosLinha){
 				Evento evento = new Evento();
-				evento.setChave(linhaEvento.substring(0,4));
-				int posicaoInicialIdentificador = 5 ;
-				int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoFolhaPagamento.VIRGULA.getDescricao()) ;
+				evento.setChave(linhaEvento.substring(0,3));
+				int posicaoInicialIdentificador = linha.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1 ;
+				int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoFolha.VIRGULA.getDescricao()) ;
 				String linhaInvertida = new StringBuffer(linha.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
-				int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()) ;
+				int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoFolha.ESPACO_NA_LINHA.getDescricao()) ;
 				evento.setNome(getNomeEvento(linha.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida)));
 				evento.setCidade(getArquivoPagamento().getCidade());;
 				evento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
@@ -177,9 +179,9 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 
 	private boolean existeCaractereInvalido(String palavra) {
 		for (char letra : palavra.toCharArray())  {
-			if( letra == IdentificadorArquivoFolhaPagamento.BARRA.getDescricao().charAt(0) ||
-				letra == IdentificadorArquivoFolhaPagamento.PERCENTUAL.getDescricao().charAt(0) ||	
-				letra == IdentificadorArquivoFolhaPagamento.VIRGULA.getDescricao().charAt(0) 	){
+			if( letra == IdentificadorArquivoFolha.BARRA.getDescricao().charAt(0) ||
+				letra == IdentificadorArquivoFolha.PERCENTUAL.getDescricao().charAt(0) ||	
+				letra == IdentificadorArquivoFolha.VIRGULA.getDescricao().charAt(0) 	){
 				return true;
 			}
 		}
@@ -201,8 +203,8 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		String[] palavras = linha.split(" ");
 		boolean primeiraPalavra = true;
 		for(String palavra : palavras){
-			if(palavra.length()==4 && palavraSomenteNumeros(palavra) && !primeiraPalavra){
-				return linha.substring(4,linha.length()).indexOf(palavra) + 4;
+			if(palavra.length()==3 && palavraSomenteNumeros(palavra) && !primeiraPalavra){
+				return linha.substring(3,linha.length()).indexOf(palavra) + 3;
 			}
 			primeiraPalavra = false;
 		}
@@ -219,30 +221,26 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	}
 
 	private void verificarIdentificadorEvento(String linha) {
-		if(linha.contains(IdentificadorArquivoFolhaPagamento.INICIO_EVENTO.getDescricao())){
+		if(linha.contains(IdentificadorArquivoFolha.INICIO_EVENTO.getDescricao())){
 			processamentoEventos = true;
 		}
-		if(linha.contains(IdentificadorArquivoFolhaPagamento.FIM_EVENTO.getDescricao()) 
-				|| linha.contains(IdentificadorArquivoFolhaPagamento.FIM_RESUMO_GERAL.getDescricao()) 
-				|| linha.contains(IdentificadorArquivoFolhaPagamento.FIM_RESUMO_SETOR.getDescricao()) ){
+		if(linha.contains(IdentificadorArquivoFolha.FIM_EVENTO.getDescricao()) && processamentoEventos ){
 			processamentoEventos = false;
 		}
 	}
 
 	private void verificarIdentificadorResumoSetor(String linha) {
-		if(linha.contains(IdentificadorArquivoFolhaPagamento.INICIO_RESUMO_SETOR.getDescricao())
-			|| linha.contains(IdentificadorArquivoFolhaPagamento.INICIO_RESUMO_GERAL.getDescricao())){ 
+		if(linha.contains(IdentificadorArquivoFolha.INICIO_RESUMO_SETOR.getDescricao())){ 
 			resumoSetor = true;
 		}
-		if((linha.contains(IdentificadorArquivoFolhaPagamento.FIM_RESUMO_SETOR.getDescricao()))
-			|| linha.contains(IdentificadorArquivoFolhaPagamento.FIM_RESUMO_GERAL.getDescricao())){ 
+		if(linha.contains(IdentificadorArquivoFolha.FIM_RESUMO_SETOR.getDescricao())){ 
 			resumoSetor = false;
 		}
 	}
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		verificarIdentificadorPagamento(linhaAtual);
-		localizarSecretariaSetor(linhaAtual);
+		localizarSecretaria(linhaAtual);
 		localizarUnidadeTrabalho(linhaAtual);
 		localizarMatricula(linhaAtual);
 		localizarEventosPagamento(linhaAtual);
@@ -250,27 +248,50 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	}
 	
 	private void finalizarPagamento(String linhaAtual) {
-		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoFolhaPagamento.FIM_PAGAMENTO_INDIVIDUAL.getDescricao())	){
+		if(processamentoPagamentoAtivo  && !processamentoEventos && isTotalPagamento(linhaAtual)){
 			setTotaisPagamento(linhaAtual);
 		}
 	}
 
+	private boolean isTotalPagamento(String linhaAtual) {
+		String[] palavras = linhaAtual.split(" ");
+		int vezes = 0;
+		for(String palavra : palavras){
+			if(palavra.contains(",")){
+				vezes++;
+			}
+		}
+		return vezes==3;
+	}
+
 	private void setTotaisPagamento(String linhaAtual) {
-		pagamento.setTotalRemuneracao(0d);
-		pagamento.setTotalLiquido(Double.parseDouble(linhaAtual.replace(IdentificadorArquivoFolhaPagamento.FIM_PAGAMENTO_INDIVIDUAL.getDescricao(), "").replace(".","").replace(",", ".").trim()));
-		pagamento.setTotalProventos(Double.parseDouble(linhaAnterior.substring(
-				IdentificadorArquivoFolhaPagamento.VANTAGEM.getDescricao().length(), 
-				linhaAnterior.indexOf(IdentificadorArquivoFolhaPagamento.DESCONTO.getDescricao())).replace(".","").replace(",", ".").trim()));
-		pagamento.setTotalDescontos(Double.parseDouble(linhaAnterior.substring(
-				linhaAnterior.indexOf(IdentificadorArquivoFolhaPagamento.DESCONTO.getDescricao()) + IdentificadorArquivoFolhaPagamento.DESCONTO.getDescricao().length(), 
-				linhaAnterior.length()).replace(".","").replace(",", ".").trim()));
+		try {
+			String[] valores = linhaAtual.split(" ");
+			valores = removerValoresInvalidos(valores);
+			pagamento.setTotalRemuneracao(0d);
+			pagamento.setTotalProventos(Double.parseDouble(valores[0].replace(".","").replace(",", ".").trim()));
+			pagamento.setTotalDescontos(Double.parseDouble(valores[1].replace(".","").replace(",", ".").trim()));
+			pagamento.setTotalLiquido(Double.parseDouble(valores[2].replace(".","").replace(",", ".").trim()));
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar Totais de Pagamento. Linha: " + linhaAtual);
+		}
+	}
+
+	private String[] removerValoresInvalidos(String[] valores) {
+		String[] valoresValidos = new String[3];
+		int posicao = 0;
+		for(String valor : valores){
+			if(valor.contains(",")){
+				valoresValidos[posicao++] = valor;
+			}
+		}
+		return valoresValidos;
 	}
 
 	private void localizarEventosPagamento(String linhaAtual) {
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())){
-			getDiasTrabalhados(linhaAtual);
+		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoFolha.SEPARADOR_ARQUIVO.getDescricao())){
 			List<Evento> eventosNaLinha = getEventoNaLinha(linhaAtual);
 			List<String> eventosLinha = carregarEventosLinha(linhaAtual, verificarPosicaoSegundoEvento(linhaAtual));
 			for(Evento evento : eventosNaLinha){
@@ -287,28 +308,16 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		}
 	}
 
-	private void getDiasTrabalhados(String linhaAtual) {
-		if(linhaAtual.contains(IdentificadorArquivoFolhaPagamento.VENCIMENTO_BASE.getDescricao())){
-			String dias = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoFolhaPagamento.VENCIMENTO_BASE.getDescricao()) 
-					+ IdentificadorArquivoFolhaPagamento.VENCIMENTO_BASE.getDescricao().length()).trim();
-			dias = dias.substring(0, dias.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao())).trim();
-			pagamento.setDiasTrabalhados(dias);
-		}
-	}
-
 	private void localizarUnidadeTrabalho(String linhaAtual) {
-		if( processamentoPagamentoAtivo && linhaAtual.substring(0, 5).equals(IdentificadorArquivoFolhaPagamento.IDENTIFICADOR_UNIDADE_TRABALHO.getDescricao())){
-			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
-		}else if(palavraSomenteNumeros(linhaAtual.substring(0, 6))){
-			int posicaoInicialUnidadeTrabalho = verificarPosicaoSegundoEvento(linhaAtual);
-			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(" " + linhaAtual.substring(posicaoInicialUnidadeTrabalho)), linhaAtual));
+		if(linhaAtual.contains(IdentificadorArquivoFolha.FOLHA.getDescricao()) &&
+				linhaAtual.contains(IdentificadorArquivoFolha.REFERENCIA.getDescricao())	){
+			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
 		}
 	}
 
-	private void localizarSecretariaSetor(String linhaAtual) {
-		if(linhaAtual.contains(IdentificadorArquivoFolhaPagamento.SECRETARIA.getDescricao()) &&
-		   linhaAtual.contains(IdentificadorArquivoFolhaPagamento.SETOR.getDescricao())	){
+	private void localizarSecretaria(String linhaAtual) {
+		if(linhaAtual.contains(IdentificadorArquivoFolha.DEPARTAMENTO.getDescricao()) &&
+		   linhaAtual.contains(IdentificadorArquivoFolha.COMPETENCIA.getDescricao())	){
 			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
 			setor = getSetor(getSetor(linhaAtual), linhaAtual);
 		}
@@ -317,12 +326,12 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private UnidadeTrabalho getUnidadeTrabalho(String linhaAtual) throws ApplicationException {
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
-			String codigo = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()));
-			codigo = codigo.trim();
-			codigo = codigo.substring(
-					0,	codigo.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao())).trim();
-			String descricaoUnidadeTrabalho = linhaAtual.substring(linhaAtual.indexOf(codigo) + codigo.length(), 
-					linhaAtual.lastIndexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao())).trim();
+			String codigo = linhaAtual.substring(
+							linhaAtual.indexOf(IdentificadorArquivoFolha.FOLHA.getDescricao()) + IdentificadorArquivoFolha.FOLHA.getDescricao().length(),
+							linhaAtual.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao())).trim();
+			String descricaoUnidadeTrabalho = linhaAtual.substring(
+					linhaAtual.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1,
+					linhaAtual.indexOf(IdentificadorArquivoFolha.REFERENCIA.getDescricao())).trim();
 			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			unidadeTrabalho.setDescricao(descricaoUnidadeTrabalho); 
@@ -337,10 +346,8 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		Secretaria secretaria = new Secretaria();
 		try {
 			String descricao = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()),
-					linhaAtual.indexOf(IdentificadorArquivoFolhaPagamento.SETOR.getDescricao())).trim();
-			descricao = descricao.substring(
-					descricao.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao())).trim();
+					linhaAtual.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1,
+					linhaAtual.indexOf(IdentificadorArquivoFolha.COMPETENCIA.getDescricao())).trim();
 			secretaria.setCidade(getArquivoPagamento().getCidade());
 			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			secretaria.setDescricao(descricao);
@@ -355,10 +362,8 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		Setor setor = new Setor();
 		try {
 			String descricao = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoFolhaPagamento.SETOR.getDescricao()) + IdentificadorArquivoFolhaPagamento.SETOR.getDescricao().length()).trim();
-			descricao = descricao.substring(
-					descricao.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()),
-					descricao.length()).trim();
+					linhaAtual.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1,
+					linhaAtual.indexOf(IdentificadorArquivoFolha.COMPETENCIA.getDescricao())).trim();
 			setor.setCidade(getArquivoPagamento().getCidade());
 			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			setor.setDescricao(descricao);
@@ -370,12 +375,12 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	}
 
 	private  void verificarIdentificadorPagamento(String linha) {
-		if(linhaAnterior.contains(IdentificadorArquivoFolhaPagamento.INICIO_PAGAMENTOS.getDescricao())
-		   &&  linha.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())	){
+		if(linhaAnterior.contains(IdentificadorArquivoFolha.INICIO_PAGAMENTOS.getDescricao())
+		   &&  linha.contains(IdentificadorArquivoFolha.SEPARADOR_ARQUIVO.getDescricao())	){
 			processamentoPagamentoAtivo = true;
 		}
-		if(linhaAnterior.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())
-		   &&  linha.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())	){
+		if(processamentoPagamentoAtivo && linhaAnterior.contains(IdentificadorArquivoFolha.SEPARADOR_ARQUIVO.getDescricao())
+		   &&  linha.contains(IdentificadorArquivoFolha.FIM_PAGAMENTOS.getDescricao()) 	){
 			processamentoPagamentoAtivo = false;
 		}
 	}
@@ -385,7 +390,7 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		try {
 			eventoPagamento.setPagamento(pagamento);
 			eventoPagamento.setEvento(evento);
-			eventoPagamento.setValor(Double.parseDouble(getValorEvento(linha, linha.lastIndexOf(IdentificadorArquivoFolhaPagamento.VIRGULA.getDescricao()))));
+			eventoPagamento.setValor(Double.parseDouble(getValorEvento(linha, linha.lastIndexOf(IdentificadorArquivoFolha.VIRGULA.getDescricao()))));
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Evento Pagamento. Linha: " + linha);
 		}
@@ -395,7 +400,7 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private String getValorEvento(String linha, int posicaoVirgula) {
 		try {
 			String linhaInvertida = new StringBuffer(linha.substring(0, posicaoVirgula)).reverse().toString();
-			int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()) ;
+			int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoFolha.ESPACO_NA_LINHA.getDescricao()) ;
 			String valor = linha.substring(posicaoVirgula - posicaoEspacoLinhaInvertida, posicaoVirgula + 3);
 			return valor.replace(".","").replace(",", ".");
 		} catch (Exception e) {	
@@ -404,13 +409,30 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(processamentoPagamentoAtivo 
-				   &&	linhaAnterior.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())
-				   &&	!linhaAtual.contains(IdentificadorArquivoFolhaPagamento.SEPARADOR_ARQUIVO.getDescricao())	){
+		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoFolha.CPF.getDescricao())	){
 			String numeroMatricula = getNumeroMatricula(linhaAtual);
 			verificarPagamento(numeroMatricula);
 			novaMatricula(numeroMatricula, linhaAtual);
 		}
+		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoFolha.ADMISSAO.getDescricao())	){
+			matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
+			matricula.setVinculo(getVinculo(getVinculo(linhaAtual), linhaAtual));
+			matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
+			matricula.setCargaHoraria(getCargaHoraria(linhaAtual));
+		}
+	}
+
+	private int getCargaHoraria(String linhaAtual) throws ApplicationException {
+		int cargaHorariaNumero = 0;
+		try {
+			String cargaHoraria = linhaAtual.substring(linhaAtual.indexOf(
+					IdentificadorArquivoFolha.CARGA_HORARIA.getDescricao()) + IdentificadorArquivoFolha.CARGA_HORARIA.getDescricao().length(),
+					linhaAtual.length()).trim();
+			cargaHorariaNumero = Integer.parseInt(cargaHoraria.trim());
+		} catch (Exception e) {
+			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);
+		}
+		return cargaHorariaNumero;
 	}
 
 	private void verificarPagamento(String numeroMatricula) {
@@ -424,7 +446,8 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		try {
 			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			return (Date)formatter.parse(linhaAtual.substring(
-					linhaAtual.length() -10,linhaAtual.length()));
+					linhaAtual.indexOf(IdentificadorArquivoFolha.ADMISSAO.getDescricao()) + IdentificadorArquivoFolha.ADMISSAO.getDescricao().length(),
+					linhaAtual.indexOf(IdentificadorArquivoFolha.CARGA_HORARIA.getDescricao())).trim());
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Data de Admissão. Linha: " + linhaAtual);
 		}
@@ -452,11 +475,8 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 		matricula.setNivelPagamento(nivelPagamento);
 		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);
+		matricula.setUnidadeTrabalho(unidadeTrabalho);
 		matricula.setNumeroMatricula(numeroMatricula);
-		matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
-		matricula.setVinculo(getVinculo(getVinculo(linhaAtual), linhaAtual));
-		matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
-		matricula.setCargaHoraria(99);
 		matricula.setNomeFuncionario(getNomeFuncionario(linhaAtual));;
 		matriculas.add(matricula);
 		pagamento.setMatricula(matricula);
@@ -465,10 +485,9 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private Cargo getCargo(String linhaAtual) throws ApplicationException {
 		Cargo cargo = new Cargo();
 		try {
-			int posicaoInicialCargo = verificarPosicaoSegundoEvento(linhaAtual);
-			String palavraComCargo = linhaAtual.substring(posicaoInicialCargo, linhaAtual.indexOf(matricula.getVinculo().getDescricao()));
-			Integer numero = Integer.parseInt(palavraComCargo.substring(0,4));
-			String descricao = palavraComCargo.substring(5, palavraComCargo.length()).toUpperCase().trim();
+			String descricao = linhaAtual.substring(0,
+								linhaAtual.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao())).toUpperCase().trim();
+			Integer numero = descricao.substring(0,2).hashCode();
 			cargo.setCidade(getArquivoPagamento().getCidade());
 			cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			cargo.setNumero(numero); 
@@ -482,7 +501,9 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private String getNomeFuncionario(String linha) throws ApplicationException {
 		String nome= "";
 		try {
-			nome = linha.substring(5,verificarPosicaoSegundoEvento(linha));
+			nome = linha.substring(
+					linha.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1,
+					linha.indexOf(IdentificadorArquivoFolha.CPF.getDescricao()) ).toUpperCase().trim();
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);
 		}
@@ -493,8 +514,9 @@ public class ProcessarArquivoFolhaPagamentoService extends ProcessarArquivoPagam
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			String descricao = linha.substring(0,linha.length() - 10).trim();
-			descricao = descricao.substring(descricao.lastIndexOf(IdentificadorArquivoFolhaPagamento.ESPACO_NA_LINHA.getDescricao()), descricao.length()).trim();
+			String descricao = linha.substring(
+								linha.indexOf(IdentificadorArquivoFolha.HIFEN.getDescricao()) + 1,
+								linha.indexOf(IdentificadorArquivoFolha.ADMISSAO.getDescricao()) ).trim();
 			Integer numero = descricao.substring(0,2).hashCode();
 			vinculo.setNumero(numero); 
 			vinculo.setDescricao(descricao);

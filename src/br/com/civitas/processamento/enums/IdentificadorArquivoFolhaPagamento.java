@@ -1,6 +1,6 @@
 package br.com.civitas.processamento.enums;
 
-public enum IdentificadorArquivoFolha {
+public enum IdentificadorArquivoFolhaPagamento {
 
 		INICIO_EVENTO("VENCIMENTO BASE"),
 		FIM_EVENTO("VANTAGENS..:"), 
@@ -24,7 +24,7 @@ public enum IdentificadorArquivoFolha {
 	
 		private String descricao;
 		
-		private IdentificadorArquivoFolha(String descricao){
+		private IdentificadorArquivoFolhaPagamento(String descricao){
 			this.descricao  = descricao;
 		}
 		

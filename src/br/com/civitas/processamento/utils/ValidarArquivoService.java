@@ -37,7 +37,7 @@ public class ValidarArquivoService {
 	private String nomeArquivoPdfTemporario;
 	private String nomeArquivoTxtTemporario;
 	
-	private boolean terceiraLinha;
+	private boolean finalValidacao;
 	private boolean lancarExcessaoCidade;
 	private boolean lancarExcessaoMes;
 	private boolean lancarExcessaoTipoArquivo;
@@ -56,11 +56,13 @@ public class ValidarArquivoService {
 	private void iniciarValores(UploadedFile file, ArquivoPagamento arquivo) {
 		this.file = file;
 		this.arquivo = arquivo;
-		terceiraLinha = false;
+		finalValidacao = false;
 		lancarExcessaoCidade = true;
 		lancarExcessaoMes = true;
 		lancarExcessaoTipoArquivo = true;
 		lancarExcessaoAno = true;
+		nomeArquivoPdfTemporario = null;
+		nomeArquivoTxtTemporario = null;
 	}
 
 	private void validarTipoArquivo() {
@@ -84,10 +86,10 @@ public class ValidarArquivoService {
 		int numeroLinha = 1;
 		if (!document.isEncrypted()) {
 			BufferedReader brEvento = prepararArquivoValidacao(document);
-			while (brEvento.ready() && !terceiraLinha) {
+			while (brEvento.ready() && !finalValidacao) {
 				String linha = brEvento.readLine();
 				validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
-				if (numeroLinha == 3) terceiraLinha = true;
+				if (numeroLinha == 3) finalValidacao = true;
 				numeroLinha++;
 			}
 			brEvento.close();
@@ -112,6 +114,15 @@ public class ValidarArquivoService {
 		if (linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno) {
 			lancarExcessaoAno = false;
 		}
+		if(TipoArquivo.ARQUIVO_FOLHA.equals(tipoArquivo) && lancarExcessaoMes  && linha.contains(getChaveMesAno()) ){
+			lancarExcessaoMes = false;
+		}
+	}
+
+	private String getChaveMesAno() {
+		return arquivo.getMes().getNumero().toString().length() == 1 ?
+				"0" + arquivo.getMes().getNumero() + "/" + arquivo.getAno().getAno() :
+				arquivo.getMes().getNumero() + "/" + arquivo.getAno().getAno() 	;
 	}
 
 	private BufferedReader prepararArquivoValidacao(PDDocument document) throws IOException, FileNotFoundException {
@@ -172,7 +183,7 @@ public class ValidarArquivoService {
 		}
 	}
 
-	public static String removerAcentos(String str) {
+	public String removerAcentos(String str) {
 		return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
 }

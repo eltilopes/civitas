@@ -137,11 +137,11 @@ public abstract class ProcessarArquivoPagamento {
 		Evento eventoAuxiliar = new Evento();
 		try {
 			evento.setChave(chave);
+			evento.setNome(evento.getChave());
 			evento.setCidade(arquivoPagamento.getCidade());;
 			evento.setTipoArquivo(arquivoPagamento.getTipoArquivo());
 			eventoAuxiliar = getEvento(evento);
 			if(Objects.isNull(eventoAuxiliar)){
-				evento.setNome(evento.getChave());
 				evento= eventoService.save(evento);
 				eventos.add(evento);
 			}else{
@@ -157,7 +157,6 @@ public abstract class ProcessarArquivoPagamento {
 		try {
 			eventoAuxiliar = getEvento(evento);
 			if(Objects.isNull(eventoAuxiliar)){
-				evento.setNome(evento.getChave());
 				evento= eventoService.save(evento);
 				eventos.add(evento);
 			}else{
@@ -172,7 +171,8 @@ public abstract class ProcessarArquivoPagamento {
 		for(Evento e : eventos){
 			if(e.getCidade().getId().equals(evento.getCidade().getId()) 
 					&& e.getTipoArquivo().getCodigo()==evento.getTipoArquivo().getCodigo()
-					&& e.getChave().equals(evento.getChave())){
+					&& e.getChave().equals(evento.getChave())
+					&& e.getNome().equals(evento.getNome())){
 				evento = e;
 				return evento;
 			}

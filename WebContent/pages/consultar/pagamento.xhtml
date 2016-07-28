@@ -177,7 +177,14 @@
 		</ui:define>
 	
 		<ui:define name="botoesInsertFiltro">
-
+			
+			<h:commandLink id="confirma"
+						   process="@this"
+						   class="btn btn-primary tool-tip"
+						   actionListener="#{bean.exportarExcel()}"> Exportar Excel
+				<p:fileDownload value="#{bean.arquivoExcel}"/>
+			</h:commandLink>
+			
 		</ui:define>
 	
 		<ui:define name="resultFiltro" >

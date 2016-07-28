@@ -1,5 +1,8 @@
 package br.com.civitas.processamento.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +12,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
+
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
@@ -52,22 +61,22 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	@ManagedProperty("#{mesService}")
 	private MesService mesService;
-	
+
 	@ManagedProperty("#{secretariaService}")
 	private SecretariaService secretariaService;
-	
+
 	@ManagedProperty("#{setorService}")
 	private SetorService setorService;
-	
+
 	@ManagedProperty("#{unidadeTrabalhoService}")
 	private UnidadeTrabalhoService unidadeTrabalhoService;
-	
+
 	@ManagedProperty("#{nivelPagamentoService}")
 	private NivelPagamentoService nivelPagamentoService;
-	
+
 	@ManagedProperty("#{cargaHorariaPagamentoService}")
 	private CargaHorariaPagamentoService cargaHorariaPagamentoService;
-	
+
 	@ManagedProperty("#{cargoService}")
 	private CargoService cargoService;
 
@@ -79,6 +88,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<Secretaria> secretarias;
 	private List<UnidadeTrabalho> unidadesTrabalho;
 	private List<NivelPagamento> niveisPagamento;
+	private List<Pagamento> pagamentos;
 	private List<CargaHorariaPagamento> cargasHorariaPagamento;
 
 	private Setor setor;
@@ -87,6 +97,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private UnidadeTrabalho unidadeTrabalho;
 	private NivelPagamento nivelPagamento;
 	private CargaHorariaPagamento cargaHorariaPagamento;
+	private StreamedContent arquivoExcel;
 
 	@PostConstruct
 	public void init() {
@@ -101,40 +112,69 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		super.cancel(event);
 		getEntitySearch().setArquivo(new ArquivoPagamento());
 	}
-	
-	public void carregarPorCidade(){
-		if(Objects.nonNull(getEntitySearch().getArquivo().getCidade())){
+
+	public void carregarPorCidade() {
+		if (Objects.nonNull(getEntitySearch().getArquivo().getCidade())) {
 			setSecretarias(secretariaService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setSetores(setorService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setUnidadesTrabalho(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setNiveisPagamento(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargasHorariaPagamento(
+					cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 		}
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void find(ActionEvent event) {
-		try{
+		try {
 			limpaListas();
 			List<Pagamento> list = null;
-			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor, unidadeTrabalho, nivelPagamento, cargaHorariaPagamento);
-			if( list.isEmpty() ){
-				throw new ApplicationException( "Consulta sem resultados." );
+			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor,
+					unidadeTrabalho, nivelPagamento, cargaHorariaPagamento);
+			pagamentos = list;
+			if (list.isEmpty()) {
+				throw new ApplicationException("Consulta sem resultados.");
 			}
 			getResultSearch().setWrappedData(list);
-			setOriginalResult( (List<Pagamento>)getResultSearch().getWrappedData() );
+			setOriginalResult((List<Pagamento>) getResultSearch().getWrappedData());
 			setCurrentState(STATE_SEARCH);
-		}catch (ApplicationException e) {
+		} catch (ApplicationException e) {
 			e.printStackTrace();
-			FacesUtils.addWarnMessage( e.getMessage() );
-		}catch (Exception e) {
+			FacesUtils.addWarnMessage(e.getMessage());
+		} catch (Exception e) {
 			e.printStackTrace();
-			FacesUtils.addErrorMessage( getMessage( "ERROR_MESSAGE" ) );
+			FacesUtils.addErrorMessage(getMessage("ERROR_MESSAGE"));
 		}
 	}
+
+	public void exportarExcel() {
+
+		@SuppressWarnings("resource")
+		HSSFWorkbook workbook = new HSSFWorkbook();
+		HSSFSheet firstSheet = workbook.createSheet("Aba1");
+		String nomeArquivo = "teste.xls";
+		try {
+			int i = 0;
+			for (Pagamento p : pagamentos) {
+				HSSFRow row = firstSheet.createRow(i);
+				row.createCell(0).setCellValue(p.getMatricula().getNomeFuncionario());
+				row.createCell(1).setCellValue(p.getDiasTrabalhados());
+				i++;
+			}
+
+		  File out = new File("file.xls");
+		  workbook.write( new FileOutputStream(out));
+		  setArquivoExcel(new DefaultStreamedContent(new FileInputStream(out), 
+		    		"application/vnd.ms-excel", nomeArquivo));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Erro ao exportar arquivo");
+		} 
+	} 
 
 	public List<Ano> getAnos() {
 		return anos;
@@ -295,6 +335,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void setCargasHorariaPagamento(List<CargaHorariaPagamento> cargasHorariaPagamento) {
 		this.cargasHorariaPagamento = cargasHorariaPagamento;
+	}
+
+	public StreamedContent getArquivoExcel() {
+		return arquivoExcel;
+	}
+
+	public void setArquivoExcel(StreamedContent arquivoExcel) {
+		this.arquivoExcel = arquivoExcel;
 	}
 
 }

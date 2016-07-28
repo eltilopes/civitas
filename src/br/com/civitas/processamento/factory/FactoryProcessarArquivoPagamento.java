@@ -17,6 +17,9 @@ public class FactoryProcessarArquivoPagamento {
 			service = "processarArquivoLayoutService";
 			break;
 		case FOLHA_PAGAMENTO:
+			service = "processarArquivoFolhaPagamentoService";
+			break;	
+		case ARQUIVO_FOLHA:
 			service = "processarArquivoFolhaService";
 			break;	
 		}
