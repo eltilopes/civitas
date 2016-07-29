@@ -67,7 +67,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	@PostConstruct
 	public void init() {
-		cidades = cidadeService.buscarTodos();
+		cidades = cidadeService.buscarTodasAtivas();
 		anos = anoService.buscarTodos();
 		meses = mesService.buscarTodos();
 		tiposArquivos = FactoryEnuns.listaTipoArquivo();

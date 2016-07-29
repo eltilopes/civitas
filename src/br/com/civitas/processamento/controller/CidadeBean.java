@@ -7,8 +7,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionEvent;
 
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
+import br.com.civitas.arquitetura.util.FacesUtils;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Estado;
 import br.com.civitas.processamento.service.CidadeService;
@@ -33,6 +35,19 @@ public class CidadeBean extends AbstractCrudBean<Cidade, CidadeService>  impleme
 		estados = estadoService.buscarTodos();
 	}
 	
+	@Override
+	public void save(ActionEvent event) {
+		existeCidade();
+		super.save(event);
+	}
+	
+	private void existeCidade() {
+		List<Cidade> cidadesExistentes = service.findByNameMaisEstado(getEntity().getDescricao(), getEntity().getEstado());
+		if(!cidadesExistentes.isEmpty()){
+			FacesUtils.addWarnMessage("Cidade já existe!");
+		}
+	}
+
 	public List<Estado> getEstados() {
 		return estados;
 	}

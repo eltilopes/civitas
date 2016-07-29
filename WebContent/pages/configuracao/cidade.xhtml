@@ -87,13 +87,6 @@
 						<h:outputText rendered="#{!cidade.ativa}" value="NÃO"/>
 					 </p:column>
 					 
-				 	 <p:column style="width:60px; text-align:center;"  >
-						<f:facet name="header">
-							<h:selectBooleanCheckbox rendered="#{bean.resultSearch.rowCount > 0}" styleClass="ui-checkBoxMain" />
-						</f:facet>
-						<h:selectBooleanCheckbox styleClass="ui-checkBox"  valueChangeListener="#{bean.select}" />
-					 </p:column>
-					 
 			</p:dataTable> 
 		</ui:define>
 		
@@ -110,11 +103,8 @@
 							 update=":painelGlobal"
 							 ajax="false"/>
 							 
-			<p:commandButton value="Excluir" 
-							 styleClass="btn btn-primary botaoExcluir"
-							 style="display:none;"
-							 onclick="showIf()"/>
 		</ui:define>
+		
 		<ui:define name="camposInsert">
 		<fieldset>
 			<legend>Cadastro de Cidade</legend>

@@ -101,7 +101,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	@PostConstruct
 	public void init() {
-		cidades = cidadeService.buscarTodos();
+		cidades = cidadeService.buscarTodasAtivas();
 		anos = anoService.buscarTodos();
 		meses = mesService.buscarTodos();
 		getEntitySearch().setArquivo(new ArquivoPagamento());

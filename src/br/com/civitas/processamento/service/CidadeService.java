@@ -32,6 +32,16 @@ public class CidadeService extends AbstractPersistence<Cidade> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<Cidade> buscarTodasAtivas() {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT DISTINCT c FROM Cidade c WHERE c.ativa = :ativa ");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString()).setParameter("ativa", true);
+		List <Cidade> cidades = (List<Cidade>) query.list();
+		Collections.sort(cidades, (Cidade c1, Cidade c2) -> c1.getDescricao().compareTo(c2.getDescricao()));
+		return cidades;
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	public List<Cidade> findByEstado(Estado estado){
 		StringBuilder sql = new StringBuilder();
@@ -42,7 +52,7 @@ public class CidadeService extends AbstractPersistence<Cidade> {
 	@SuppressWarnings("unchecked")
 	public List<Cidade> findByNameMaisEstado(String nome, Estado estado){
 		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT cid FROM Cidade cid WHERE sem_acentos(UPPER(cid.descricao)) = sem_acentos(UPPER(:cidade)) AND cid.estado = :estado ");
+		sql.append(" SELECT cid FROM Cidade cid WHERE UPPER(cid.descricao) = UPPER(:cidade) AND cid.estado = :estado ");
 		return getSessionFactory().getCurrentSession().createQuery(sql.toString()).setParameter("cidade", nome).setParameter("estado", estado).list();
 	}
 
