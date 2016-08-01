@@ -2,19 +2,21 @@ package br.com.civitas.processamento.enums;
 
 public enum TipoArquivo {
 
-		NENHUM("NENHUM ARQUIVO","NENHUM ARQUIVO", 0), 
-		ARQUIVO_LAYOUT("ARQUIVO LAYOUT","<< AGRUPAMENTO:", 1),
-		FOLHA_PAGAMENTO("FOLHA PAGAMENTO","RELATÓRIO DA FOLHA DE PAGAMENTO", 2),
-		ARQUIVO_FOLHA("ARQUIVO FOLHA","COMPETENCIA....:", 3);
+		NENHUM("NENHUM ARQUIVO","NENHUM ARQUIVO", 0, 0), 
+		ARQUIVO_LAYOUT("ARQUIVO LAYOUT","<< AGRUPAMENTO:", 1, 3),
+		ARQUIVO_INFORMATICA("S&S INFORMATICA","RELATORIO DA FOLHA DE PAGAMENTO", 2, 3),
+		ARQUIVO_TARGET("ARQUIVO TARGET","COMPETENCIA", 3, 8);
 	
 		private String descricao;
 		private String chaveValidacao;
 		private int codigo;
+		private int fimProcessamento;
 		
-		private TipoArquivo(String descricao,String chaveValidacao, int codigo){
+		private TipoArquivo(String descricao,String chaveValidacao, int codigo, int fimProcessamento){
 			this.chaveValidacao = chaveValidacao;
 			this.descricao  = descricao;
 			this.codigo = codigo;
+			this.fimProcessamento = fimProcessamento;
 		}
 		
 		public String getDescricao(){
@@ -28,5 +30,9 @@ public enum TipoArquivo {
 		public String getChaveValidacao() {
 			return chaveValidacao;
 		}
-		
+
+		public int getFimProcessamento() {
+			return fimProcessamento;
+		}
+
 	}

@@ -89,7 +89,7 @@ public class ValidarArquivoService {
 			while (brEvento.ready() && !finalValidacao) {
 				String linha = brEvento.readLine();
 				validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
-				if (numeroLinha == 3) finalValidacao = true;
+				if (numeroLinha == arquivo.getTipoArquivo().getFimProcessamento()) finalValidacao = true;
 				numeroLinha++;
 			}
 			brEvento.close();
@@ -104,7 +104,7 @@ public class ValidarArquivoService {
 				&& lancarExcessaoCidade) {
 			lancarExcessaoCidade = false;
 		}
-		if (linha.toUpperCase().contains(tipoArquivo.getChaveValidacao().toUpperCase())
+		if (removerAcentos(linha.toUpperCase()).contains(tipoArquivo.getChaveValidacao().toUpperCase())
 				&& lancarExcessaoTipoArquivo) {
 			lancarExcessaoTipoArquivo = false;
 		}
@@ -114,7 +114,7 @@ public class ValidarArquivoService {
 		if (linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno) {
 			lancarExcessaoAno = false;
 		}
-		if(TipoArquivo.ARQUIVO_FOLHA.equals(tipoArquivo) && lancarExcessaoMes  && linha.contains(getChaveMesAno()) ){
+		if(TipoArquivo.ARQUIVO_TARGET.equals(tipoArquivo) && lancarExcessaoMes  && linha.contains(getChaveMesAno()) ){
 			lancarExcessaoMes = false;
 		}
 	}

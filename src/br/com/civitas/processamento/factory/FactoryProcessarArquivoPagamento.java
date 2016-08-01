@@ -16,11 +16,11 @@ public class FactoryProcessarArquivoPagamento {
 		case ARQUIVO_LAYOUT:
 			service = "processarArquivoLayoutService";
 			break;
-		case FOLHA_PAGAMENTO:
-			service = "processarArquivoFolhaPagamentoService";
+		case ARQUIVO_INFORMATICA:
+			service = "processarArquivoInformaticaService";
 			break;	
-		case ARQUIVO_FOLHA:
-			service = "processarArquivoFolhaService";
+		case ARQUIVO_TARGET:
+			service = "processarArquivoTargetService";
 			break;	
 		}
 		return (IProcessarArquivoPagamento) FacesUtils.getBean(service);

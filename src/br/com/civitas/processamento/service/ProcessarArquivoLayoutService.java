@@ -61,9 +61,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  Pagamento pagamento;
 	private  Matricula matricula;
 	private  Secretaria secretaria;
-	private  UnidadeTrabalho unidadeTrabalho;
 	private  NivelPagamento nivelPagamento;
-	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
@@ -113,11 +111,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
-		unidadeTrabalho = null;
 		nivelPagamento = null;
 		secretaria = null;
 		setor = null;
-		cargaHorariaPagamento = null;
 		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -172,8 +168,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		localizarSecretariaSetor(linhaAtual);
-		localizarNivelGrupoPagamento(linhaAtual);
 		localizarMatricula(linhaAtual);
+		localizarNivelGrupoPagamento(linhaAtual);
 		localizarUnidadeTrabalho(linhaAtual);
 		verificarIdentificador(linhaAtual, getArquivoPagamento().getNomeArquivo());
 	}
@@ -182,14 +178,14 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		if(linhaAtual.contains(IdentificadorArquivoLayout.NIVEL.getDescricao()) 
 				&& !linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())){
 			nivelPagamento = getNivelPagamento(getNivelPagamento(linhaAtual), linhaAtual);
-			cargaHorariaPagamento = getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual);
+			matricula.setNivelPagamento(nivelPagamento);
+			matricula.setCargaHorariaPagamento(getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual));
 		}
 	}
 
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())){
-			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
-			matricula.setUnidadeTrabalho(unidadeTrabalho);
+			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
 		}
 	}
 
@@ -475,8 +471,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);
-		matricula.setNivelPagamento(nivelPagamento);
-		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);
 		matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
