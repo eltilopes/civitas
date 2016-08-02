@@ -1,0 +1,2 @@
+﻿INSERT INTO TB_PERMISSAO VALUES
+    (nextval('seq_permissao') , 'NIVEL_PAGAMENTO_R', 'LER NÍVEL PAGAMENTO');   

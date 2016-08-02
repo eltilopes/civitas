@@ -1,5 +1,6 @@
 package br.com.civitas.processamento.entity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -36,6 +37,9 @@ public class NivelPagamento implements IEntity {
 	@Column(name = "ds_descricao",nullable = false)
 	private String descricao;
 	
+	@Column(name = "nr_salario_base")  
+	private Double salarioBase;
+
 	@Column(name = "nr_tipo_arquivo",nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private TipoArquivo tipoArquivo;
@@ -74,9 +78,39 @@ public class NivelPagamento implements IEntity {
 	public void setCidade(Cidade cidade) {
 		this.cidade = cidade;
 	}
+	public Double getSalarioBase() {
+		return salarioBase;
+	}
+	public void setSalarioBase(Double salarioBase) {
+		this.salarioBase = salarioBase;
+	}
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(descricao != null && descricao != ""){
+			map.put("descricao", descricao);
+		}if(cidade != null && cidade.getId() != null ){
+			map.put("cidade.id",cidade.getId() );
+		}
+		return map;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NivelPagamento other = (NivelPagamento) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

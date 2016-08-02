@@ -1,0 +1,1 @@
+ALTER TABLE tb_nivel_pagamento ADD COLUMN nr_salario_base double precision;
