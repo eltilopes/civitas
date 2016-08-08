@@ -181,6 +181,7 @@
 			<h:commandLink id="confirma"
 						   process="@this"
 						   class="btn btn-primary tool-tip"
+						   rendered="#{bean.resultSearch.rowCount > 0}"
 						   actionListener="#{bean.exportarExcel()}"> Exportar Excel
 				<p:fileDownload value="#{bean.arquivoExcel}"/>
 			</h:commandLink>
@@ -236,8 +237,8 @@
 	   				<h:outputText id="diasTrabalhados" value="#{pag.diasTrabalhados}" />
 	   			</p:column>
 	   			
-				<p:column headerText="Remuneração" style="text-align:right;" sortBy="#{pag.totalRemuneracao}" >
-	   				<h:outputText id="totalRemuneracao"  value="#{pag.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
+				<p:column headerText="Proventos" style="text-align:right;" sortBy="#{pag.totalProventos}" >
+	   				<h:outputText id="totalProventos"  value="#{pag.totalProventos}"  converter="valorNumericoMoedaConverter" />
 	   			</p:column>
 	   			
 			</p:dataTable> 

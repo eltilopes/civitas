@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,14 +156,35 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		@SuppressWarnings("resource")
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet firstSheet = workbook.createSheet("Aba1");
-		String nomeArquivo = "teste.xls";
+		String nomeArquivo = "pagamento.xls";
+		String[] colunas =  {"ARQUIVO","CIDADE","ANO","MÊS","NOME FUNCIONÁRIO",
+							 "DATA ADMISSÃO","SECRETARIA","UNID. TRABALHO",
+							 "NÍVEL PAG.","CARGA HOR. PAG.","SETOR","FUNÇÃO","CH","DIAS TRABALHADOS","PROVENTO"};
+		
 		try {
 			int i = 0;
+			HSSFRow row = firstSheet.createRow(i++);
+			int j = 0;
+			for(String nomeColuna : colunas){
+				row.createCell(j++).setCellValue(nomeColuna);
+			}
 			for (Pagamento p : pagamentos) {
-				HSSFRow row = firstSheet.createRow(i);
-				row.createCell(0).setCellValue(p.getMatricula().getNomeFuncionario());
-				row.createCell(1).setCellValue(p.getDiasTrabalhados());
-				i++;
+				row = firstSheet.createRow(i++);
+				row.createCell(0).setCellValue(p.getArquivo().getNomeArquivo());
+				row.createCell(1).setCellValue(p.getArquivo().getCidade().getDescricao());
+				row.createCell(2).setCellValue(p.getArquivo().getAno().getAno());
+				row.createCell(3).setCellValue(p.getArquivo().getMes().getDescricao());
+				row.createCell(4).setCellValue(p.getMatricula().getNomeFuncionario());
+				row.createCell(5).setCellValue(new SimpleDateFormat("dd/MM/yyyy").format(p.getMatricula().getDataAdmissao()));
+				row.createCell(6).setCellValue(Objects.nonNull(p.getMatricula().getSecretaria()) ? p.getMatricula().getSecretaria().getDescricao() : "");
+				row.createCell(7).setCellValue(Objects.nonNull(p.getMatricula().getUnidadeTrabalho()) ? p.getMatricula().getUnidadeTrabalho().getDescricao() : "");
+				row.createCell(8).setCellValue(Objects.nonNull(p.getMatricula().getNivelPagamento()) ? p.getMatricula().getNivelPagamento().getDescricao() : "");
+				row.createCell(9).setCellValue(Objects.nonNull(p.getMatricula().getCargaHorariaPagamento()) ? p.getMatricula().getCargaHorariaPagamento().getDescricao() : "");
+				row.createCell(10).setCellValue(Objects.nonNull(p.getMatricula().getSetor()) ? p.getMatricula().getSetor().getDescricao() : "");
+				row.createCell(11).setCellValue(Objects.nonNull(p.getMatricula().getCargo()) ? p.getMatricula().getCargo().getDescricao() : "");
+				row.createCell(12).setCellValue(p.getMatricula().getCargaHoraria());
+				row.createCell(13).setCellValue(p.getDiasTrabalhados());
+				row.createCell(14).setCellValue(p.getTotalProventos());
 			}
 
 		  File out = new File("file.xls");
