@@ -25,6 +25,7 @@ import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.entity.Vinculo;
+import br.com.civitas.processamento.enums.IdentificadorArquivoLayout;
 import br.com.civitas.processamento.enums.IdentificadorArquivoTarget;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 
@@ -67,6 +68,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
+	private  List<String> nomes = new ArrayList<String>();
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
 	private  boolean resumoSetor = false;
@@ -93,6 +95,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			String linha = br.readLine(); 
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
+			nomes.add(linha);
+		}
+		for(String l : nomes){
+			System.out.println(l);
 		}
 		pagamentos.add(pagamento);
 		br.close();
@@ -104,7 +110,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		while (brEvento.ready()) {
 			String linha = brEvento.readLine(); 
 			localizarEvento(linha);
+			linhaAnterior = linha;
 		}
+		linhaAnterior = "";
 		brEvento.close();
 	}
 	
@@ -135,98 +143,36 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void localizarEvento(String linha) {
 		verificarIdentificadorEvento(linha);
 		verificarIdentificadorResumoSetor(linha);
-		if(processamentoEventos && !resumoSetor && !linha.contains(IdentificadorArquivoTarget.SEPARADOR_ARQUIVO.getDescricao())){
-			List<Evento> eventosNaLinha = getEventoNaLinha(linha);
-			for(Evento e : eventosNaLinha){
-				getEvento(e, linha);
-			}
+		if(processamentoEventos && !resumoSetor && !linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
+			getEvento(linha, getChaveEvento(linha));
 		}
 	}
 
-	private List<Evento> getEventoNaLinha(String linha) {
-		List<Evento> eventosNaLinha = new ArrayList<Evento>();
+	private String getChaveEvento(String linha) {
 		try {
-			int posicaoSegundoEvento = verificarPosicaoSegundoEvento(linha);
-			List<String> eventosLinha = carregarEventosLinha(linha, posicaoSegundoEvento);
-			for(String linhaEvento : eventosLinha){
-				Evento evento = new Evento();
-				evento.setChave(linhaEvento.substring(0,3));
-				int posicaoInicialIdentificador = linha.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1 ;
-				int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoTarget.VIRGULA.getDescricao()) ;
-				String linhaInvertida = new StringBuffer(linha.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
-				int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()) ;
-				evento.setNome(getNomeEvento(linha.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida)));
-				evento.setCidade(getArquivoPagamento().getCidade());;
-				evento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-				eventosNaLinha.add(evento);
-			}
+			int posicaoInicialIdentificador = 0 ;
+			int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) ;
+			String linhaInvertida = new StringBuffer(linha.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
+			int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
+			posicaoEspacoLinhaInvertida = posicaoEspacoLinhaInvertida  + 1 + linhaInvertida.substring(posicaoEspacoLinhaInvertida + 1).indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
+			return linha.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida).trim();
+			
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Chave Evento. Linha: " + linha);
 		}
-		return eventosNaLinha;
-	}
-
-	private String getNomeEvento(String nome) {
-		String nomeVerificado = "";
-		String[] palavras = nome.split(" ");
-		for(String palavra : palavras){
-			if(!existeCaractereInvalido(palavra) || !palavraSomenteNumeros(palavra)){
-				nomeVerificado = nomeVerificado + palavra + " ";
-			}
-		}
-		return nomeVerificado.toUpperCase().trim();
-	}
-
-	private boolean existeCaractereInvalido(String palavra) {
-		for (char letra : palavra.toCharArray())  {
-			if( letra == IdentificadorArquivoTarget.BARRA.getDescricao().charAt(0) ||
-				letra == IdentificadorArquivoTarget.PERCENTUAL.getDescricao().charAt(0) ||	
-				letra == IdentificadorArquivoTarget.VIRGULA.getDescricao().charAt(0) 	){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private List<String> carregarEventosLinha(String linha, int posicaoSegundoEvento) {
-		List<String> eventosLinha = new ArrayList<String>();
-		if(posicaoSegundoEvento  == 0){
-			eventosLinha.add(linha);
-		}else{
-			eventosLinha.add(linha.substring(0,posicaoSegundoEvento));
-			eventosLinha.add(linha.substring(posicaoSegundoEvento, linha.length()));
-		}
-		return eventosLinha;
 	}
 	
-	private int verificarPosicaoSegundoEvento(String linha) {
-		String[] palavras = linha.split(" ");
-		boolean primeiraPalavra = true;
-		for(String palavra : palavras){
-			if(palavra.length()==3 && palavraSomenteNumeros(palavra) && !primeiraPalavra){
-				return linha.substring(3,linha.length()).indexOf(palavra) + 3;
-			}
-			primeiraPalavra = false;
-		}
-		return 0;
-	}
-
-	private boolean palavraSomenteNumeros(String palavra) {
-		try {
-			Integer.parseInt(palavra);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
 	private void verificarIdentificadorEvento(String linha) {
-		if(linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
+		if(linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && linhaAnterior.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())){
 			processamentoEventos = true;
 		}
-		if(linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) && processamentoEventos ){
+		if((linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) || fimPagina(linha)) && processamentoEventos ){
 			processamentoEventos = false;
 		}
+	}
+
+	private boolean fimPagina(String linha) {
+		return linha.toUpperCase().contains(getArquivoPagamento().getCidade().getDescricao().toUpperCase());
 	}
 
 	private void verificarIdentificadorResumoSetor(String linha) {
@@ -241,7 +187,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		verificarIdentificadorPagamento(linhaAtual);
 		localizarSecretaria(linhaAtual);
-		localizarUnidadeTrabalho(linhaAtual);
 		localizarMatricula(linhaAtual);
 		localizarEventosPagamento(linhaAtual);
 		finalizarPagamento(linhaAtual);
@@ -291,63 +236,54 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void localizarEventosPagamento(String linhaAtual) {
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoTarget.SEPARADOR_ARQUIVO.getDescricao())){
-			List<Evento> eventosNaLinha = getEventoNaLinha(linhaAtual);
-			List<String> eventosLinha = carregarEventosLinha(linhaAtual, verificarPosicaoSegundoEvento(linhaAtual));
-			for(Evento evento : eventosNaLinha){
-				for(String linha : eventosLinha){
-					if(linha.toUpperCase().contains(evento.getNome().toUpperCase())){
-						getEventos().forEach((e) -> {
-							if(e.getChave().equals(evento.getChave()) && e.getNome().equals(evento.getNome())){
-								pagamento.getEventosPagamento().add(getEventoPagamento(linha, e));
-							}
-						});
-					}
+		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
+			for(Evento evento : getEventos()){
+				if(linhaAtual.toUpperCase().contains(evento.getNome().toUpperCase())){
+						pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
 				}
-			}
-		}
-	}
-
-	private void localizarUnidadeTrabalho(String linhaAtual) {
-		if(linhaAtual.contains(IdentificadorArquivoTarget.FOLHA.getDescricao()) &&
-				linhaAtual.contains(IdentificadorArquivoTarget.REFERENCIA.getDescricao())	){
-			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
-		}
+			}		
+		}	
 	}
 
 	private void localizarSecretaria(String linhaAtual) {
-		if(linhaAtual.contains(IdentificadorArquivoTarget.DEPARTAMENTO.getDescricao()) &&
-		   linhaAtual.contains(IdentificadorArquivoTarget.COMPETENCIA.getDescricao())	){
+		if(linhaAtual.contains(IdentificadorArquivoTarget.ORGAO.getDescricao()) 	){
 			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
-			setor = getSetor(getSetor(linhaAtual), linhaAtual);
+			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAnterior), linhaAnterior);
 		}
 	}
 
-	private UnidadeTrabalho getUnidadeTrabalho(String linhaAtual) throws ApplicationException {
+	private UnidadeTrabalho getUnidadeTrabalho(String linha) throws ApplicationException {
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
-			String codigo = linhaAtual.substring(
-							linhaAtual.indexOf(IdentificadorArquivoTarget.FOLHA.getDescricao()) + IdentificadorArquivoTarget.FOLHA.getDescricao().length(),
-							linhaAtual.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao())).trim();
-			String descricaoUnidadeTrabalho = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-					linhaAtual.indexOf(IdentificadorArquivoTarget.REFERENCIA.getDescricao())).trim();
+			int posicaoPrimeiroNumero = posicaoPrimeiroNumero(linha);
+			String codigo = linha.substring(posicaoPrimeiroNumero, linha.length()).trim();
+			String descricaoUnidadeTrabalho = linha.substring(0, posicaoPrimeiroNumero).trim();
 			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			unidadeTrabalho.setDescricao(descricaoUnidadeTrabalho); 
 			unidadeTrabalho.setCodigo(Integer.parseInt(codigo)); 
 		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar a Unidade Trabalho. Linha: " + linhaAtual);
+			throw new ApplicationException("Erro ao pegar a Unidade Trabalho. Linha: " + linha);
 		}
 		return unidadeTrabalho;
 	}
 	
+	private int posicaoPrimeiroNumero(String linha) {
+	    char[] c = linha.toCharArray();
+	    for ( int i = 0; i < c.length; i++ ){
+	        if ( Character.isDigit( c[ i ] ) ) {
+	            return i;
+	        }
+	    }
+	    return linha.length();
+	}
+
 	private Secretaria getSecretaria(String linhaAtual) throws ApplicationException {
 		Secretaria secretaria = new Secretaria();
 		try {
 			String descricao = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-					linhaAtual.indexOf(IdentificadorArquivoTarget.COMPETENCIA.getDescricao())).trim();
+					linhaAtual.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()) + 1,
+					linhaAtual.indexOf(IdentificadorArquivoTarget.ORGAO.getDescricao())).trim();
 			secretaria.setCidade(getArquivoPagamento().getCidade());
 			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			secretaria.setDescricao(descricao);
@@ -358,29 +294,11 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		return secretaria;
 	}
 	
-	private Setor getSetor(String linhaAtual) throws ApplicationException {
-		Setor setor = new Setor();
-		try {
-			String descricao = linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-					linhaAtual.indexOf(IdentificadorArquivoTarget.COMPETENCIA.getDescricao())).trim();
-			setor.setCidade(getArquivoPagamento().getCidade());
-			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			setor.setDescricao(descricao);
-			
-		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Setor. Linha: " + linhaAtual);
-		}
-		return setor;
-	}
-
 	private  void verificarIdentificadorPagamento(String linha) {
-		if(linhaAnterior.contains(IdentificadorArquivoTarget.INICIO_PAGAMENTOS.getDescricao())
-		   &&  linha.contains(IdentificadorArquivoTarget.SEPARADOR_ARQUIVO.getDescricao())	){
+		if(linha.contains(IdentificadorArquivoTarget.INICIO_PAGAMENTOS.getDescricao())){
 			processamentoPagamentoAtivo = true;
 		}
-		if(processamentoPagamentoAtivo && linhaAnterior.contains(IdentificadorArquivoTarget.SEPARADOR_ARQUIVO.getDescricao())
-		   &&  linha.contains(IdentificadorArquivoTarget.FIM_PAGAMENTOS.getDescricao()) 	){
+		if(processamentoPagamentoAtivo  &&  linha.contains(IdentificadorArquivoTarget.FIM_PAGAMENTOS.getDescricao()) 	){
 			processamentoPagamentoAtivo = false;
 		}
 	}
@@ -409,8 +327,8 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.CPF.getDescricao())	){
-			String numeroMatricula = getNumeroMatricula(linhaAtual);
+		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())	){
+			String numeroMatricula = getNumeroMatricula();
 			verificarPagamento(numeroMatricula);
 			novaMatricula(numeroMatricula, linhaAtual);
 		}
@@ -445,16 +363,14 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private Date getDataAdmissao(String linhaAtual) {
 		try {
 			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			return (Date)formatter.parse(linhaAtual.substring(
-					linhaAtual.indexOf(IdentificadorArquivoTarget.ADMISSAO.getDescricao()) + IdentificadorArquivoTarget.ADMISSAO.getDescricao().length(),
-					linhaAtual.indexOf(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao())).trim());
+			return (Date)formatter.parse(linhaAtual.substring(0,10).trim());
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Data de Admissão. Linha: " + linhaAtual);
 		}
 	}
 
-	private String getNumeroMatricula(String linhaAtual) throws Exception {
-		String numeroMatricula = linhaAtual.substring(0,5).trim();
+	private String getNumeroMatricula() throws Exception {
+		String numeroMatricula = linhaAnterior.substring(0,5).trim();
 		Integer numero = 0;
 		try {
 			numero = Integer.parseInt(numeroMatricula.replace("-", ""));
@@ -499,24 +415,36 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private String getNomeFuncionario(String linha) throws ApplicationException {
-		String nome= "";
-		try {
-			nome = linha.substring(
-					linha.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-					linha.indexOf(IdentificadorArquivoTarget.CPF.getDescricao()) ).toUpperCase().trim();
-		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);
-		}
-		return nome ;
+
+		System.out.println(linhaAnterior);
+//		String[] palavras = linhaAnterior.split(" ");
+//		for(String palavra : palavras){
+//			JLabel label = new JLabel(palavra);
+//			System.out.println(palavra + " = " + label.getFont().isBold() );
+//			System.out.println(palavra + " = " + label.getFont().getName() );
+//			System.out.println(palavra + " = " + label.getFont().getFontName() );
+//			System.out.println(palavra + " = " + label.getFont().getStyle() );
+//			System.out.println(palavra + " = " + label.getFont().getSize() );
+//		}
+		
+		
+//		String nome= "";
+//		try {
+//			nome = linha.substring(
+//					linha.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
+//					linha.indexOf(IdentificadorArquivoTarget.CPF.getDescricao()) ).toUpperCase().trim();
+//		} catch (Exception e) {
+//			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);
+//		}
+//		return nome ;
+		return linha;
 		
 	}
 
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			String descricao = linha.substring(
-								linha.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-								linha.indexOf(IdentificadorArquivoTarget.ADMISSAO.getDescricao()) ).trim();
+			String descricao = linha.substring(11, linha.indexOf(IdentificadorArquivoTarget.ADMISSAO.getDescricao()) ).trim();
 			Integer numero = descricao.substring(0,2).hashCode();
 			vinculo.setNumero(numero); 
 			vinculo.setDescricao(descricao);

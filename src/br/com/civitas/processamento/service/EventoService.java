@@ -41,13 +41,24 @@ public class EventoService extends AbstractPersistence<Evento> {
 	@SuppressWarnings("unchecked")
 	public List<Evento> buscarTipoArquivoCidade(Cidade cidade, TipoArquivo tipoArquivo) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT e FROM Evento e ");
+		sql.append(" SELECT DISTINCT e FROM Evento e ");
 		sql.append(" WHERE e.cidade = :cidade  ");
 		sql.append(" AND e.tipoArquivo = :tipoArquivo  ");
 		
 		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
 									  .setParameter("cidade", cidade)
 									  .setParameter("tipoArquivo", tipoArquivo)
+									  .list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Evento> buscarCidade(Cidade cidade) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT DISTINCT e FROM Evento e ");
+		sql.append(" WHERE e.cidade = :cidade  ");
+		sql.append(" ORDER BY e.nome  ");
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+									  .setParameter("cidade", cidade)
 									  .list();
 	}
 

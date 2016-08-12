@@ -1,248 +1,234 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
-		
-	<ui:composition template="/new-template/template-crud.xhtml">
-    
-    	<ui:define name="tituloPagina">
-    		<h:outputText value="Pagamento" />
-    	</ui:define>
-    	
-   		<ui:define name="pageScript">
-			<script type="text/javascript"
-				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
-		</ui:define>
-    	
-		<ui:define name="parametros">
-    	   <ui:param name="bean" value="#{pagamentoBean}" />
-    	</ui:define>
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-    	<ui:define name="tituloFieldSetFiltro">
+<ui:composition template="/new-template/template-crud.xhtml">
+
+	<ui:define name="tituloPagina">
+		<h:outputText value="Pagamento" />
+	</ui:define>
+
+	<ui:define name="pageScript">
+		<script type="text/javascript"
+			src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+	</ui:define>
+
+	<ui:define name="parametros">
+		<ui:param name="bean" value="#{pagamentoBean}" />
+	</ui:define>
+
+	<ui:define name="tituloFieldSetFiltro">
     		Pagamento
 		</ui:define>
-		
-		<script>
-			$(document).ready(function(){
-				$(".valor").mask('######.##0,00', {reverse: true});
+
+	<script>
+		$(document).ready(function() {
+			$(".valor").mask('######.##0,00', {
+				reverse : true
 			});
-		</script>
-		
-		<ui:define name="camposFiltro">
-			<fieldset>
+		});
+	</script>
+
+	<ui:define name="camposFiltro">
+		<fieldset>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Ano " />
+						<h:selectOneMenu id="anoSearch"
+							value="#{bean.entitySearch.arquivo.ano}"
+							converter="entityConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+								value="#{bean.anos}" />
+						</h:selectOneMenu>
+						<h:message for="anoSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Mês " />
+						<h:selectOneMenu id="mesSearch"
+							value="#{bean.entitySearch.arquivo.mes}"
+							converter="entityConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}"
+								itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.meses}" />
+						</h:selectOneMenu>
+						<h:message for="mesSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Cidade " />
+						<p:selectOneMenu id="cidadeSearch"
+							value="#{bean.entitySearch.arquivo.cidade}"
+							converter="entityConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}"
+								itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.cidades}" />
+							<p:ajax event="change" update=":painelGlobal"
+								listener="#{bean.carregarPorCidade}"
+								oncomplete="carregando.hide()" />
+						</p:selectOneMenu>
+						<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+			</div>
+			<h:panelGroup id="panelPorCidade"
+				rendered="#{bean.entitySearch.arquivo.cidade != null}">
 				<div class="row">
 					<div class="col-md-4">
-							<div class="form-group">
-							<h:outputText value="Ano " />
-							<h:selectOneMenu id="anoSearch"
-											 value="#{bean.entitySearch.arquivo.ano}"
-											 converter="entityConverter" styleClass="form-control">
+						<div class="form-group">
+							<h:outputText value="Secretaria " />
+							<h:selectOneMenu id="secretariaSearch" value="#{bean.secretaria}"
+								converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
-										value="#{bean.anos}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao}" value="#{bean.secretarias}" />
 							</h:selectOneMenu>
-							<h:message for="anoSearch" tooltip="true"
-							styleClass="error-messages" />
+							<h:message for="secretariaSearch" tooltip="true"
+								styleClass="error-messages" />
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="form-group">
-							<h:outputText value="Mês " />
-							<h:selectOneMenu id="mesSearch"
-											 value="#{bean.entitySearch.arquivo.mes}"
-											 converter="entityConverter" styleClass="form-control">
+							<h:outputText value="Setor " />
+							<h:selectOneMenu id="setorSearch" value="#{bean.setor}"
+								converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.meses}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao.toUpperCase()}"
+									value="#{bean.setores}" />
 							</h:selectOneMenu>
-							<h:message for="mesSearch" tooltip="true"
-							styleClass="error-messages" />
+							<h:message for="setorSearch" tooltip="true"
+								styleClass="error-messages" />
 						</div>
 					</div>
 					<div class="col-md-4">
-							<div class="form-group">
-							<h:outputText value="Cidade " />
-							<p:selectOneMenu id="cidadeSearch"
-											 value="#{bean.entitySearch.arquivo.cidade}"
-											 converter="entityConverter" styleClass="form-control">
+						<div class="form-group">
+							<h:outputText value="Cargo " />
+							<h:selectOneMenu id="cargoSearch" value="#{bean.cargo}"
+								converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.cidades}" />
-								<p:ajax event="change" update=":painelGlobal" listener="#{bean.carregarPorCidade}"  oncomplete="carregando.hide()"/>
-							</p:selectOneMenu>
-							<h:message for="cidadeSearch" tooltip="true"
-							styleClass="error-messages" />
-						</div>
-					</div>
-				</div>	
-				<h:panelGroup id="panelPorCidade" rendered="#{bean.entitySearch.arquivo.cidade != null}">
-					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
-							<h:outputText value="Secretaria " />
-							<h:selectOneMenu id="secretariaSearch"
-											 value="#{bean.secretaria}"
-											 converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao}"
-										value="#{bean.secretarias}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.cargos}" />
 							</h:selectOneMenu>
-							<h:message for="secretariaSearch" tooltip="true"
-							styleClass="error-messages" />
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="form-group">
-								<h:outputText value="Setor " />
-								<h:selectOneMenu id="setorSearch"
-												 value="#{bean.setor}"
-												 converter="entityConverter" styleClass="form-control">
-									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-											value="#{bean.setores}" />
-								</h:selectOneMenu>
-								<h:message for="setorSearch" tooltip="true"
+							<h:message for="cargoSearch" tooltip="true"
 								styleClass="error-messages" />
-							</div>
-						</div>
-						<div class="col-md-4">
-								<div class="form-group">
-								<h:outputText value="Cargo " />
-								<h:selectOneMenu id="cargoSearch"
-												 value="#{bean.cargo}"
-												 converter="entityConverter" styleClass="form-control">
-									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-											value="#{bean.cargos}" />
-								</h:selectOneMenu>
-								<h:message for="cargoSearch" tooltip="true"
-								styleClass="error-messages" />
-							</div>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
 							<h:outputText value="Unidade Trabalho " />
 							<h:selectOneMenu id="unidadeTrabalhoSearch"
-											 value="#{bean.unidadeTrabalho}"
-											 converter="entityConverter" styleClass="form-control">
+								value="#{bean.unidadeTrabalho}" converter="entityConverter"
+								styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.unidadesTrabalho}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao.toUpperCase()}"
+									value="#{bean.unidadesTrabalho}" />
 							</h:selectOneMenu>
 							<h:message for="unidadeTrabalhoSearch" tooltip="true"
-							styleClass="error-messages" />
-							</div>
+								styleClass="error-messages" />
 						</div>
-						<div class="col-md-4">
-							<div class="form-group">
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
 							<h:outputText value="Nível Pagamento " />
 							<h:selectOneMenu id="nivelPagamentoSearch"
-											 value="#{bean.nivelPagamento}"
-											 converter="entityConverter" styleClass="form-control">
+								value="#{bean.nivelPagamento}" converter="entityConverter"
+								styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.niveisPagamento}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao.toUpperCase()}"
+									value="#{bean.niveisPagamento}" />
 							</h:selectOneMenu>
 							<h:message for="nivelPagamentoSearch" tooltip="true"
-							styleClass="error-messages" />
-							</div>
+								styleClass="error-messages" />
 						</div>
-						<div class="col-md-4">
-							<div class="form-group">
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
 							<h:outputText value="Carga Horária Pagamento " />
 							<h:selectOneMenu id="cargaHorariaPagamentoSearch"
-											 value="#{bean.cargaHorariaPagamento}"
-											 converter="entityConverter" styleClass="form-control">
+								value="#{bean.cargaHorariaPagamento}"
+								converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.cargasHorariaPagamento}" />
+								<f:selectItems var="o" itemValue="#{o}"
+									itemLabel="#{o.descricao.toUpperCase()}"
+									value="#{bean.cargasHorariaPagamento}" />
 							</h:selectOneMenu>
 							<h:message for="cargaHorariaPagamentoSearch" tooltip="true"
-							styleClass="error-messages" />
-							</div>
+								styleClass="error-messages" />
 						</div>
-					</div>	
-				</h:panelGroup>	
-			</fieldset>		
-		</ui:define>	
-		
-		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Pagamentos" />
-		</ui:define>
-	
-		<ui:define name="botoesInsertFiltro">
-			
-			<h:commandLink id="confirma"
-						   process="@this"
-						   class="btn btn-primary tool-tip"
-						   rendered="#{bean.resultSearch.rowCount > 0}"
-						   actionListener="#{bean.exportarExcel()}"> Exportar Excel
-				<p:fileDownload value="#{bean.arquivoExcel}"/>
-			</h:commandLink>
-			
-		</ui:define>
-	
-		<ui:define name="resultFiltro" >
-			<p:dataTable id="arquivos" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaPagamentos" rows="10" emptyMessage="Nenhum Pagamento foi encontrado."
-			 		 value="#{bean.resultSearch}" var="pag" paginator="#{bean.resultSearch.rowCount > 0}"
-			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
-			 		 rowStyleClass="bgLinha1,bgLinha2">
-		        
-				<p:column headerText="Nome Funcionário" style="text-align:left;" sortBy="#{pag.matricula.nomeFuncionario}">
-	   				<h:outputText id="nome" value="#{pag.matricula.nomeFuncionario}" />
-	   			</p:column>
-	   			
-	   			<p:column headerText="Admissão" style="text-align:center;" sortBy="#{pag.matricula.dataAdmissao}" >
-	   				<h:outputText id="dataAdmissao" value="#{pag.matricula.dataAdmissao}"   >
-	   					<f:convertDateTime pattern="dd/MM/yyyy" />
-	   				</h:outputText>	
-	   			</p:column>
+					</div>
+				</div>
+				<div class="row" >
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Selecione os Eventos a serem exibidos" />
+							<p:selectManyMenu id="eventos"
+								value="#{bean.eventosSelecionados}" converter="entityConverter"
+								var="evento" filter="true" filterMatchMode="contains"
+								showCheckbox="true" styleClass="form-control">
+								<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
+									itemLabel="#{e.nome}" itemValue="#{e}" />
+								<p:column>
+									<h:outputText value="#{evento.nome}" />
+								</p:column>
+							</p:selectManyMenu>
+						</div>
+					</div>
+				</div>
+			</h:panelGroup>
+		</fieldset>
+	</ui:define>
 
-				<p:column headerText="Secretaria" style="text-align:left;" sortBy="#{pag.matricula.secretaria.descricao}" >
-	   				<h:outputText id="secretaria" value="#{pag.matricula.secretaria.descricao}" />
-	   			</p:column>
+	<ui:define name="tituloPainel">
+		<ui:param name="tituloPainel" value="Pagamentos" />
+	</ui:define>
 
-				<p:column headerText="Unid. Trabalho" style="text-align:left;" sortBy="#{pag.matricula.unidadeTrabalho.descricao}" >
-	   				<h:outputText id="unidadeTrabalho" value="#{pag.matricula.unidadeTrabalho.descricao}" />
-	   			</p:column>
+	<ui:define name="botoesInsertFiltro">
 
-				<p:column headerText="Nível Pag." style="text-align:left;" sortBy="#{pag.matricula.nivelPagamento.descricao}" >
-	   				<h:outputText id="nivelPagamento" value="#{pag.matricula.nivelPagamento.descricao}" />
-	   			</p:column>
+		<h:commandLink id="confirma" process="@this"
+			class="btn btn-primary tool-tip"
+			rendered="#{bean.resultSearch.rowCount > 0}"
+			actionListener="#{bean.exportarExcel()}"> Exportar Excel
+				<p:fileDownload value="#{bean.arquivoExcel}" />
+		</h:commandLink>
 
-				<p:column headerText="Carga Hor. Pag." style="text-align:left;" sortBy="#{pag.matricula.cargaHorariaPagamento.descricao}" >
-	   				<h:outputText id="cargaHorariaPagamento" value="#{pag.matricula.cargaHorariaPagamento.descricao}" />
-	   			</p:column>
+	</ui:define>
 
-				<p:column headerText="Setor" style="text-align:left;" sortBy="#{pag.matricula.setor.descricao}" >
-	   				<h:outputText id="setor" value="#{pag.matricula.setor.descricao}" />
-	   			</p:column>
+	<ui:define name="resultFiltro">
 
-				<p:column headerText="Função" style="text-align:left;" sortBy="#{pag.matricula.cargo.descricao}">
-	   				<h:outputText id="funcao" value="#{pag.matricula.cargo.descricao}" />
-	   			</p:column>
+		<p:dataTable id="arquivos"
+			styleClass="table table-responsive table-mobile"
+			widgetVar="tabelaPagamentos" rows="10"
+			emptyMessage="Nenhum Pagamento foi encontrado."
+			value="#{bean.pagamentosMap.entrySet().toArray()}" var="mapVO"
+			paginator="true" rendered="true" paginatorPosition="bottom"
+			rowStyleClass="bgLinha1,bgLinha2">
 
-				<p:column headerText="CH" style="text-align:left;"  sortBy="#{pag.matricula.cargaHoraria}" >
-	   				<h:outputText id="cargaHoraria" value="#{pag.matricula.cargaHoraria}" />
-	   			</p:column>
-	   			
-				<p:column headerText="Dias Trabalhados" style="text-align:left;"  sortBy="#{pag.diasTrabalhados}" >
-	   				<h:outputText id="diasTrabalhados" value="#{pag.diasTrabalhados}" />
-	   			</p:column>
-	   			
-				<p:column headerText="Proventos" style="text-align:right;" sortBy="#{pag.totalProventos}" >
-	   				<h:outputText id="totalProventos"  value="#{pag.totalProventos}"  converter="valorNumericoMoedaConverter" />
-	   			</p:column>
-	   			
-			</p:dataTable> 
-		</ui:define>
-		
-    </ui:composition>
+			<p:columns value="#{bean.pagamentosColumnsMap}" var="column">
+
+				<f:facet name="header">  
+                     #{column}  
+                 </f:facet>
+				 #{bean.getObject(column, mapVO.value)}	
+                </p:columns>
+		</p:dataTable>
+	</ui:define>
+
+</ui:composition>
 </html>

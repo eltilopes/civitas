@@ -50,10 +50,12 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, Cargo cargo, Secretaria secretaria, 
 			Setor setor, UnidadeTrabalho unidadeTrabalho, NivelPagamento nivelPagamento, CargaHorariaPagamento cargaHorariaPagamento) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT p FROM Pagamento p ");
+		sql.append("SELECT DISTINCT p FROM Pagamento p ");
 		sql.append("INNER JOIN FETCH p.arquivo ap ");
 		sql.append("INNER JOIN FETCH p.matricula m ");
 		sql.append("LEFT JOIN FETCH m.unidadeTrabalho ut ");
+		sql.append("LEFT JOIN FETCH p.eventosPagamento evp ");
+		sql.append("LEFT JOIN FETCH evp.evento ev ");
 		sql.append("LEFT JOIN FETCH m.nivelPagamento np ");
 		sql.append("LEFT JOIN FETCH m.cargaHorariaPagamento chp ");
 		sql.append("INNER JOIN FETCH m.cargo ca ");

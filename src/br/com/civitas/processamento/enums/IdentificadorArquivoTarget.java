@@ -2,18 +2,18 @@ package br.com.civitas.processamento.enums;
 
 public enum IdentificadorArquivoTarget {
 
-		INICIO_EVENTO("VENCIMENTO"),
-		FIM_EVENTO("----------------------------------------------------------------------------------"), 
-		INICIO_RESUMO_SETOR("RESUMO DA FOLHA"),
-		FIM_RESUMO_SETOR("TOTAL DE SERVIDORES"), 
-		DEPARTAMENTO("DEPARTAMENTO:"), 
+		INICIO_EVENTO("Referência Proventos Descontos Valor Líquido"),
+		FIM_EVENTO("CPF"), 
+		INICIO_RESUMO_SETOR("RESUMO DO SETOR"),
+		FIM_RESUMO_SETOR("Total de Vínculos:"), 
+		ORGAO("Órgão:"), 
 		COMPETENCIA("COMPETENCIA....:"), 
-		FOLHA("FOLHA.......:"), 
+		EMMISSAO("Emissão:"), 
 		REFERENCIA("REFERENCIA.....:"), 
 		DEPENDENTES("DEPENDENTES:"), 
 		SETOR("SETOR:"), 
 		CPF("CPF:"), 
-		ADMISSAO("ADMISSAO:"), 
+		ADMISSAO("Dta. Admiss.:"), 
 		CARGA_HORARIA("CARGA HORARIA:"), 
 		VANTAGEM("VANTAGENS..:"), 
 		DESCONTO("DESCONTOS..:"), 
@@ -22,10 +22,11 @@ public enum IdentificadorArquivoTarget {
 		PERCENTUAL("%")	,	
 		HIFEN("-")	,	
 		VIRGULA(","), 
-		INICIO_PAGAMENTOS("SERVIDOR  PROVENTOS                                              VALOR    DESCONTOS                                                  VALOR              LIQUIDO"), 
-		FIM_PAGAMENTOS("PAGINA"), 
+		VINCULO("Vínc"), 
+		INICIO_PAGAMENTOS("Vínc"), 
+		FIM_PAGAMENTOS("CPF:"), 
 		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
-		SEPARADOR_ARQUIVO("-------------------------------------------------------------------------------------------------------"); 
+		TIPO("Tipo:"); 
 	
 		private String descricao;
 		

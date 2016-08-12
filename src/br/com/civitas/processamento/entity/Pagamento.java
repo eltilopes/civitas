@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -39,8 +40,11 @@ public class Pagamento implements IEntity {
 	@JoinColumn(name="cd_arquivo",nullable=false)
 	private ArquivoPagamento arquivo;
 	
-	@Transient
+	@OneToMany(mappedBy = "pagamento", fetch = FetchType.LAZY)
 	private List<EventoPagamento> eventosPagamento;
+	
+	@Transient
+	private List<EventoPagamento> eventosPagamentoSelecionados;
 
 	@Column(name = "nr_total_proventos", nullable = false)
 	private Double totalProventos = 0d;
@@ -131,6 +135,14 @@ public class Pagamento implements IEntity {
 
 	public void setDiasTrabalhados(String diasTrabalhados) {
 		this.diasTrabalhados = diasTrabalhados;
+	}
+
+	public List<EventoPagamento> getEventosPagamentoSelecionados() {
+		return eventosPagamentoSelecionados;
+	}
+
+	public void setEventosPagamentoSelecionados(List<EventoPagamento> eventosPagamentoSelecionados) {
+		this.eventosPagamentoSelecionados = eventosPagamentoSelecionados;
 	}
 
 	@Override

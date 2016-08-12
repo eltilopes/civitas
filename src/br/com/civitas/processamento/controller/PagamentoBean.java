@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +32,8 @@ import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Cidade;
+import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Mes;
 import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
@@ -38,12 +44,15 @@ import br.com.civitas.processamento.service.AnoService;
 import br.com.civitas.processamento.service.CargaHorariaPagamentoService;
 import br.com.civitas.processamento.service.CargoService;
 import br.com.civitas.processamento.service.CidadeService;
+import br.com.civitas.processamento.service.EventoPagamentoService;
+import br.com.civitas.processamento.service.EventoService;
 import br.com.civitas.processamento.service.MesService;
 import br.com.civitas.processamento.service.NivelPagamentoService;
 import br.com.civitas.processamento.service.PagamentoService;
 import br.com.civitas.processamento.service.SecretariaService;
 import br.com.civitas.processamento.service.SetorService;
 import br.com.civitas.processamento.service.UnidadeTrabalhoService;
+import br.com.civitas.processamento.vo.PagamentoVO;
 
 @ManagedBean
 @ViewScoped
@@ -65,6 +74,12 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	@ManagedProperty("#{secretariaService}")
 	private SecretariaService secretariaService;
+
+	@ManagedProperty("#{eventoService}")
+	private EventoService eventoService;
+
+	@ManagedProperty("#{eventoPagamentoService}")
+	private EventoPagamentoService eventoPagamentoService;
 
 	@ManagedProperty("#{setorService}")
 	private SetorService setorService;
@@ -89,9 +104,12 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<Secretaria> secretarias;
 	private List<UnidadeTrabalho> unidadesTrabalho;
 	private List<NivelPagamento> niveisPagamento;
-	private List<Pagamento> pagamentos;
 	private List<CargaHorariaPagamento> cargasHorariaPagamento;
-
+	private List<Evento> eventosDisponiveis;
+	private List<Evento> eventosSelecionados;
+	private Map<String, Object> pagamentosMap;
+	private List<String> pagamentosColumnsMap;
+	
 	private Setor setor;
 	private Secretaria secretaria;
 	private Cargo cargo;
@@ -99,7 +117,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private NivelPagamento nivelPagamento;
 	private CargaHorariaPagamento cargaHorariaPagamento;
 	private StreamedContent arquivoExcel;
-
+	
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarTodasAtivas();
@@ -122,25 +140,22 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setUnidadesTrabalho(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setNiveisPagamento(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargasHorariaPagamento(
-					cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setEventosDisponiveis(eventoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setEventosSelecionados(new ArrayList<Evento>());
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void find(ActionEvent event) {
 		try {
-			limpaListas();
 			List<Pagamento> list = null;
 			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor,
 					unidadeTrabalho, nivelPagamento, cargaHorariaPagamento);
-			pagamentos = list;
+			popularEventosSelecionados(list);
 			if (list.isEmpty()) {
 				throw new ApplicationException("Consulta sem resultados.");
 			}
-			getResultSearch().setWrappedData(list);
-			setOriginalResult((List<Pagamento>) getResultSearch().getWrappedData());
 			setCurrentState(STATE_SEARCH);
 		} catch (ApplicationException e) {
 			e.printStackTrace();
@@ -151,41 +166,92 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		}
 	}
 
+	private void popularEventosSelecionados(List<Pagamento> list) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		pagamentosMap  = new HashMap<String, Object>();
+		pagamentosColumnsMap = getListFields();
+		for(Pagamento pagamento : list){
+			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
+			if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
+				int i = 0;
+				for(Evento evento : eventosSelecionados){
+					for(EventoPagamento ep : pagamento.getEventosPagamento()){
+						if(evento.getChave().equals(ep.getEvento().getChave())){
+							pagamento.getEventosPagamentoSelecionados().add(ep);
+						}
+					}
+					if(pagamento.getEventosPagamentoSelecionados().size() == i++){
+						pagamento.getEventosPagamentoSelecionados().add(getEventoValorZerado(evento));
+					}
+				}	
+			}
+			pagamentosMap.put(pagamento.getId().toString(), getMapValueFields(pagamento));
+		}
+	}
+
+	public String getObject(String chave, HashMap<String, Object> mapa) {
+		return (String) mapa.get(chave);
+	}
+	
+	private Map<String, Object> getMapValueFields(Pagamento pagamento) throws IllegalArgumentException, IllegalAccessException {
+		Map<String, Object> pagamentosMap = new HashMap<String, Object>();
+		PagamentoVO pagamentoVO = new PagamentoVO(pagamento);
+		Field[] declaredFields = pagamentoVO.getClass().getDeclaredFields();
+		for (Field field : declaredFields) {
+			pagamentosMap.put(PagamentoVO.getNomeColuna(field.getName()), field.get(pagamentoVO));
+		}
+		if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
+			for (EventoPagamento eventoPagamento : pagamento.getEventosPagamentoSelecionados()) {
+				pagamentosMap.put(eventoPagamento.getEvento().getChave(),String.format("%.2f", eventoPagamento.getValor()) );
+			}
+		}
+		return pagamentosMap;
+	}
+
+	private List<String> getListFields() throws IllegalArgumentException, IllegalAccessException {
+		List<String> colunas = new ArrayList<String>();
+		PagamentoVO pagamentoVO = new PagamentoVO(true);
+		Field[] declaredFields = pagamentoVO.getClass().getDeclaredFields();
+		for (Field field : declaredFields) {
+			colunas.add((String) field.get(pagamentoVO));
+		}
+		if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
+			for (Evento evento : eventosSelecionados) {
+				colunas.add((String) evento.getNome());
+			}
+		}
+		return colunas;
+	}
+
+	private EventoPagamento getEventoValorZerado(Evento evento) {
+		EventoPagamento eventoPagamento = new EventoPagamento();
+		eventoPagamento.setEvento(evento);
+		eventoPagamento.setValor(0d);
+		return eventoPagamento;
+	}
+
+	@SuppressWarnings("unchecked")
 	public void exportarExcel() {
 
 		@SuppressWarnings("resource")
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet firstSheet = workbook.createSheet("Aba1");
 		String nomeArquivo = "pagamento.xls";
-		String[] colunas =  {"ARQUIVO","CIDADE","ANO","MÊS","NOME FUNCIONÁRIO",
-							 "DATA ADMISSÃO","SECRETARIA","UNID. TRABALHO",
-							 "NÍVEL PAG.","CARGA HOR. PAG.","SETOR","FUNÇÃO","CH","DIAS TRABALHADOS","PROVENTO"};
 		
 		try {
-			int i = 0;
-			HSSFRow row = firstSheet.createRow(i++);
-			int j = 0;
-			for(String nomeColuna : colunas){
-				row.createCell(j++).setCellValue(nomeColuna);
-			}
-			for (Pagamento p : pagamentos) {
-				row = firstSheet.createRow(i++);
-				row.createCell(0).setCellValue(p.getArquivo().getNomeArquivo());
-				row.createCell(1).setCellValue(p.getArquivo().getCidade().getDescricao());
-				row.createCell(2).setCellValue(p.getArquivo().getAno().getAno());
-				row.createCell(3).setCellValue(p.getArquivo().getMes().getDescricao());
-				row.createCell(4).setCellValue(p.getMatricula().getNomeFuncionario());
-				row.createCell(5).setCellValue(new SimpleDateFormat("dd/MM/yyyy").format(p.getMatricula().getDataAdmissao()));
-				row.createCell(6).setCellValue(Objects.nonNull(p.getMatricula().getSecretaria()) ? p.getMatricula().getSecretaria().getDescricao() : "");
-				row.createCell(7).setCellValue(Objects.nonNull(p.getMatricula().getUnidadeTrabalho()) ? p.getMatricula().getUnidadeTrabalho().getDescricao() : "");
-				row.createCell(8).setCellValue(Objects.nonNull(p.getMatricula().getNivelPagamento()) ? p.getMatricula().getNivelPagamento().getDescricao() : "");
-				row.createCell(9).setCellValue(Objects.nonNull(p.getMatricula().getCargaHorariaPagamento()) ? p.getMatricula().getCargaHorariaPagamento().getDescricao() : "");
-				row.createCell(10).setCellValue(Objects.nonNull(p.getMatricula().getSetor()) ? p.getMatricula().getSetor().getDescricao() : "");
-				row.createCell(11).setCellValue(Objects.nonNull(p.getMatricula().getCargo()) ? p.getMatricula().getCargo().getDescricao() : "");
-				row.createCell(12).setCellValue(p.getMatricula().getCargaHoraria());
-				row.createCell(13).setCellValue(p.getDiasTrabalhados());
-				row.createCell(14).setCellValue(p.getTotalProventos());
-			}
+			int numeroLinha = 0;
+			HSSFRow row = firstSheet.createRow(numeroLinha++);
+			int numeroCelulaColuna = 0;
+			boolean primeiraColuna = true;
+			for(String nomeColuna : pagamentosColumnsMap){
+				row = firstSheet.getRow(0);
+				row.createCell(numeroCelulaColuna).setCellValue(nomeColuna);
+				for (Map.Entry<String, Object> mapa : pagamentosMap.entrySet()) {
+					row = primeiraColuna ? firstSheet.createRow(numeroLinha++) : firstSheet.getRow(numeroLinha++);
+					row.createCell(numeroCelulaColuna).setCellValue(getObject(nomeColuna,(HashMap<String, Object>) mapa.getValue()));
+				}
+				numeroCelulaColuna++;
+				numeroLinha = 1;
+			}	
 
 		  File out = new File("file.xls");
 		  workbook.write( new FileOutputStream(out));
@@ -343,6 +409,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.nivelPagamentoService = nivelPagamentoService;
 	}
 
+	public void setEventoService(EventoService eventoService) {
+		this.eventoService = eventoService;
+	}
+
+	public void setEventoPagamentoService(EventoPagamentoService eventoPagamentoService) {
+		this.eventoPagamentoService = eventoPagamentoService;
+	}
+
 	public NivelPagamento getNivelPagamento() {
 		return nivelPagamento;
 	}
@@ -359,12 +433,44 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.cargasHorariaPagamento = cargasHorariaPagamento;
 	}
 
+	public List<Evento> getEventosDisponiveis() {
+		return eventosDisponiveis;
+	}
+
+	public void setEventosDisponiveis(List<Evento> eventosDisponiveis) {
+		this.eventosDisponiveis = eventosDisponiveis;
+	}
+
+	public List<Evento> getEventosSelecionados() {
+		return eventosSelecionados;
+	}
+
+	public void setEventosSelecionados(List<Evento> eventosSelecionados) {
+		this.eventosSelecionados = eventosSelecionados;
+	}
+
 	public StreamedContent getArquivoExcel() {
 		return arquivoExcel;
 	}
 
 	public void setArquivoExcel(StreamedContent arquivoExcel) {
 		this.arquivoExcel = arquivoExcel;
+	}
+
+	public Map<String, Object> getPagamentosMap() {
+		return pagamentosMap;
+	}
+
+	public void setPagamentosMap(Map<String, Object> pagamentosMap) {
+		this.pagamentosMap = pagamentosMap;
+	}
+
+	public List<String> getPagamentosColumnsMap() {
+		return pagamentosColumnsMap;
+	}
+
+	public void setPagamentosColumnsMap(List<String> pagamentosColumnsMap) {
+		this.pagamentosColumnsMap = pagamentosColumnsMap;
 	}
 
 }
