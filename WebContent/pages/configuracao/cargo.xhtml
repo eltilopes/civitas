@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Cargo" />
+    	</ui:define>
+    	
+   		<ui:define name="pageScript">
+			<script type="text/javascript"
+				src="#{request.contextPath}/resources/js/tooltip/tooltip.js" />
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{cargoBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Eventos
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Cidade " />
+							<h:selectOneMenu id="cidadeSearch"
+											 value="#{bean.entitySearch.cidade}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cidades}" />
+							</h:selectOneMenu>
+							<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4 form-group">
+						<h:outputText value="Tipo Arquivo " />
+						<h:selectOneMenu id="tipoArquivoSearch" 
+										 value="#{bean.entitySearch.tipoArquivo}" 
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoArquivoSearch" tooltip="true"
+							styleClass="error-messages" />	
+					</div>
+				</div>	
+				<div class="row">
+					<div class="col-md-8 ">
+						<div class="form-group">
+							<h:outputText value="Descrição: " style="font-weight: normal;"/>
+							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
+							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
+						</div>
+					</div>
+				</div>	
+			</fieldset>		
+		</ui:define>	
+		
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Cargos" />
+		</ui:define>
+	
+		<ui:define name="botoesInsertFiltro">
+			<p:commandButton value="Existe Cargos Inativos"
+						 actionListener="#{bean.visuaizarCargosInativos()}" 
+						 rendered="#{sessionScope.perms.CARGO_C and bean.existeCargosInativos}"
+						 styleClass="btn btn-primary"
+						 update=":painelGlobal"
+						 ajax="false"/>
+
+		</ui:define>
+	
+		<ui:define name="resultFiltro" >
+			<p:dataTable id="cargosInativos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaCargosInativos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
+			 		 value="#{bean.cargosInativos}" var="cargoInativo" paginator="#{bean.cargosInativos.size() > 0}"
+			 		 rendered="#{bean.cargosInativos.size() > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+			 		 
+			 		 <p:column headerText="" style="width:60px; text-align:center;" >
+						<div class="colunaAcao">					    			
+							<h:commandLink id="cmdUpd" actionListener="#{bean.prepararUpdate(cargoInativo)}">
+							    <i class="glyphicon glyphicon-edit" />
+							</h:commandLink>
+							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+								showEffect="fade" trackMouse="true" />
+						</div>
+					</p:column>
+					
+			 		 <p:column headerText="Cidade" >
+						<h:outputText value="#{cargoInativo.cidade.descricao.toUpperCase()}" />
+					 </p:column>
+			 		 
+			 		 <p:column headerText="Tipo Arquivo" >
+						<h:outputText value="#{cargoInativo.tipoArquivo.descricao}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Observações" >
+						<h:outputText value="#{cargoInativo.linhaCargo}" />
+					 </p:column>
+			
+			</p:dataTable> 
+		
+			<p:dataTable id="eventos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaCargos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
+			 		 value="#{bean.resultSearch}" var="cargo" paginator="#{bean.resultSearch.rowCount > 0}"
+			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
+			 		 rowStyleClass="bgLinha1,bgLinha2">
+			 		 
+			 		 <p:column headerText="Cidade" >
+						<h:outputText value="#{cargo.cidade.descricao.toUpperCase()}" />
+					 </p:column>
+			 		 
+			 		 <p:column headerText="Tipo Arquivo" >
+						<h:outputText value="#{cargo.tipoArquivo.descricao}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Descrição" >
+						<h:outputText value="#{cargo.descricao}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Número" >
+						<h:outputText value="#{cargo.numero}" />
+					 </p:column>
+			
+			</p:dataTable> 
+		</ui:define>
+		
+		<ui:define name="tituloFieldSetInsert">
+			<h4> Cadastro de Cargo </h4>
+		</ui:define>
+		
+		<ui:define name="camposInsert">
+		<fieldset>
+			<legend>Cadastro de Cargo</legend>
+			<div class="row" >
+				<div class="col-md-6 form-group">
+					<h:outputText value="Cidade:" style="font-weight: normal;"/>
+					<h:inputText id="cidadeInsert" value="#{bean.entity.cidade.descricao}" disabled="true" styleClass="form-control"  />
+					<h:message for="cidadeInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group">
+					<h:outputText value="Tipo Arquivo: " style="font-weight: normal;"/>
+					<h:inputText id="tipoArquivoInsert" styleClass="form-control" disabled="true"  value="#{bean.entity.tipoArquivo.descricao}" />
+					<h:message for="tipoArquivoInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group">
+					<h:outputText value="Descrição: " style="font-weight: normal;"/>
+					<h:inputText id="nomeInsert" styleClass="form-control" value="#{bean.entity.descricao}" />
+					<h:message for="nomeInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group">
+					<h:outputText value="Número: " style="font-weight: normal;"/>
+					<h:inputText id="numeroInsert" styleClass="form-control" disabled="true" value="#{bean.entity.numero}" />
+					<h:message for="numeroInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-6 form-group" >
+					<h:outputText value="Observação: " style="font-weight: normal;"/>
+					<h:inputText id="linhaInsert" styleClass="form-control" value="#{bean.entity.linhaCargo}" />
+					<h:message for="linhaInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >	
+				<div class="col-md-9 form-group">
+					<div class="alert alert-warning" role="alert">
+						<span class="glyphicon glyphicon-exclamation-sign"></span>
+						É importante que a Descrição do Cargo, seja igual a que esta na Observação.
+					</div>
+				</div>
+			</div>	
+		</fieldset>
+	</ui:define>
+	
+	<ui:define name="botoesInsert">
+		<h:panelGroup id="botoes">
+			<p></p>
+		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
+				actionListener="#{bean['update']}"
+				rendered="#{bean['editing']}"
+				oncomplete="carregando.hide(); mensagemAviso.show();"
+				update=":painelGlobal" onclick="carregando.show();"
+				ajax="false" />
+				
+			<p:commandButton styleClass="btn btn-primary" value="Voltar"
+				actionListener="#{bean['cancel']}" immediate="true"
+				update=":painelGlobal" ajax="false" />
+			<p></p>
+		</h:panelGroup>
+	</ui:define>
+		
+    </ui:composition>
+	
+</html>

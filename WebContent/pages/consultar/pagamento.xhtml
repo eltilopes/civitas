@@ -176,9 +176,9 @@
 				</div>
 				<div class="row" >
 					<div class="col-md-4">
-						<div class="form-group">
+						<div class="form-group" style="width: 100% !important" >
 							<h:outputText value="Selecione os Eventos a serem exibidos" />
-							<p:selectManyMenu id="eventos"
+							<p:selectManyMenu id="eventos" 
 								value="#{bean.eventosSelecionados}" converter="entityConverter"
 								var="evento" filter="true" filterMatchMode="contains"
 								showCheckbox="true" styleClass="form-control">
@@ -203,7 +203,7 @@
 
 		<h:commandLink id="confirma" process="@this"
 			class="btn btn-primary tool-tip"
-			rendered="#{bean.resultSearch.rowCount > 0}"
+			rendered="true"
 			actionListener="#{bean.exportarExcel()}"> Exportar Excel
 				<p:fileDownload value="#{bean.arquivoExcel}" />
 		</h:commandLink>
@@ -216,16 +216,15 @@
 			styleClass="table table-responsive table-mobile"
 			widgetVar="tabelaPagamentos" rows="10"
 			emptyMessage="Nenhum Pagamento foi encontrado."
-			value="#{bean.pagamentosMap.entrySet().toArray()}" var="mapVO"
+			value="#{bean.pagamentosMap}" var="mapVO"
 			paginator="true" rendered="true" paginatorPosition="bottom"
 			rowStyleClass="bgLinha1,bgLinha2">
 
 			<p:columns value="#{bean.pagamentosColumnsMap}" var="column">
-
 				<f:facet name="header">  
                      #{column}  
                  </f:facet>
-				 #{bean.getObject(column, mapVO.value)}	
+				 #{bean.getObject(column, mapVO)}	
                 </p:columns>
 		</p:dataTable>
 	</ui:define>

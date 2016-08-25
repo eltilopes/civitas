@@ -1,5 +1,6 @@
 package br.com.civitas.processamento.entity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -36,6 +37,12 @@ public class Cargo implements IEntity {
 	@Column(name = "ds_descricao",nullable = false, length = 30)
 	private String descricao;
 	
+	@Column(name = "ds_linha_cargo")
+	private String linhaCargo;
+	
+	@Column(name="fl_ativo",nullable = false)
+	private Boolean ativo = true;
+
 	@Column(name = "nr_tipo_arquivo",nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private TipoArquivo tipoArquivo;
@@ -74,10 +81,51 @@ public class Cargo implements IEntity {
 	public void setCidade(Cidade cidade) {
 		this.cidade = cidade;
 	}
+	public String getLinhaCargo() {
+		return linhaCargo;
+	}
+	public void setLinhaCargo(String linhaCargo) {
+		this.linhaCargo = linhaCargo;
+	}
+	public Boolean getAtivo() {
+		return ativo;
+	}
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
+	}
+	
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(ativo != null ){
+			map.put("ativo", ativo);
+		}if(descricao != null && descricao != ""){
+			map.put("descricao", descricao);
+		}if(cidade != null && cidade.getId() != null ){
+			map.put("cidade.id",cidade.getId() );
+		}if(tipoArquivo != null  ){
+			map.put("tipoArquivo",tipoArquivo.getCodigo() );
+		}
+		return map;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cargo other = (Cargo) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

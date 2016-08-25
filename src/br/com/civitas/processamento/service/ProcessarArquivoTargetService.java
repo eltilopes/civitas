@@ -68,7 +68,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
-	private  List<String> nomes = new ArrayList<String>();
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
 	private  boolean resumoSetor = false;
@@ -95,10 +94,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			String linha = br.readLine(); 
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
-			nomes.add(linha);
-		}
-		for(String l : nomes){
-			System.out.println(l);
 		}
 		pagamentos.add(pagamento);
 		br.close();

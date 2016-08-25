@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
@@ -25,8 +27,11 @@ import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.Cargo;
+import br.com.civitas.processamento.enums.IdentificadorArquivoTarget;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.service.ArquivoPagamentoService;
+import br.com.civitas.processamento.service.CargoService;
 
 @Service
 public class ValidarArquivoService {
@@ -36,6 +41,10 @@ public class ValidarArquivoService {
 	private ArquivoPagamento arquivo;
 	private String nomeArquivoPdfTemporario;
 	private String nomeArquivoTxtTemporario;
+	private String linhaAnterior = "";
+	private List<String> linhasComCargo = new ArrayList<String>();
+	private List<String> cargosValidados = new ArrayList<String>();
+	private List<Cargo> cargos ;
 	
 	private boolean finalValidacao;
 	private boolean lancarExcessaoCidade;
@@ -45,6 +54,9 @@ public class ValidarArquivoService {
 
 	@Autowired
 	private ArquivoPagamentoService arquivoService;
+
+	@Autowired
+	private CargoService cargoService;
 
 	public void validarArquivo(UploadedFile file, ArquivoPagamento arquivo) throws IOException {
 		iniciarValores(file, arquivo);
@@ -89,16 +101,73 @@ public class ValidarArquivoService {
 			while (brEvento.ready() && !finalValidacao) {
 				String linha = brEvento.readLine();
 				validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
-				if (numeroLinha == arquivo.getTipoArquivo().getFimProcessamento()) finalValidacao = true;
+				if (arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_TARGET)){
+					localizarCargo(linha);
+					linhaAnterior = linha;
+				}else if(numeroLinha == arquivo.getTipoArquivo().getFimProcessamento()){	
+					finalValidacao = true;
+				}	
 				numeroLinha++;
 			}
 			brEvento.close();
 		}
 		document.close();
+		if(arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_TARGET)){
+			cargos = cargoService.buscarTipoArquivoCidade(arquivo.getCidade(), arquivo.getTipoArquivo());
+			validarCargos();
+		}
 		deletarArquivos();
 		tratarExcecoes();
 	}
 
+	private void validarCargos() {
+		for(Cargo cargo : cargos){
+			for(String linha : linhasComCargo){
+				if(linha.contains(cargo.getDescricao())){
+					cargosValidados.add(linha);
+				}
+			}
+		}
+		linhasComCargo.removeAll(cargosValidados);
+		if(!linhasComCargo.isEmpty()){
+			salvarCargos();
+			throw new ApplicationException("Arquivo possui cargos nâo mapeados.");
+		}
+	}
+
+	private void salvarCargos() {
+		List<Cargo> cargos = new ArrayList<Cargo>();
+		for(String linha : linhasComCargo){
+			setCargos(cargos,linha);
+		}
+		cargoService.insertAll(cargos);
+	}
+
+	private void setCargos(List<Cargo> cargos, String linha) {
+		Cargo cargo = new Cargo();
+		cargo.setAtivo(false);
+		cargo.setLinhaCargo(linha);
+		cargo.setCidade(arquivo.getCidade());
+		cargo.setNumero(999999);
+		cargo.setDescricao("INATIVO");
+		cargo.setTipoArquivo(arquivo.getTipoArquivo());
+		cargos.add(cargo);
+	}
+
+	private void localizarCargo(String linha) {
+		if(		(linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao()) 
+				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
+				|| linha.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao())) 
+				
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TOTAL_ORCAMENTARIO.getDescricao()) 
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TIPO.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.FUNDO_RESERVA.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao())){
+			linhasComCargo.add(linhaAnterior);
+		}
+	}
+	
 	private void validarArquivoCidadeMesAno(String linha, TipoArquivo tipoArquivo) {
 		if (linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase()))
 				&& lancarExcessaoCidade) {

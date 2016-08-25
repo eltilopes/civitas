@@ -51,6 +51,7 @@ public class CargoService extends AbstractPersistence<Cargo> {
 		sql.append(" SELECT c FROM Cargo c ");
 		sql.append(" WHERE c.cidade = :cidade  ");
 		sql.append(" AND c.tipoArquivo = :tipoArquivo  ");
+		sql.append(" ORDER BY length(c.descricao) DESC  ");
 		
 		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
 									  .setParameter("cidade", cidade)
@@ -68,4 +69,38 @@ public class CargoService extends AbstractPersistence<Cargo> {
 				.setParameter("cidade", cidade)
 				.list();
 	}
+
+	public boolean existeCargosInativos() {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT c from Cargo c WHERE c.ativo = false ");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		return !query.list().isEmpty();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Cargo> buscarTodosInativos() {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT c FROM Cargo c ");
+		sql.append("INNER JOIN FETCH c.cidade cid ");
+		sql.append(" WHERE c.ativo = false ");
+		sql.append(" ORDER BY cid.descricao ASC ");
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString()).list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Cargo> buscarTipoArquivoCidadeDescricao(Cidade cidade, TipoArquivo tipoArquivo,String descricao) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT c FROM Cargo c ");
+		sql.append(" WHERE c.cidade = :cidade  ");
+		sql.append(" AND c.tipoArquivo = :tipoArquivo  ");
+		sql.append(" AND UPPER(c.linhaCargo) LIKE UPPER(:descricao) ");
+		sql.append(" AND UPPER(c.descricao) <> UPPER(:descricao) ");
+		
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+									  .setParameter("cidade", cidade)
+									  .setParameter("tipoArquivo", tipoArquivo)
+									  .setParameter("descricao", "%" + descricao + "%")
+									  .list();
+	}
+	
 }

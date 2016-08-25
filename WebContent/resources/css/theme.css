@@ -298,6 +298,14 @@ color: #4f4f4f;
 	width:100% !important;
 }
 
+.ui-selectlistbox{
+	width:100% !important;
+}
+
+.ui-selectlistbox-list{
+	width:100% !important;
+}
+
 /** panel **/
 
 .ui-panel{

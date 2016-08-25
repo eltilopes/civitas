@@ -107,7 +107,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<CargaHorariaPagamento> cargasHorariaPagamento;
 	private List<Evento> eventosDisponiveis;
 	private List<Evento> eventosSelecionados;
-	private Map<String, Object> pagamentosMap;
+	private List<Map<String, Object>> pagamentosMap;
 	private List<String> pagamentosColumnsMap;
 	
 	private Setor setor;
@@ -167,7 +167,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	}
 
 	private void popularEventosSelecionados(List<Pagamento> list) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		pagamentosMap  = new HashMap<String, Object>();
+		pagamentosMap  = new ArrayList<Map<String, Object>>();
 		pagamentosColumnsMap = getListFields();
 		for(Pagamento pagamento : list){
 			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
@@ -184,7 +184,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 					}
 				}	
 			}
-			pagamentosMap.put(pagamento.getId().toString(), getMapValueFields(pagamento));
+			pagamentosMap.add( getMapValueFields(pagamento));
 		}
 	}
 
@@ -229,12 +229,11 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		return eventoPagamento;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("resource")
 	public void exportarExcel() {
 
-		@SuppressWarnings("resource")
 		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet firstSheet = workbook.createSheet("Aba1");
+		HSSFSheet firstSheet = workbook.createSheet("Pagamentos");
 		String nomeArquivo = "pagamento.xls";
 		
 		try {
@@ -245,12 +244,13 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			for(String nomeColuna : pagamentosColumnsMap){
 				row = firstSheet.getRow(0);
 				row.createCell(numeroCelulaColuna).setCellValue(nomeColuna);
-				for (Map.Entry<String, Object> mapa : pagamentosMap.entrySet()) {
+				for (Map<String, Object> mapa : pagamentosMap) {
 					row = primeiraColuna ? firstSheet.createRow(numeroLinha++) : firstSheet.getRow(numeroLinha++);
-					row.createCell(numeroCelulaColuna).setCellValue(getObject(nomeColuna,(HashMap<String, Object>) mapa.getValue()));
+					row.createCell(numeroCelulaColuna).setCellValue(getObject(nomeColuna,(HashMap<String, Object>) mapa));
 				}
 				numeroCelulaColuna++;
 				numeroLinha = 1;
+				primeiraColuna = false;
 			}	
 
 		  File out = new File("file.xls");
@@ -457,11 +457,11 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.arquivoExcel = arquivoExcel;
 	}
 
-	public Map<String, Object> getPagamentosMap() {
+	public List<Map<String, Object>> getPagamentosMap() {
 		return pagamentosMap;
 	}
 
-	public void setPagamentosMap(Map<String, Object> pagamentosMap) {
+	public void setPagamentosMap(List<Map<String, Object>> pagamentosMap) {
 		this.pagamentosMap = pagamentosMap;
 	}
 

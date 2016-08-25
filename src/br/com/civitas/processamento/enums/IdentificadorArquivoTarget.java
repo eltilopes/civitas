@@ -8,11 +8,14 @@ public enum IdentificadorArquivoTarget {
 		FIM_RESUMO_SETOR("Total de Vínculos:"), 
 		ORGAO("Órgão:"), 
 		COMPETENCIA("COMPETENCIA....:"), 
-		EMMISSAO("Emissão:"), 
+		EMISSAO("Emissão:"), 
 		REFERENCIA("REFERENCIA.....:"), 
+		PAGAMENTO_BANCO("Pagamento em Banco"), 
+		TOTAL_ORCAMENTARIO("Total Orçamentário"), 
 		DEPENDENTES("DEPENDENTES:"), 
 		SETOR("SETOR:"), 
 		CPF("CPF:"), 
+		LOTACAO("Lotação.:"), 
 		ADMISSAO("Dta. Admiss.:"), 
 		CARGA_HORARIA("CARGA HORARIA:"), 
 		VANTAGEM("VANTAGENS..:"), 
@@ -25,6 +28,7 @@ public enum IdentificadorArquivoTarget {
 		VINCULO("Vínc"), 
 		INICIO_PAGAMENTOS("Vínc"), 
 		FIM_PAGAMENTOS("CPF:"), 
+		FUNDO_RESERVA("Fundo de Reserva"), 
 		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
 		TIPO("Tipo:"); 
 	
