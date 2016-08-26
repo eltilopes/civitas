@@ -9,6 +9,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
+import br.com.civitas.arquitetura.util.FacesUtils;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.enums.TipoArquivo;
@@ -46,6 +47,7 @@ public class CargoBean extends AbstractCrudBean<Cargo, CargoService>  implements
 
 	public void visuaizarCargosInativos(){
 		setCargosInativos(service.buscarTodosInativos());
+		setExisteCargosInativos(false);
 	}
 	
 	@Override
@@ -54,7 +56,12 @@ public class CargoBean extends AbstractCrudBean<Cargo, CargoService>  implements
 		getEntity().setLinhaCargo(null);
 		getEntity().setDescricao(getEntity().getDescricao().trim());
 		getEntity().setNumero(getEntity().getDescricao().substring(0,2).hashCode());
-		super.executeUpdate();
+		if(service.existeCargosInativos(getEntity())){
+			super.executeUpdate();
+		}else{
+			FacesUtils.addInfoMessage("Esse cargo já estava cadastrado!");
+			setCurrentState( STATE_SEARCH );
+		}
 		apagarCargosSemelhantes();
 		visuaizarCargosInativos();
 	}

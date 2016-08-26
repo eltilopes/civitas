@@ -59,6 +59,25 @@ public class CargoService extends AbstractPersistence<Cargo> {
 									  .list();
 	}
 	
+	public boolean existeCargosInativos(Cargo cargo) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT c FROM Cargo c ");
+		sql.append(" WHERE c.numero = :numero  ");
+		sql.append(" AND c.cidade = :cidade  ");
+		sql.append(" AND c.tipoArquivo = :tipoArquivo  ");
+		sql.append(" AND c.descricao = :descricao ");
+		sql.append(" AND c.id <> :id ");
+		sql.append(" AND c.ativo = true ");
+		
+		return getSessionFactory().getCurrentSession().createQuery(sql.toString())
+									  .setParameter("numero", cargo.getNumero())
+									  .setParameter("cidade", cargo.getCidade())
+									  .setParameter("id", cargo.getId())
+									  .setParameter("descricao", cargo.getDescricao())
+									  .setParameter("tipoArquivo", cargo.getTipoArquivo())
+									  .list().isEmpty();
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Cargo> buscarCidade(Cidade cidade) {
 		StringBuilder sql = new StringBuilder();
@@ -93,13 +112,14 @@ public class CargoService extends AbstractPersistence<Cargo> {
 		sql.append(" SELECT c FROM Cargo c ");
 		sql.append(" WHERE c.cidade = :cidade  ");
 		sql.append(" AND c.tipoArquivo = :tipoArquivo  ");
-		sql.append(" AND UPPER(c.linhaCargo) LIKE UPPER(:descricao) ");
+		sql.append(" AND UPPER(c.linhaCargo) LIKE UPPER(:descricaoUpper) ");
 		sql.append(" AND UPPER(c.descricao) <> UPPER(:descricao) ");
 		
 		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
 									  .setParameter("cidade", cidade)
 									  .setParameter("tipoArquivo", tipoArquivo)
-									  .setParameter("descricao", "%" + descricao + "%")
+									  .setParameter("descricaoUpper", "%" + descricao + "%")
+									  .setParameter("descricao", descricao)
 									  .list();
 	}
 	

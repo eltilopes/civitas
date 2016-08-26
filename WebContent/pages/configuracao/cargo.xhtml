@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://java.sun.com/jsf/core"
@@ -6,7 +6,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
 		
-	<ui:composition template="/new-template/template-crud.xhtml">
+	<ui:composition template="/new-template/template-crud.xhtml" >
     
     	<ui:define name="tituloPagina">
     		<h:outputText value="Cargo" />
@@ -58,7 +58,7 @@
 				<div class="row">
 					<div class="col-md-8 ">
 						<div class="form-group">
-							<h:outputText value="DescriÃ§Ã£o: " style="font-weight: normal;"/>
+							<h:outputText value="Descrição: " style="font-weight: normal;"/>
 							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
 							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
 						</div>
@@ -82,7 +82,7 @@
 		</ui:define>
 	
 		<ui:define name="resultFiltro" >
-			<p:dataTable id="cargosInativos" styleClass="table table-responsive table-mobile"
+			<p:dataTable id="cargosInativos" styleClass="table table-responsive table-mobile" 
 		   			 widgetVar="tabelaCargosInativos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
 			 		 value="#{bean.cargosInativos}" var="cargoInativo" paginator="#{bean.cargosInativos.size() > 0}"
 			 		 rendered="#{bean.cargosInativos.size() > 0}" paginatorPosition="bottom"
@@ -103,11 +103,11 @@
 					 </p:column>
 			 		 
 			 		 <p:column headerText="Tipo Arquivo" >
-						<h:outputText value="#{cargoInativo.tipoArquivo.descricao}" />
+						<h:outputText value="#{cargoInativo.tipoArquivo.descricao}" escape="false"/>
 					 </p:column>
 			
-			 		 <p:column headerText="ObservaÃ§Ãµes" >
-						<h:outputText value="#{cargoInativo.linhaCargo}" />
+			 		 <p:column headerText="Observações" >
+						<h:outputText value="#{cargoInativo.linhaCargo}" escape="false" />
 					 </p:column>
 			
 			</p:dataTable> 
@@ -126,11 +126,11 @@
 						<h:outputText value="#{cargo.tipoArquivo.descricao}" />
 					 </p:column>
 			
-			 		 <p:column headerText="DescriÃ§Ã£o" >
+			 		 <p:column headerText="Descrição" >
 						<h:outputText value="#{cargo.descricao}" />
 					 </p:column>
 			
-			 		 <p:column headerText="NÃºmero" >
+			 		 <p:column headerText="Número" >
 						<h:outputText value="#{cargo.numero}" />
 					 </p:column>
 			
@@ -160,21 +160,21 @@
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group">
-					<h:outputText value="DescriÃ§Ã£o: " style="font-weight: normal;"/>
+					<h:outputText value="Descrição: " style="font-weight: normal;"/>
 					<h:inputText id="nomeInsert" styleClass="form-control" value="#{bean.entity.descricao}" />
 					<h:message for="nomeInsert" tooltip="true" styleClass="error-messages" />
 				</div>
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group">
-					<h:outputText value="NÃºmero: " style="font-weight: normal;"/>
+					<h:outputText value="Número: " style="font-weight: normal;"/>
 					<h:inputText id="numeroInsert" styleClass="form-control" disabled="true" value="#{bean.entity.numero}" />
 					<h:message for="numeroInsert" tooltip="true" styleClass="error-messages" />
 				</div>
 			</div>
 			<div class="row" >	
 				<div class="col-md-6 form-group" >
-					<h:outputText value="ObservaÃ§Ã£o: " style="font-weight: normal;"/>
+					<h:outputText value="Observação: " style="font-weight: normal;"/>
 					<h:inputText id="linhaInsert" styleClass="form-control" value="#{bean.entity.linhaCargo}" />
 					<h:message for="linhaInsert" tooltip="true" styleClass="error-messages" />
 				</div>
@@ -183,7 +183,7 @@
 				<div class="col-md-9 form-group">
 					<div class="alert alert-warning" role="alert">
 						<span class="glyphicon glyphicon-exclamation-sign"></span>
-						Ã‰ importante que a DescriÃ§Ã£o do Cargo, seja igual a que esta na ObservaÃ§Ã£o.
+						É importante que a Descrição do Cargo, seja igual a que esta na Observação.
 					</div>
 				</div>
 			</div>	

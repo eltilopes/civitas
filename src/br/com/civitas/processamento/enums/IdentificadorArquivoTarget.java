@@ -17,7 +17,7 @@ public enum IdentificadorArquivoTarget {
 		CPF("CPF:"), 
 		LOTACAO("Lotação.:"), 
 		ADMISSAO("Dta. Admiss.:"), 
-		CARGA_HORARIA("CARGA HORARIA:"), 
+		CARGA_HORARIA("CH:"), 
 		VANTAGEM("VANTAGENS..:"), 
 		DESCONTO("DESCONTOS..:"), 
 		ESPACO_NA_LINHA(" ")	,	

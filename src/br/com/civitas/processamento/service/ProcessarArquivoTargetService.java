@@ -66,6 +66,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  UnidadeTrabalho unidadeTrabalho;
 	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
+	private  Cargo cargo;
 	private  List<Pagamento> pagamentos;
 	private  List<Matricula> matriculas;
 	private  boolean processamentoPagamentoAtivo = false;
@@ -243,16 +244,18 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void localizarSecretaria(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoTarget.ORGAO.getDescricao()) 	){
 			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
-			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAnterior), linhaAnterior);
+		}
+		if(linhaAtual.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao()) 	){
+			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
 		}
 	}
 
 	private UnidadeTrabalho getUnidadeTrabalho(String linha) throws ApplicationException {
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
-			int posicaoPrimeiroNumero = posicaoPrimeiroNumero(linha);
-			String codigo = linha.substring(posicaoPrimeiroNumero, linha.length()).trim();
-			String descricaoUnidadeTrabalho = linha.substring(0, posicaoPrimeiroNumero).trim();
+			String unidadeTrabalhoString = linha.substring(linha.indexOf(IdentificadorArquivoTarget.LOTACAO.getDescricao()) + IdentificadorArquivoTarget.LOTACAO.getDescricao().length(), linha.length()).trim();
+			String codigo = unidadeTrabalhoString.substring(0, unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()));
+			String descricaoUnidadeTrabalho = unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(codigo) + codigo.length(), unidadeTrabalhoString.length()).trim();
 			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			unidadeTrabalho.setDescricao(descricaoUnidadeTrabalho); 
@@ -263,16 +266,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		return unidadeTrabalho;
 	}
 	
-	private int posicaoPrimeiroNumero(String linha) {
-	    char[] c = linha.toCharArray();
-	    for ( int i = 0; i < c.length; i++ ){
-	        if ( Character.isDigit( c[ i ] ) ) {
-	            return i;
-	        }
-	    }
-	    return linha.length();
-	}
-
 	private Secretaria getSecretaria(String linhaAtual) throws ApplicationException {
 		Secretaria secretaria = new Secretaria();
 		try {
@@ -322,26 +315,38 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())	){
+		if(processamentoPagamentoAtivo  &&	localizarCargo(linhaAtual)	){
+			cargo = getCargo();
 			String numeroMatricula = getNumeroMatricula();
 			verificarPagamento(numeroMatricula);
 			novaMatricula(numeroMatricula, linhaAtual);
+			matricula.setCargo(cargo);
 		}
 		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao())	){
 			matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
 			matricula.setVinculo(getVinculo(getVinculo(linhaAtual), linhaAtual));
-			matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
 			matricula.setCargaHoraria(getCargaHoraria(linhaAtual));
 		}
 	}
 
+	private boolean localizarCargo(String linha ) {
+		return ((linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())
+				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
+				|| linha.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao()))
+
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TOTAL_ORCAMENTARIO.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TIPO.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.FUNDO_RESERVA.getDescricao())
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao()));
+	}
+	
 	private int getCargaHoraria(String linhaAtual) throws ApplicationException {
 		int cargaHorariaNumero = 0;
 		try {
-			String cargaHoraria = linhaAtual.substring(linhaAtual.indexOf(
-					IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao()) + IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao().length(),
-					linhaAtual.length()).trim();
-			cargaHorariaNumero = Integer.parseInt(cargaHoraria.trim());
+			String cargaHoraria = linhaAtual.substring(0,linhaAtual.indexOf(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao())).trim();
+			cargaHorariaNumero = Integer.parseInt(cargaHoraria.substring(cargaHoraria.lastIndexOf(
+					IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()), cargaHoraria.length()).trim());
 		} catch (Exception e) {
 			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);
 		}
@@ -365,7 +370,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private String getNumeroMatricula() throws Exception {
-		String numeroMatricula = linhaAnterior.substring(0,5).trim();
+		String numeroMatricula = linhaAnterior.substring(linhaAnterior.indexOf(cargo.getDescricao()) + cargo.getDescricao().length(), linhaAnterior.length()).trim();
 		Integer numero = 0;
 		try {
 			numero = Integer.parseInt(numeroMatricula.replace("-", ""));
@@ -388,58 +393,28 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		matricula.setSetor(setor);
 		matricula.setUnidadeTrabalho(unidadeTrabalho);
 		matricula.setNumeroMatricula(numeroMatricula);
-		matricula.setNomeFuncionario(getNomeFuncionario(linhaAtual));;
+		matricula.setNomeFuncionario(getNomeFuncionario());;
 		matriculas.add(matricula);
 		pagamento.setMatricula(matricula);
 	}
 
-	private Cargo getCargo(String linhaAtual) throws ApplicationException {
-		Cargo cargo = new Cargo();
-		try {
-			String descricao = linhaAtual.substring(0,
-								linhaAtual.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao())).toUpperCase().trim();
-			Integer numero = descricao.substring(0,2).hashCode();
-			cargo.setCidade(getArquivoPagamento().getCidade());
-			cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			cargo.setNumero(numero); 
-			cargo.setDescricao(descricao);
-		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Cargo. Linha: " + linhaAtual);
+	private Cargo getCargo() {
+		for(Cargo cargo : getCargos()){
+			if(linhaAnterior.contains(cargo.getDescricao())){
+				return cargo;
+			}
 		}
-		return cargo;
+		return null;
 	}
 
-	private String getNomeFuncionario(String linha) throws ApplicationException {
-
-		System.out.println(linhaAnterior);
-//		String[] palavras = linhaAnterior.split(" ");
-//		for(String palavra : palavras){
-//			JLabel label = new JLabel(palavra);
-//			System.out.println(palavra + " = " + label.getFont().isBold() );
-//			System.out.println(palavra + " = " + label.getFont().getName() );
-//			System.out.println(palavra + " = " + label.getFont().getFontName() );
-//			System.out.println(palavra + " = " + label.getFont().getStyle() );
-//			System.out.println(palavra + " = " + label.getFont().getSize() );
-//		}
-		
-		
-//		String nome= "";
-//		try {
-//			nome = linha.substring(
-//					linha.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + 1,
-//					linha.indexOf(IdentificadorArquivoTarget.CPF.getDescricao()) ).toUpperCase().trim();
-//		} catch (Exception e) {
-//			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);
-//		}
-//		return nome ;
-		return linha;
-		
+	private String getNomeFuncionario() throws ApplicationException {
+		return linhaAnterior.substring(0,linhaAnterior.indexOf(cargo.getDescricao())).trim();
 	}
 
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			String descricao = linha.substring(11, linha.indexOf(IdentificadorArquivoTarget.ADMISSAO.getDescricao()) ).trim();
+			String descricao = linha.substring(11, linha.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()) ).trim();
 			Integer numero = descricao.substring(0,2).hashCode();
 			vinculo.setNumero(numero); 
 			vinculo.setDescricao(descricao);
