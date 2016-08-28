@@ -237,6 +237,9 @@ public abstract class ProcessarArquivoPagamento {
 	}
 	
 	public UnidadeTrabalho getUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho, String linha) {
+		if(unidadeTrabalho == null){
+			return null;
+		}
 		UnidadeTrabalho unidadeTrabalhoAuxiliar = new UnidadeTrabalho();
 		try {
 			unidadeTrabalhoAuxiliar = getUnidadeTrabalho(unidadeTrabalho);
@@ -254,6 +257,7 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private UnidadeTrabalho getUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
 		for(UnidadeTrabalho ut : unidadesTrabalho){
+			System.out.println(ut.getDescricao());
 			if(ut.getCidade().getId().equals(unidadeTrabalho.getCidade().getId()) && 
 					ut.getTipoArquivo().getCodigo()==unidadeTrabalho.getTipoArquivo().getCodigo() && 
 					ut.getDescricao().equals(unidadeTrabalho.getDescricao()) &&

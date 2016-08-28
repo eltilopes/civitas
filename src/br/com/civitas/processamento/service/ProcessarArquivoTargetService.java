@@ -3,6 +3,7 @@ package br.com.civitas.processamento.service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
+import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
-import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
@@ -62,9 +63,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  Pagamento pagamento;
 	private  Matricula matricula;
 	private  Secretaria secretaria;
-	private  NivelPagamento nivelPagamento;
 	private  UnidadeTrabalho unidadeTrabalho;
-	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
 	private  Cargo cargo;
 	private  List<Pagamento> pagamentos;
@@ -118,8 +117,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		matricula = null;
 		secretaria = null;
 		setor = null;
-		nivelPagamento = null;
-		cargaHorariaPagamento = null;
+		unidadeTrabalho = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
 		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -159,16 +157,20 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 	
 	private void verificarIdentificadorEvento(String linha) {
-		if(linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && linhaAnterior.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())){
+		if(linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
 			processamentoEventos = true;
 		}
-		if((linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) || fimPagina(linha)) && processamentoEventos ){
+		if(processamentoEventos && (linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao()) || linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) || fimPagina(linha)) ){
 			processamentoEventos = false;
 		}
 	}
 
 	private boolean fimPagina(String linha) {
-		return linha.toUpperCase().contains(getArquivoPagamento().getCidade().getDescricao().toUpperCase());
+		return linha.toUpperCase().contains(removerAcentos(getArquivoPagamento().getCidade().getDescricao().toUpperCase()));
+	}
+	
+	public String removerAcentos(String str) {
+		return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
 
 	private void verificarIdentificadorResumoSetor(String linha) {
@@ -182,15 +184,44 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		verificarIdentificadorPagamento(linhaAtual);
-		localizarSecretaria(linhaAtual);
+		localizarSecretariaSetor(linhaAtual);
+		localizarUnidadeTrabalho(linhaAtual);
 		localizarMatricula(linhaAtual);
+		localizarNivelPagamento(linhaAtual);
+		localizarDataAdmissao(linhaAtual); 
+		localizarCargaHoraria(linhaAtual); 
+		localizarVinculo(linhaAtual); 
 		localizarEventosPagamento(linhaAtual);
 		finalizarPagamento(linhaAtual);
 	}
 	
+	//TODO: ajustar aqui o nivel de pagamento 
+	private void localizarNivelPagamento(String linhaAtual) {
+		if(linhaAtual.contains(IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao()) 	){
+			matricula.setNivelPagamento(getNivelPagamento(getNivelPagamento(linhaAtual), linhaAtual));
+		}
+	}
+
+	private NivelPagamento getNivelPagamento(String linhaAtual) {
+		NivelPagamento nivelPagamento = new NivelPagamento();
+		try {
+			String descricao = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao()) + IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao().length(),linhaAtual.length()).trim() ;
+			descricao = descricao.substring(descricao.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + IdentificadorArquivoTarget.HIFEN.getDescricao().length(), descricao.length()).trim(); 
+			nivelPagamento.setCidade(getArquivoPagamento().getCidade());
+			nivelPagamento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+			nivelPagamento.setDescricao(descricao); 
+			nivelPagamento.setCodigo(descricao.hashCode() + ""); 
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar o Nível Pagamento. Linha: " + linhaAtual);
+		}
+		return nivelPagamento;
+	}
+
 	private void finalizarPagamento(String linhaAtual) {
-		if(processamentoPagamentoAtivo  && !processamentoEventos && isTotalPagamento(linhaAtual)){
-			setTotaisPagamento(linhaAtual);
+		if(linhaAtual.contains(IdentificadorArquivoTarget.TOTAIS.getDescricao())){
+			if( !processamentoPagamentoAtivo  && !processamentoEventos && isTotalPagamento(linhaAtual)){
+				setTotaisPagamento(linhaAtual);
+			}
 		}
 	}
 
@@ -212,7 +243,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			pagamento.setTotalRemuneracao(0d);
 			pagamento.setTotalProventos(Double.parseDouble(valores[0].replace(".","").replace(",", ".").trim()));
 			pagamento.setTotalDescontos(Double.parseDouble(valores[1].replace(".","").replace(",", ".").trim()));
-			pagamento.setTotalLiquido(Double.parseDouble(valores[2].replace(".","").replace(",", ".").trim()));
+			pagamento.setTotalLiquido(Double.parseDouble(valores[2].replace(IdentificadorArquivoTarget.CPF.getDescricao(), "").replace(".","").replace(",", ".").trim()));
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar Totais de Pagamento. Linha: " + linhaAtual);
 		}
@@ -233,6 +264,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
 		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
+			localizarDiasTrabalhados(linhaAtual);
 			for(Evento evento : getEventos()){
 				if(linhaAtual.toUpperCase().contains(evento.getNome().toUpperCase())){
 						pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
@@ -241,25 +273,51 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		}	
 	}
 
-	private void localizarSecretaria(String linhaAtual) {
+	private void localizarDiasTrabalhados(String linhaAtual) {
+		getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.SALARIO_BASE.getDescricao());
+		getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao());
+	}
+
+	private void getDiasTrabalhados(String linhaAtual, String descricaoIdentificador) {
+		if(linhaAtual.contains(descricaoIdentificador)){
+			String dias = linhaAtual.substring(
+					linhaAtual.indexOf(descricaoIdentificador) 
+					+ descricaoIdentificador.length()).trim();
+			dias = dias.substring(0, dias.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao())).trim();
+			pagamento.setDiasTrabalhados(dias);
+		}
+	}
+
+	private void localizarSecretariaSetor(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoTarget.ORGAO.getDescricao()) 	){
 			secretaria = getSecretaria(getSecretaria(linhaAtual), linhaAtual);
+			setor = getSetor(getSetor(), linhaAnterior);
 		}
+	}
+
+	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao()) 	){
 			unidadeTrabalho = getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual);
 		}
 	}
 
 	private UnidadeTrabalho getUnidadeTrabalho(String linha) throws ApplicationException {
+		if(linha.contains("01/08/2014")){
+			System.out.println(linha);
+		}
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
 			String unidadeTrabalhoString = linha.substring(linha.indexOf(IdentificadorArquivoTarget.LOTACAO.getDescricao()) + IdentificadorArquivoTarget.LOTACAO.getDescricao().length(), linha.length()).trim();
 			String codigo = unidadeTrabalhoString.substring(0, unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()));
-			String descricaoUnidadeTrabalho = unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(codigo) + codigo.length(), unidadeTrabalhoString.length()).trim();
-			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
-			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			unidadeTrabalho.setDescricao(descricaoUnidadeTrabalho); 
-			unidadeTrabalho.setCodigo(Integer.parseInt(codigo)); 
+			unidadeTrabalhoString = unidadeTrabalhoString.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), "").length() < 2 ? "" :  unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + IdentificadorArquivoTarget.HIFEN.getDescricao().length(), unidadeTrabalhoString.length()).trim();
+			if(StringUtils.notNullOrEmpty(unidadeTrabalhoString)){
+				unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
+				unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+				unidadeTrabalho.setDescricao(unidadeTrabalhoString); 
+				unidadeTrabalho.setCodigo(Integer.parseInt(codigo)); 
+			}else {
+				unidadeTrabalho = null;
+			}
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Unidade Trabalho. Linha: " + linha);
 		}
@@ -282,8 +340,31 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		return secretaria;
 	}
 	
+	private Setor getSetor() throws ApplicationException {
+		Setor setor = new Setor();
+		try {
+			String descricao = new StringBuffer(linhaAnterior.trim()).reverse().toString();
+			
+			setor.setCidade(getArquivoPagamento().getCidade());
+			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+			setor.setDescricao(new StringBuffer(descricao.substring(posicaoPrimeiraLetra(descricao) + 1, descricao.length())).reverse().toString());
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar o Setor. Linha: " + linhaAnterior);
+		}
+		return setor;
+	}
+	
+	private int posicaoPrimeiraLetra(String palavra){
+		int posicao = 0;
+		for(Character c : palavra.toCharArray()){
+			if(!Character.isDigit(c))	return posicao;
+			posicao++;
+		}
+		return posicao;
+	}
+	
 	private  void verificarIdentificadorPagamento(String linha) {
-		if(linha.contains(IdentificadorArquivoTarget.INICIO_PAGAMENTOS.getDescricao())){
+		if(localizarCargo(linha)){
 			processamentoPagamentoAtivo = true;
 		}
 		if(processamentoPagamentoAtivo  &&  linha.contains(IdentificadorArquivoTarget.FIM_PAGAMENTOS.getDescricao()) 	){
@@ -320,12 +401,23 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			String numeroMatricula = getNumeroMatricula();
 			verificarPagamento(numeroMatricula);
 			novaMatricula(numeroMatricula, linhaAtual);
-			matricula.setCargo(cargo);
 		}
+	}
+
+	private void localizarDataAdmissao(String linhaAtual) {
 		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao())	){
 			matricula.setDataAdmissao(getDataAdmissao(linhaAtual));
-			matricula.setVinculo(getVinculo(getVinculo(linhaAtual), linhaAtual));
-			matricula.setCargaHoraria(getCargaHoraria(linhaAtual));
+		}
+	}
+
+	private void localizarVinculo(String linhaAtual) {
+		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())	){
+			matricula.setVinculo(getVinculo(getVinculo(linhaAtual), linhaAtual));}
+	}
+	
+	private void localizarCargaHoraria(String linhaAtual) {
+		if(processamentoPagamentoAtivo  &&	linhaAtual.contains(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao())	){
+			matricula.setCargaHoraria(getCargaHoraria(linhaAtual));	
 		}
 	}
 
@@ -345,10 +437,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		int cargaHorariaNumero = 0;
 		try {
 			String cargaHoraria = linhaAtual.substring(0,linhaAtual.indexOf(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao())).trim();
-			cargaHorariaNumero = Integer.parseInt(cargaHoraria.substring(cargaHoraria.lastIndexOf(
-					IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()), cargaHoraria.length()).trim());
+			cargaHoraria = cargaHoraria.substring(cargaHoraria.lastIndexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao(), cargaHoraria.length())).trim();
+			cargaHorariaNumero = Integer.parseInt(cargaHoraria);
 		} catch (Exception e) {
-			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);
+			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAtual);
 		}
 		return cargaHorariaNumero;
 	}
@@ -388,12 +480,11 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);
-		matricula.setNivelPagamento(nivelPagamento);
-		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
-		matricula.setSetor(setor);
 		matricula.setUnidadeTrabalho(unidadeTrabalho);
+		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);
-		matricula.setNomeFuncionario(getNomeFuncionario());;
+		matricula.setNomeFuncionario(getNomeFuncionario());
+		matricula.setCargo(cargo);
 		matriculas.add(matricula);
 		pagamento.setMatricula(matricula);
 	}
@@ -414,7 +505,8 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			String descricao = linha.substring(11, linha.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao()) ).trim();
+			String descricao = linha.substring(11, linha.indexOf(IdentificadorArquivoTarget.ADMISSAO.getDescricao()) ).trim();
+			descricao = descricao.replace(matricula.getCargaHoraria() + "", "").replace(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao(), "").trim();
 			Integer numero = descricao.substring(0,2).hashCode();
 			vinculo.setNumero(numero); 
 			vinculo.setDescricao(descricao);
