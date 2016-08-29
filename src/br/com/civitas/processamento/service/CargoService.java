@@ -2,6 +2,7 @@ package br.com.civitas.processamento.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.Query;
 import org.springframework.stereotype.Service;
@@ -97,13 +98,26 @@ public class CargoService extends AbstractPersistence<Cargo> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Cargo> buscarTodosInativos() {
+	public List<Cargo> buscarTodosInativos(Cargo cargo) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT c FROM Cargo c ");
 		sql.append("INNER JOIN FETCH c.cidade cid ");
 		sql.append(" WHERE c.ativo = false ");
+		sql.append(Objects.nonNull(cargo.getCidade()) ? "AND cid = :cidade " : "");
+		sql.append(Objects.nonNull(cargo.getDescricao()) ? "AND UPPER(c.descricao) <> UPPER(:descricao) " : "");
+		sql.append(Objects.nonNull(cargo.getTipoArquivo()) ? "AND c.tipoArquivo = :tipoArquivo " : "");
 		sql.append(" ORDER BY cid.descricao ASC ");
-		return  getSessionFactory().getCurrentSession().createQuery(sql.toString()).list();
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		if(Objects.nonNull(cargo.getCidade())){
+			query.setParameter("cidade", cargo.getCidade());
+		}
+		if(Objects.nonNull(cargo.getDescricao())){
+			query.setParameter("descricao", cargo.getDescricao());
+		}
+		if(Objects.nonNull(cargo.getTipoArquivo())){
+			query.setParameter("tipoArquivo", cargo.getTipoArquivo());
+		}
+		return query.list();
 	}
 
 	@SuppressWarnings("unchecked")

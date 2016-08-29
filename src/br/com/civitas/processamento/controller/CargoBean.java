@@ -1,6 +1,7 @@
 package br.com.civitas.processamento.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -46,7 +47,7 @@ public class CargoBean extends AbstractCrudBean<Cargo, CargoService>  implements
 	}
 
 	public void visuaizarCargosInativos(){
-		setCargosInativos(service.buscarTodosInativos());
+		setCargosInativos(service.buscarTodosInativos(getEntitySearch()));
 		setExisteCargosInativos(false);
 	}
 	
@@ -67,7 +68,19 @@ public class CargoBean extends AbstractCrudBean<Cargo, CargoService>  implements
 	}
 	
 	private void apagarCargosSemelhantes() {
-		service.removeAll(service.buscarTipoArquivoCidadeDescricao(getEntity().getCidade(), getEntity().getTipoArquivo(), getEntity().getDescricao()));
+		List<Cargo> cargosSemelhantes = service.buscarTipoArquivoCidadeDescricao(getEntity().getCidade(), getEntity().getTipoArquivo(), getEntity().getDescricao());
+		List<Cargo> cargosNaoSemelhantes = new ArrayList<Cargo>();
+		for(Cargo cargo : cargosSemelhantes){
+			String numeroMatricula = cargo.getLinhaCargo().substring(cargo.getLinhaCargo().length() -7, cargo.getLinhaCargo().length()).trim();
+			String descricaoCargoSemelhante = cargo.getLinhaCargo().substring(
+							cargo.getLinhaCargo().indexOf(getEntity().getDescricao()), 
+							cargo.getLinhaCargo().indexOf(numeroMatricula)).trim();
+			if(!descricaoCargoSemelhante.equals(getEntity().getDescricao())){
+				cargosNaoSemelhantes.add(cargo);
+			}
+		}
+		cargosSemelhantes.removeAll(cargosNaoSemelhantes);
+		service.removeAll(cargosSemelhantes);
 	}
 
 	public void prepararUpdate(Cargo cargoInativo) {

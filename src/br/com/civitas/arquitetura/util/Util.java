@@ -85,6 +85,24 @@ public class Util {
 		return zeros + valor;
 	}
 	
+	public static int posicaoPrimeiraLetra(String palavra){
+		int posicao = 0;
+		for(Character c : palavra.toCharArray()){
+			if(!Character.isDigit(c))	return posicao;
+			posicao++;
+		}
+		return posicao;
+	}
+
+	public static int posicaoPrimeiraNumero(String palavra){
+		int posicao = 0;
+		for(Character c : palavra.toCharArray()){
+			if(Character.isDigit(c))	return posicao;
+			posicao++;
+		}
+		return posicao;
+	}
+	
 	public static String logTime(DateTime dataInicio, DateTime dataFim){
 		PeriodFormatter periodFormatter = new PeriodFormatterBuilder().printZeroAlways()
 																	  .minimumPrintedDigits(2)
