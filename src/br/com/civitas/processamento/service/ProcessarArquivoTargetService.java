@@ -158,7 +158,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 	
 	private void verificarIdentificadorEvento(String linha) {
-		if(linha.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
+		if(linhaAnterior.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && 
+				(linha.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())		)){
 			processamentoEventos = true;
 		}
 		if(processamentoEventos && (linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao()) || linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) || fimPagina(linha)) ){
@@ -456,9 +458,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private String getNumeroMatricula() throws Exception {
-		if(linhaAnterior.contains("4729259")){
-			System.out.println("4729259");
-		}
 		String numeroMatricula = linhaAnterior.substring(linhaAnterior.indexOf(cargo.getDescricao()) + cargo.getDescricao().length(), linhaAnterior.length()).trim();
 		Integer numero = 0;
 		try {
