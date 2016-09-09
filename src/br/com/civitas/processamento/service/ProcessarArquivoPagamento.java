@@ -257,7 +257,6 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private UnidadeTrabalho getUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
 		for(UnidadeTrabalho ut : unidadesTrabalho){
-			System.out.println(ut.getDescricao());
 			if(ut.getCidade().getId().equals(unidadeTrabalho.getCidade().getId()) && 
 					ut.getTipoArquivo().getCodigo()==unidadeTrabalho.getTipoArquivo().getCodigo() && 
 					ut.getDescricao().equals(unidadeTrabalho.getDescricao()) &&

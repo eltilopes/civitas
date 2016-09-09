@@ -68,7 +68,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<h:outputText value="Cidade " />
-						<p:selectOneMenu id="cidadeSearch"
+						<p:selectOneMenu id="cidadeSearch" style="width: auto !important;"
 							value="#{bean.entitySearch.arquivo.cidade}"
 							converter="entityConverter" styleClass="form-control">
 							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
@@ -174,20 +174,22 @@
 						</div>
 					</div>
 				</div>
-				<div class="row" >
-					<div class="col-md-4">
-						<div class="form-group" style="width: 100% !important" >
-							<h:outputText value="Selecione os Eventos a serem exibidos" />
-							<p:selectManyMenu id="eventos" 
-								value="#{bean.eventosSelecionados}" converter="entityConverter"
-								var="evento" filter="true" filterMatchMode="contains"
-								showCheckbox="true" styleClass="form-control">
-								<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
-									itemLabel="#{e.nome}" itemValue="#{e}" />
-								<p:column>
-									<h:outputText value="#{evento.nome}" />
-								</p:column>
-							</p:selectManyMenu>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputText value="Selecione os Eventos a serem exibidos" />
+								<p:selectManyMenu id="eventos" style="height: 100px !important;"
+									value="#{bean.eventosSelecionados}" converter="entityConverter"
+									var="evento" filter="true" filterMatchMode="contains"
+									showCheckbox="true" styleClass="form-control">
+									<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
+										itemLabel="#{e.nome}" itemValue="#{e}" />
+									<p:column>
+										<h:outputText value="#{evento.nome}" />
+									</p:column>
+								</p:selectManyMenu>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -202,8 +204,7 @@
 	<ui:define name="botoesInsertFiltro">
 
 		<h:commandLink id="confirma" process="@this"
-			class="btn btn-primary tool-tip"
-			rendered="true"
+			class="btn btn-primary tool-tip" rendered="true"
 			actionListener="#{bean.exportarExcel()}"> Exportar Excel
 				<p:fileDownload value="#{bean.arquivoExcel}" />
 		</h:commandLink>
@@ -211,22 +212,23 @@
 	</ui:define>
 
 	<ui:define name="resultFiltro">
+		<div class="table-responsive">
+			<p:dataTable id="arquivos" tableStyle="width:auto !important" 
+				tableStyleClass="table table-responsive table-mobile"  resizableColumns="true"
+				widgetVar="tabelaPagamentos" rows="10"
+				emptyMessage="Nenhum Pagamento foi encontrado."
+				value="#{bean.pagamentosMap}" var="mapVO" paginator="true"
+				rendered="true" paginatorPosition="bottom"
+				rowStyleClass="bgLinha1,bgLinha2">
 
-		<p:dataTable id="arquivos"
-			styleClass="table table-responsive table-mobile"
-			widgetVar="tabelaPagamentos" rows="10"
-			emptyMessage="Nenhum Pagamento foi encontrado."
-			value="#{bean.pagamentosMap}" var="mapVO"
-			paginator="true" rendered="true" paginatorPosition="bottom"
-			rowStyleClass="bgLinha1,bgLinha2">
-
-			<p:columns value="#{bean.pagamentosColumnsMap}" var="column"  >
-				<f:facet name="header">  
-                     #{column}  
-                 </f:facet>
-				 #{bean.getObject(column, mapVO)}	
-                </p:columns>
-		</p:dataTable>
+				<p:columns value="#{bean.pagamentosColumnsMap}" var="column" >
+					<f:facet name="header" >  
+	                     #{column}  
+	                 </f:facet>
+					 #{bean.getObject(column, mapVO)}	
+	                </p:columns>
+			</p:dataTable>
+		</div>
 	</ui:define>
 
 </ui:composition>

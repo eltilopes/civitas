@@ -3,7 +3,10 @@ package br.com.civitas.processamento.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
@@ -51,15 +54,22 @@ public class EventoService extends AbstractPersistence<Evento> {
 									  .list();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	public List<Evento> buscarCidade(Cidade cidade) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT DISTINCT e FROM Evento e ");
-		sql.append(" WHERE e.cidade = :cidade  ");
-		sql.append(" ORDER BY e.nome  ");
-		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
-									  .setParameter("cidade", cidade)
-									  .list();
+		sql.append(" select e.nm_nome as nome, e.nm_chave as chave, cast(e.ci_evento as bigint) as id  from tb_evento e ");
+		sql.append(" left join tb_evento_pagamento ep ON ep.cd_evento = e.ci_evento ");
+		sql.append(" where e.cd_cidade = :cidade ");
+		sql.append(" group by e.nm_nome, e.ci_evento,  e.nm_chave ");
+		sql.append(" order by count(ep.ci_evento_pagamento ) desc ");
+		
+		Session session = (Session) getSessionFactory().getCurrentSession();
+		org.hibernate.Query query = session.createSQLQuery(sql.toString())
+				.addScalar("id", Hibernate.LONG)
+				.addScalar("nome")
+				.addScalar("chave");
+		query.setResultTransformer(Transformers.aliasToBean(Evento.class));
+		return  query.setParameter("cidade", cidade.getId()).list();
 	}
 
 }

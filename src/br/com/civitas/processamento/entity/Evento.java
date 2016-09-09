@@ -21,7 +21,7 @@ import br.com.civitas.processamento.enums.TipoArquivo;
 
 @Entity
 @Table(name = "tb_evento")
-public class Evento implements IEntity {
+public class Evento implements IEntity, Comparable<Evento> {
 
 	private static final long serialVersionUID = -176970653069185670L;
 	
@@ -101,6 +101,11 @@ public class Evento implements IEntity {
 
 	public void setTipoArquivo(TipoArquivo tipoArquivo) {
 		this.tipoArquivo = tipoArquivo;
+	}
+
+	@Override
+	public int compareTo(Evento o) {
+		return o.getNome().compareTo(this.nome);
 	}
 
 }
