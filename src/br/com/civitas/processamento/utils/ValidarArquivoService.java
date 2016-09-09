@@ -75,6 +75,10 @@ public class ValidarArquivoService {
 		lancarExcessaoAno = true;
 		nomeArquivoPdfTemporario = null;
 		nomeArquivoTxtTemporario = null;
+		linhasComCargo = new ArrayList<String>();
+		cargosValidados = new ArrayList<String>();
+		cargos = null;
+		linhaAnterior = "";
 	}
 
 	private void validarTipoArquivo() {

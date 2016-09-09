@@ -51,6 +51,7 @@ public class CargoService extends AbstractPersistence<Cargo> {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT c FROM Cargo c ");
 		sql.append(" WHERE c.cidade = :cidade  ");
+		sql.append(" AND c.ativo = true  ");
 		sql.append(" AND c.tipoArquivo = :tipoArquivo  ");
 		sql.append(" ORDER BY length(c.descricao) DESC  ");
 		
