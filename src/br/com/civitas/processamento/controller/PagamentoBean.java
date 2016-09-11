@@ -109,6 +109,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<Evento> eventosSelecionados;
 	private List<Map<String, Object>> pagamentosMap;
 	private List<String> pagamentosColumnsMap;
+	private Map<String, Double> somatorioValores;
 	
 	private Setor setor;
 	private Secretaria secretaria;
@@ -169,7 +170,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private void popularEventosSelecionados(List<Pagamento> list) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		pagamentosMap  = new ArrayList<Map<String, Object>>();
 		pagamentosColumnsMap = getListFields();
+		somatorioValores = new HashMap<String, Double>();
 		for(Pagamento pagamento : list){
+			setTotaisValores(pagamento.getTotalProventos(), PagamentoVO.proventosColuna());
 			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
 			if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
 				int i = 0;
@@ -177,6 +180,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 					for(EventoPagamento ep : pagamento.getEventosPagamento()){
 						if(evento.getChave().equals(ep.getEvento().getChave())){
 							pagamento.getEventosPagamentoSelecionados().add(ep);
+							setTotaisValores(ep.getValor(), evento.getNome());
 						}
 					}
 					if(pagamento.getEventosPagamentoSelecionados().size() == i++){
@@ -186,6 +190,17 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			}
 			pagamentosMap.add( getMapValueFields(pagamento));
 		}
+	}
+
+	private void setTotaisValores(Double valor, String chave) {
+		if(!somatorioValores.containsKey(chave)){
+			somatorioValores.put(chave, 0.0); 
+		}
+		somatorioValores.put(chave, somatorioValores.get(chave) + valor); 
+	}
+	
+	public Double getSomatorio(String chave) {
+		return somatorioValores.containsKey(chave) ? somatorioValores.get(chave) : null;
 	}
 
 	public String getObject(String chave, HashMap<String, Object> mapa) {
@@ -471,6 +486,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void setPagamentosColumnsMap(List<String> pagamentosColumnsMap) {
 		this.pagamentosColumnsMap = pagamentosColumnsMap;
+	}
+
+	public Map<String, Double> getSomatorioValores() {
+		return somatorioValores;
+	}
+
+	public void setSomatorioValores(Map<String, Double> somatorioValores) {
+		this.somatorioValores = somatorioValores;
 	}
 
 }

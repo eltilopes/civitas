@@ -121,7 +121,8 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		unidadeTrabalho = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
-		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidadeAno(getArquivoPagamento().getCidade(), 
+				getArquivoPagamento().getTipoArquivo(),getArquivoPagamento().getAno()));
 		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -146,7 +147,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private String getChaveEvento(String linha) {
 		try {
 			int posicaoInicialIdentificador = 0 ;
-			int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) ;
+			int posicaoPrimeiraVirgula = linha.lastIndexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) ;
 			String linhaInvertida = new StringBuffer(linha.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
 			int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
 			posicaoEspacoLinhaInvertida = posicaoEspacoLinhaInvertida  + 1 + linhaInvertida.substring(posicaoEspacoLinhaInvertida + 1).indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
@@ -209,14 +210,20 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		try {
 			String descricao = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao()) + IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao().length(),linhaAtual.length()).trim() ;
 			if(descricao.toUpperCase().contains(IdentificadorArquivoTarget.CARGO.getDescricao().toUpperCase())){
-				descricao = descricao.substring(0,descricao.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) - 1) + " " + 
+				descricao = descricao.substring(0,descricao.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) ) + " " + 
 							descricao.substring(descricao.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) , descricao.length()).trim(); 
 			}
-			descricao = descricao.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), "").trim();
+			descricao = descricao.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), " ")
+					.replace(IdentificadorArquivoTarget.CARGO.getDescricao(), "")
+					.replace(IdentificadorArquivoTarget.VIRGULA.getDescricao(), "")
+					.trim();
+			descricao = descricao.substring(Util.posicaoPrimeiraLetra(descricao), descricao.length());
 			nivelPagamento.setCidade(getArquivoPagamento().getCidade());
 			nivelPagamento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			nivelPagamento.setDescricao(descricao); 
-			nivelPagamento.setCodigo(getNumeroHashCode(descricao, 5) + ""); 
+			nivelPagamento.setDescricao(descricao.trim()); 
+			nivelPagamento.setAno(getArquivoPagamento().getAno());
+			nivelPagamento.setSecretaria(secretaria);
+			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricao)? getNumeroHashCode(descricao, 5) + "" : ""); 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nível Pagamento. Linha: " + linhaAtual);
 		}
@@ -308,9 +315,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private UnidadeTrabalho getUnidadeTrabalho(String linha) throws ApplicationException {
-		if(linha.contains("01/08/2014")){
-			System.out.println(linha);
-		}
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
 			String unidadeTrabalhoString = linha.substring(linha.indexOf(IdentificadorArquivoTarget.LOTACAO.getDescricao()) + IdentificadorArquivoTarget.LOTACAO.getDescricao().length(), linha.length()).trim();
@@ -476,7 +480,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private Integer getNumeroHashCode(String descricao, int posicaoFinal){
 		Integer numero = descricao.hashCode();
 		descricao = numero.toString().replace("-", "");
-		System.out.println(descricao);
 		return Integer.parseInt(descricao.substring(0,posicaoFinal));
 	}
 	

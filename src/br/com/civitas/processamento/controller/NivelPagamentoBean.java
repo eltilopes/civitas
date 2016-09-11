@@ -9,8 +9,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
+import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.NivelPagamento;
+import br.com.civitas.processamento.service.AnoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.NivelPagamentoService;
 
@@ -23,14 +25,19 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 	@ManagedProperty("#{cidadeService}")
 	private CidadeService cidadeService;
 	
+	@ManagedProperty("#{anoService}")
+	private AnoService anoService;
+	
 	@ManagedProperty("#{nivelPagamentoService}")
 	private NivelPagamentoService service;
 	
 	private List<Cidade> cidades;
+	private List<Ano> anos;
 	
 	@PostConstruct
 	public void init(){
 		cidades = cidadeService.buscarTodasAtivas();
+		anos = anoService.buscarTodos();
 	}
 
 	public CidadeService getCidadeService() {
@@ -47,6 +54,18 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 
 	public void setCidades(List<Cidade> cidades) {
 		this.cidades = cidades;
+	}
+
+	public List<Ano> getAnos() {
+		return anos;
+	}
+
+	public void setAnos(List<Ano> anos) {
+		this.anos = anos;
+	}
+
+	public void setAnoService(AnoService anoService) {
+		this.anoService = anoService;
 	}
 
 	public void setService(NivelPagamentoService service) {

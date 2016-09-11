@@ -47,6 +47,14 @@ public class NivelPagamento implements IEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cd_cidade", nullable = false)
 	private Cidade cidade;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "cd_ano", nullable = false)
+	private Ano ano;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "cd_secretaria", nullable = false)
+	private Secretaria secretaria;
 
 	public Long getId() {
 		return id;
@@ -84,6 +92,18 @@ public class NivelPagamento implements IEntity {
 	public void setSalarioBase(Double salarioBase) {
 		this.salarioBase = salarioBase;
 	}
+	public Ano getAno() {
+		return ano;
+	}
+	public void setAno(Ano ano) {
+		this.ano = ano;
+	}
+	public Secretaria getSecretaria() {
+		return secretaria;
+	}
+	public void setSecretaria(Secretaria secretaria) {
+		this.secretaria = secretaria;
+	}
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -93,6 +113,10 @@ public class NivelPagamento implements IEntity {
 			map.put("descricao", descricao);
 		}if(cidade != null && cidade.getId() != null ){
 			map.put("cidade.id",cidade.getId() );
+		}if(ano != null && ano.getId() != null ){
+			map.put("ano.id",ano.getId() );
+		}if(secretaria != null && secretaria.getId() != null ){
+			map.put("secretaria.id",secretaria.getId() );
 		}
 		return map;
 	}
@@ -112,5 +136,5 @@ public class NivelPagamento implements IEntity {
 			return false;
 		return true;
 	}
-
+	
 }

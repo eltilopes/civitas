@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
+import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.enums.TipoArquivo;
@@ -20,15 +21,17 @@ public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<NivelPagamento> buscarTipoArquivoCidade(Cidade cidade, TipoArquivo tipoArquivo) {
+	public List<NivelPagamento> buscarTipoArquivoCidadeAno(Cidade cidade, TipoArquivo tipoArquivo, Ano ano) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT n FROM NivelPagamento n ");
 		sql.append(" WHERE n.cidade = :cidade  ");
 		sql.append(" AND n.tipoArquivo = :tipoArquivo  ");
+		sql.append(" AND n.ano = :ano ");
 		
 		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
 									  .setParameter("cidade", cidade)
 									  .setParameter("tipoArquivo", tipoArquivo)
+									  .setParameter("ano", ano)
 									  .list();
 	}
 	

@@ -185,6 +185,7 @@ public abstract class ProcessarArquivoPagamento {
 		try {
 			cargoAuxiliar = getCargo(cargo);
 			if(Objects.isNull(cargoAuxiliar)){
+				cargo.setAtivo(true);
 				cargo = cargoService.save(cargo);
 				cargos.add(cargo);
 			}else{
@@ -323,7 +324,9 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private NivelPagamento getNivelPagamento(NivelPagamento nivelPagamento) {
 		for(NivelPagamento np : niveisPagamento){
-			if(np.getCidade().getId().equals(nivelPagamento.getCidade().getId()) && 
+			if(np.getCidade().getId().equals(nivelPagamento.getCidade().getId()) &&
+					np.getAno().getId().equals(nivelPagamento.getAno().getId()) &&
+					np.getSecretaria().getId().equals(nivelPagamento.getSecretaria().getId()) &&
 					np.getTipoArquivo().getCodigo()==nivelPagamento.getTipoArquivo().getCodigo() && 
 					np.getDescricao().equals(nivelPagamento.getDescricao()) &&
 					np.getCodigo().equals(nivelPagamento.getCodigo())){

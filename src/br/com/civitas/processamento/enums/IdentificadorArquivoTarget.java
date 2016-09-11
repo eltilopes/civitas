@@ -14,7 +14,7 @@ public enum IdentificadorArquivoTarget {
 		TOTAL_ORCAMENTARIO("Total Orçamentário"), 
 		DEPENDENTES("DEPENDENTES:"), 
 		SETOR("SETOR:"), 
-		CARGO("Cargo"), 
+		CARGO("Cargo 2"), 
 		CPF("CPF:"), 
 		TOTAIS("Totais"), 
 		LOTACAO("Lotação.:"), 

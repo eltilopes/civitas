@@ -114,7 +114,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		nivelPagamento = null;
 		secretaria = null;
 		setor = null;
-		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidadeAno(getArquivoPagamento().getCidade(), 
+				getArquivoPagamento().getTipoArquivo(),getArquivoPagamento().getAno()));
 		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -226,6 +227,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			nivelPagamento.setCidade(getArquivoPagamento().getCidade());
 			nivelPagamento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			nivelPagamento.setDescricao(descricao); 
+			nivelPagamento.setAno(getArquivoPagamento().getAno());
+			nivelPagamento.setSecretaria(secretaria);
 			nivelPagamento.setCodigo(codigo); 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Nivel Pagamento. Linha: " + linhaAtual);

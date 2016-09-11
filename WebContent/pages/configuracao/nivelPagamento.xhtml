@@ -37,7 +37,21 @@
 							styleClass="error-messages" />
 						</div>
 					</div>
-					<div class="col-md-6 ">
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Ano " />
+							<h:selectOneMenu id="anoSearch"
+											 value="#{bean.entitySearch.ano}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+										value="#{bean.anos}" />
+							</h:selectOneMenu>
+							<h:message for="anoSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<div class="col-md-4 ">
 						<div class="form-group">
 							<h:outputText value="Descrição: " style="font-weight: normal;"/>
 							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
@@ -52,9 +66,10 @@
 			<ui:param name="tituloPainel" value="Nível Pagamento" />
 		</ui:define>
 	
+		<ui:define name="botoesInsertFiltro" />
 	
 		<ui:define name="resultFiltro" >
-			<p:dataTable id="cidades" styleClass="table table-responsive table-mobile"
+			<p:dataTable id="niveisPagamento" styleClass="table table-responsive table-mobile"
 		   			 widgetVar="tabelaNivelPagamento" rows="10" emptyMessage="Nenhum Nível Pagamento foi encontrado."
 			 		 value="#{bean.resultSearch}" var="nivelPagamento" paginator="#{bean.resultSearch.rowCount > 0}"
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
@@ -70,8 +85,17 @@
 						</div>
 					</p:column>
 					
+			 		 <p:column headerText="Ano" style="text-align:left;">
+						<h:outputText value="#{nivelPagamento.ano.ano}" />
+					 </p:column>
+					 
 			 		 <p:column headerText="Cidade" style="text-align:center;">
 						<h:outputText value="#{nivelPagamento.cidade.descricao}" />
+					 </p:column>
+					 
+			 		 <p:column headerText="Secretaria" style="text-align:center;">
+						<h:outputText rendered="#{nivelPagamento.secretaria != null}" 
+							value="#{nivelPagamento.secretaria.descricao}" />
 					 </p:column>
 					 
 			 		 <p:column headerText="Tipo Arquivo" style="text-align:left;" >
@@ -102,9 +126,23 @@
 			<legend>Cadastro de Nível Pagamento</legend>
 			<div class="row" >
 				<div class="col-md-6 form-group">
-					<h:outputText value="Estado:" style="font-weight: normal;"/>
+					<h:outputText value="Cidade:" style="font-weight: normal;"/>
 					<h:inputText id="cidadeInsert" value="#{bean.entity.cidade.descricao}" disabled="true" styleClass="form-control"  />
 					<h:message for="cidadeInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >
+				<div class="col-md-6 form-group">
+					<h:outputText value="Ano:" style="font-weight: normal;"/>
+					<h:inputText id="anoInsert" value="#{bean.entity.ano.ano}" disabled="true" styleClass="form-control"  />
+					<h:message for="anoInsert" tooltip="true" styleClass="error-messages" />
+				</div>
+			</div>
+			<div class="row" >
+				<div class="col-md-6 form-group">
+					<h:outputText value="Secretaria" style="font-weight: normal;" rendered="#{bean.entity.secretaria != null}"  />
+					<h:inputText id="secretariaInsert" value="#{bean.entity.secretaria.descricao}" rendered="#{bean.entity.secretaria != null}"  disabled="true" styleClass="form-control"  />
+					<h:message for="secretariaInsert" tooltip="true" styleClass="error-messages"  rendered="#{bean.entity.secretaria != null}" />
 				</div>
 			</div>
 			<div class="row" >	

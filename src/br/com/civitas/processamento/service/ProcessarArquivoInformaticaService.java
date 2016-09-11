@@ -19,7 +19,6 @@ import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Matricula;
-import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
@@ -44,9 +43,6 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private  UnidadeTrabalhoService unidadeTrabalhoService;
 	
 	@Autowired
-	private  NivelPagamentoService nivelPagamentoService;
-	
-	@Autowired
 	private  CargaHorariaPagamentoService cargaHorariaPagamentoService;
 	
 	@Autowired
@@ -61,7 +57,6 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private  Pagamento pagamento;
 	private  Matricula matricula;
 	private  Secretaria secretaria;
-	private  NivelPagamento nivelPagamento;
 	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
@@ -112,11 +107,9 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		matricula = null;
 		secretaria = null;
 		setor = null;
-		nivelPagamento = null;
 		cargaHorariaPagamento = null;
 		pagamentos = new ArrayList<Pagamento>();
 		matriculas = new ArrayList<Matricula>();
-		setNiveisPagamento(nivelPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setUnidadesTrabalho(unidadeTrabalhoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -449,7 +442,6 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);
-		matricula.setNivelPagamento(nivelPagamento);
 		matricula.setCargaHorariaPagamento(cargaHorariaPagamento);
 		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);

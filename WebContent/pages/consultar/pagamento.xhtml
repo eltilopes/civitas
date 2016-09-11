@@ -181,7 +181,7 @@
 								<h:outputText value="Selecione os Eventos a serem exibidos" />
 								<p:selectManyMenu id="eventos" style="height: 100px !important;"
 									value="#{bean.eventosSelecionados}" converter="entityConverter"
-									var="evento" filter="true" filterMatchMode="contains"
+									var="evento" filter="true" filterMatchMode="endsWith"
 									showCheckbox="true" styleClass="form-control">
 									<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
 										itemLabel="#{e.nome}" itemValue="#{e}" />
@@ -226,7 +226,10 @@
 	                     #{column}  
 	                 </f:facet>
 					 #{bean.getObject(column, mapVO)}	
-	                </p:columns>
+					 <f:facet name="footer">
+			            <h:outputText value="#{bean.getSomatorio(column)}" converter="valorNumericoMoedaConverter" />
+			        </f:facet>
+	            </p:columns>
 			</p:dataTable>
 		</div>
 	</ui:define>
