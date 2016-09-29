@@ -181,7 +181,7 @@ public class ValidarArquivoService {
 				&& lancarExcessaoTipoArquivo) {
 			lancarExcessaoTipoArquivo = false;
 		}
-		if (linha.toUpperCase().contains(arquivo.getMes().getDescricao().toUpperCase()) && lancarExcessaoMes) {
+		if (linha.toUpperCase().contains(removerAcentos(arquivo.getMes().getDescricao().toUpperCase())) && lancarExcessaoMes) {
 			lancarExcessaoMes = false;
 		}
 		if (linha.toUpperCase().contains(arquivo.getAno().getAno().toString()) && lancarExcessaoAno) {

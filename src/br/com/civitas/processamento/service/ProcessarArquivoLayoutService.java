@@ -322,7 +322,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		for(Evento e : getEventos()){
 			if(processamentoPagamentoAtivo && !linha.contains(IdentificadorArquivoLayout.CARGO.getDescricao())
 					&& !linha.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())
-					&& getChaveEvento(linha).contains(e.getChave())){
+					&& getChaveEvento(linha).equals(e.getChave())){
 				pagamento.getEventosPagamento().add(getEventoPagamento(linha, e));
 			}
 		}

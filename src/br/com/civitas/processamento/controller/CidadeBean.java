@@ -18,32 +18,34 @@ import br.com.civitas.processamento.service.EstadoService;
 
 @ManagedBean
 @ViewScoped
-public class CidadeBean extends AbstractCrudBean<Cidade, CidadeService>  implements Serializable{
+public class CidadeBean extends AbstractCrudBean<Cidade, CidadeService> implements Serializable {
 
 	private static final long serialVersionUID = -2444140578365266044L;
 
 	@ManagedProperty("#{estadoService}")
 	private EstadoService estadoService;
-	
+
 	@ManagedProperty("#{cidadeService}")
 	private CidadeService service;
-	
+
 	private List<Estado> estados;
-	
+
 	@PostConstruct
-	public void init(){
+	public void init() {
 		estados = estadoService.buscarTodos();
 	}
-	
+
 	@Override
 	public void save(ActionEvent event) {
 		existeCidade();
 		super.save(event);
+
 	}
-	
+
 	private void existeCidade() {
-		List<Cidade> cidadesExistentes = service.findByNameMaisEstado(getEntity().getDescricao(), getEntity().getEstado());
-		if(!cidadesExistentes.isEmpty()){
+		List<Cidade> cidadesExistentes = service.findByNameMaisEstado(getEntity().getDescricao(),
+				getEntity().getEstado());
+		if (!cidadesExistentes.isEmpty()) {
 			FacesUtils.addWarnMessage("Cidade já existe!");
 		}
 	}

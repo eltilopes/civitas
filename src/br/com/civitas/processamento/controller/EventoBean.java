@@ -33,7 +33,7 @@ public class EventoBean extends AbstractCrudBean<Evento, EventoService>  impleme
 	
 	@PostConstruct
 	public void init(){
-		cidades = cidadeService.buscarTodos();
+		cidades = cidadeService.buscarTodasAtivas();
 		tiposArquivos = FactoryEnuns.listaTipoArquivo();
 	}
 

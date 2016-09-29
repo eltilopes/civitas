@@ -85,112 +85,134 @@
 			</div>
 			<h:panelGroup id="panelPorCidade"
 				rendered="#{bean.entitySearch.arquivo.cidade != null}">
-				<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Secretaria " />
-							<h:selectOneMenu id="secretariaSearch" value="#{bean.secretaria}"
-								converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao}" value="#{bean.secretarias}" />
-							</h:selectOneMenu>
-							<h:message for="secretariaSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Setor " />
-							<h:selectOneMenu id="setorSearch" value="#{bean.setor}"
-								converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao.toUpperCase()}"
-									value="#{bean.setores}" />
-							</h:selectOneMenu>
-							<h:message for="setorSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Cargo " />
-							<h:selectOneMenu id="cargoSearch" value="#{bean.cargo}"
-								converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.cargos}" />
-							</h:selectOneMenu>
-							<h:message for="cargoSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Unidade Trabalho " />
-							<h:selectOneMenu id="unidadeTrabalhoSearch"
-								value="#{bean.unidadeTrabalho}" converter="entityConverter"
-								styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao.toUpperCase()}"
-									value="#{bean.unidadesTrabalho}" />
-							</h:selectOneMenu>
-							<h:message for="unidadeTrabalhoSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Nível Pagamento " />
-							<h:selectOneMenu id="nivelPagamentoSearch"
-								value="#{bean.nivelPagamento}" converter="entityConverter"
-								styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao.toUpperCase()}"
-									value="#{bean.niveisPagamento}" />
-							</h:selectOneMenu>
-							<h:message for="nivelPagamentoSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Carga Horária Pagamento " />
-							<h:selectOneMenu id="cargaHorariaPagamentoSearch"
-								value="#{bean.cargaHorariaPagamento}"
-								converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}"
-									itemLabel="#{o.descricao.toUpperCase()}"
-									value="#{bean.cargasHorariaPagamento}" />
-							</h:selectOneMenu>
-							<h:message for="cargaHorariaPagamentoSearch" tooltip="true"
-								styleClass="error-messages" />
-						</div>
-					</div>
-				</div>
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-md-4">
-							<div class="form-group">
-								<h:outputText value="Selecione os Eventos a serem exibidos" />
-								<p:selectManyMenu id="eventos" style="height: 100px !important;"
-									value="#{bean.eventosSelecionados}" converter="entityConverter"
-									var="evento" filter="true" filterMatchMode="endsWith"
-									showCheckbox="true" styleClass="form-control">
-									<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
-										itemLabel="#{e.nome}" itemValue="#{e}" />
-									<p:column>
-										<h:outputText value="#{evento.nome}" />
-									</p:column>
-								</p:selectManyMenu>
+						<h:panelGroup id="panelSecretarias"
+							rendered="#{!bean.secretariasDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione as Secretarias para Consulta" />
+									<p:selectManyMenu id="secretarias" style="height: 80px !important;"
+										value="#{bean.secretariasSelecionadas}" converter="entityConverter"
+										var="secretaria" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.secretariasDisponiveis}" var="s"
+											itemLabel="#{s.descricao}" itemValue="#{s}" />
+										<p:column>
+											<h:outputText value="#{secretaria.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
 							</div>
-						</div>
+						</h:panelGroup>
+						<h:panelGroup id="panelSetores"
+							rendered="#{!bean.setoresDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione os Setores para Consulta" />
+									<p:selectManyMenu id="setores" style="height: 80px !important;"
+										value="#{bean.setoresSelecionados}" converter="entityConverter"
+										var="setor" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.setoresDisponiveis}" var="s"
+											itemLabel="#{s.descricao}" itemValue="#{s}" />
+										<p:column>
+											<h:outputText value="#{setor.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>	
+						<h:panelGroup id="panelCargos"
+							rendered="#{!bean.cargosDisponiveis.isEmpty()}">	
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione os Cargos para Consulta" />
+									<p:selectManyMenu id="cargos" style="height: 80px !important;"
+										value="#{bean.cargosSelecionados}" converter="entityConverter"
+										var="cargo" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.cargosDisponiveis}" var="c"
+											itemLabel="#{c.descricao}" itemValue="#{c}" />
+										<p:column>
+											<h:outputText value="#{cargo.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>	
+						<h:panelGroup id="panelUnidades"
+							rendered="#{!bean.unidadesDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione as Unidades de Trabalho para Consulta" />
+									<p:selectManyMenu id="unidades" style="height: 80px !important;"
+										value="#{bean.unidadesSelecionadas}" converter="entityConverter"
+										var="unidades" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.unidadesDisponiveis}" var="u"
+											itemLabel="#{u.descricao}" itemValue="#{u}" />
+										<p:column>
+											<h:outputText value="#{unidade.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>
+						<h:panelGroup id="panelNiveis"
+							rendered="#{!bean.niveisDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione os Níveis de Pagamento para Consulta" />
+									<p:selectManyMenu id="niveis" style="height: 80px !important;"
+										value="#{bean.niveisSelecionados}" converter="entityConverter"
+										var="nivel" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.niveisDisponiveis}" var="n"
+											itemLabel="#{n.descricao}" itemValue="#{n}" />
+										<p:column>
+											<h:outputText value="#{nivel.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>	
+						<h:panelGroup id="panelCargas"
+							rendered="#{!bean.cargasDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione os Cargas Horárias para Consulta" />
+									<p:selectManyMenu id="cargas" style="height: 80px !important;"
+										value="#{bean.cargasSelecionados}" converter="entityConverter"
+										var="carga" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.cargasDisponiveis}" var="c"
+											itemLabel="#{c.descricao}" itemValue="#{c}" />
+										<p:column>
+											<h:outputText value="#{carga.descricao}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>	
+						<h:panelGroup id="panelEvento"
+							rendered="#{!bean.eventosDisponiveis.isEmpty()}">
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:outputText value="Selecione os Eventos a serem exibidos" />
+									<p:selectManyMenu id="eventos" style="height: 80px !important;"
+										value="#{bean.eventosSelecionados}" converter="entityConverter"
+										var="evento" filter="true" filterMatchMode="endsWith"
+										showCheckbox="true" styleClass="form-control">
+										<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
+											itemLabel="#{e.nome}" itemValue="#{e}" />
+										<p:column>
+											<h:outputText value="#{evento.nome}" />
+										</p:column>
+									</p:selectManyMenu>
+								</div>
+							</div>
+						</h:panelGroup>	
 					</div>
 				</div>
 			</h:panelGroup>
@@ -213,25 +235,39 @@
 
 	<ui:define name="resultFiltro">
 		<div class="table-responsive">
-			<p:dataTable id="arquivos" tableStyle="width:auto !important" 
-				tableStyleClass="table table-responsive table-mobile"  resizableColumns="true"
-				widgetVar="tabelaPagamentos" rows="50"
+
+			<p:dataTable id="arquivos" tableStyle="width:auto !important"
+				tableStyleClass="table table-responsive table-mobile"
+				resizableColumns="true" widgetVar="tabelaPagamentos" rows="50"
 				emptyMessage="Nenhum Pagamento foi encontrado."
 				value="#{bean.pagamentosMap}" var="mapVO" paginator="true"
 				rendered="true" paginatorPosition="bottom"
 				rowStyleClass="bgLinha1,bgLinha2">
+				<p:ajax event="page" listener="#{bean.onPaginate}"
+					oncomplete="refreshFooter()" />
 
-				<p:columns value="#{bean.pagamentosColumnsMap}" var="column" >
-					<f:facet name="header" >  
-	                     #{column}  
+				<p:columns value="#{bean.pagamentosColumnsMap}" style="text-align:#{bean.getNomesColunaSemDouble(column) ? 'left;' : 'right;'}" var="column">
+					<f:facet name="header">  
+						<h:outputText value=" #{column} #{bean.getNomesColunaSemDouble(column) ? '' : '(R$)'}" />	
 	                 </f:facet>
-					 #{bean.getObject(column, mapVO)}	
+					 <h:outputText value="#{bean.getObject(column, mapVO)}" />	
+					 #{bean.somarValor(column, mapVO)}
+					 
 					 <f:facet name="footer">
-			            <h:outputText value="#{bean.getSomatorio(column)}" converter="valorNumericoMoedaConverter" />
-			        </f:facet>
-	            </p:columns>
+					 	<h:outputText style="text-align:right;font-weight: bold" value="#{bean.getSomatorioPaginacao(column)}" converter="valorNumericoMoedaConverter" />
+					 	<h:outputText style="text-align:left;font-weight: bold" value="TOTAL PÁGINA(R$):" rendered="#{column eq bean.getDiasTrabalhadosColuna()}"  />
+							<br />
+						<h:outputText style="text-align:right;font-weight: bold" value="#{bean.getSomatorio(column)}" converter="valorNumericoMoedaConverter" />
+						<h:outputText style="text-align:left;font-weight: bold" value="TOTAL GERAL(R$):" rendered="#{column eq bean.getDiasTrabalhadosColuna()}"  />
+						<br />
+
+					</f:facet>
+				</p:columns>
 			</p:dataTable>
 		</div>
+		<p:remoteCommand name="refreshFooter" autoRun="true"
+			update=":formConsulta:arquivos" />
+
 	</ui:define>
 
 </ui:composition>

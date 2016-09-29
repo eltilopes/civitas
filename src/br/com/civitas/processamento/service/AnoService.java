@@ -21,7 +21,7 @@ public class AnoService extends AbstractPersistence<Ano> {
 	@SuppressWarnings("unchecked")
 	public List<Ano> buscarTodos() {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT DISTINCT a FROM Ano a");
+		sql.append("SELECT DISTINCT a FROM Ano a order by a.ano ");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		return (List<Ano>) query.list();
 	}

@@ -1,6 +1,8 @@
 package br.com.civitas.processamento.vo;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import br.com.civitas.processamento.entity.Pagamento;
@@ -115,8 +117,26 @@ public class PagamentoVO {
 		return "DIAS TRAB.";
 	}
 	
+	public static String getDiasTrabalhadosColuna(){
+		return "DIAS TRAB.";
+	}
+	
 	public static String proventosColuna(){
 		return "PROVENTOS";
+	}
+
+	public static ArrayList<String> getNomesColunaSemDouble() {
+		String[] array = {nomeFuncionarioColuna(),
+				 admissaoColuna(),
+				 vinculoColuna(),
+				 secretariaColuna(),
+				 unidadeTrabalhoColuna(),
+				 nivelPagamentoColuna(),
+				 cargaHorariaPagamentoColuna(),
+				 setorColuna(),
+				 funcaoColuna(),
+				 diasTrabalhadosColuna()};
+		return new ArrayList<String>(Arrays.asList(array));
 	}
 
 }

@@ -31,6 +31,7 @@ public class ValorNumericoMoedaConverter implements Converter {
 		Locale locale = new Locale("pt", "BR");
         NumberFormat nf = NumberFormat.getInstance(locale);
         nf.setMaximumFractionDigits(2);
+        nf.setMinimumFractionDigits(2);
         String valor = value != null ? nf.format(Double.parseDouble(value.toString())) : null;
 		return valor;
 	}

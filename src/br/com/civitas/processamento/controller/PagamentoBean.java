@@ -6,9 +6,11 @@ import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -21,6 +23,7 @@ import javax.faces.event.ActionEvent;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -99,24 +102,25 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private List<Cidade> cidades;
 	private List<Ano> anos;
 	private List<Mes> meses;
-	private List<Cargo> cargos;
-	private List<Setor> setores;
-	private List<Secretaria> secretarias;
-	private List<UnidadeTrabalho> unidadesTrabalho;
-	private List<NivelPagamento> niveisPagamento;
-	private List<CargaHorariaPagamento> cargasHorariaPagamento;
+	private List<Cargo> cargosDisponiveis;
+	private List<Cargo> cargosSelecionados;
+	private List<Setor> setoresDisponiveis;
+	private List<Setor> setoresSelecionados;
+	private List<Secretaria> secretariasDisponiveis;
+	private List<Secretaria> secretariasSelecionadas;
+	private List<UnidadeTrabalho> unidadesSelecionadas;
+	private List<UnidadeTrabalho> unidadesDisponiveis;
+	private List<NivelPagamento> niveisSelecionados;
+	private List<NivelPagamento> niveisDisponiveis;
+	private List<CargaHorariaPagamento> cargasDisponiveis;
+	private List<CargaHorariaPagamento> cargasSelecionados;
 	private List<Evento> eventosDisponiveis;
 	private List<Evento> eventosSelecionados;
 	private List<Map<String, Object>> pagamentosMap;
 	private List<String> pagamentosColumnsMap;
 	private Map<String, Double> somatorioValores;
+	private Map<String, Double> somatorioValoresPaginacao;
 	
-	private Setor setor;
-	private Secretaria secretaria;
-	private Cargo cargo;
-	private UnidadeTrabalho unidadeTrabalho;
-	private NivelPagamento nivelPagamento;
-	private CargaHorariaPagamento cargaHorariaPagamento;
 	private StreamedContent arquivoExcel;
 	
 	@PostConstruct
@@ -135,15 +139,20 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void carregarPorCidade() {
 		if (Objects.nonNull(getEntitySearch().getArquivo().getCidade())) {
-			setSecretarias(secretariaService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setSetores(setorService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargos(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setUnidadesTrabalho(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setNiveisPagamento(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setSecretariasDisponiveis(secretariaService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setSetoresDisponiveis(setorService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargosDisponiveis(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setUnidadesDisponiveis(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setNiveisDisponiveis(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+			setCargasDisponiveis(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setEventosDisponiveis(eventoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setEventosSelecionados(new ArrayList<Evento>());
+			setCargosSelecionados(new ArrayList<Cargo>());
+			setSetoresSelecionados(new ArrayList<Setor>());
+			setCargasSelecionados(new ArrayList<CargaHorariaPagamento>());
+			setNiveisSelecionados(new ArrayList<NivelPagamento>());
+			setUnidadesSelecionadas(new ArrayList<UnidadeTrabalho>());
+			setSecretariasSelecionadas(new ArrayList<Secretaria>());
 		}
 	}
 
@@ -151,8 +160,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	public void find(ActionEvent event) {
 		try {
 			List<Pagamento> list = null;
-			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargo, secretaria, setor,
-					unidadeTrabalho, nivelPagamento, cargaHorariaPagamento);
+			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargosSelecionados, secretariasSelecionadas, setoresSelecionados,
+					unidadesSelecionadas, niveisSelecionados, cargasSelecionados);
+
 			popularEventosSelecionados(list);
 			if (list.isEmpty()) {
 				throw new ApplicationException("Consulta sem resultados.");
@@ -171,6 +181,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		pagamentosMap  = new ArrayList<Map<String, Object>>();
 		pagamentosColumnsMap = getListFields();
 		somatorioValores = new HashMap<String, Double>();
+		somatorioValoresPaginacao = new HashMap<String, Double>();
 		for(Pagamento pagamento : list){
 			setTotaisValores(pagamento.getTotalProventos(), PagamentoVO.proventosColuna());
 			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
@@ -194,7 +205,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	private void setTotaisValores(Double valor, String chave) {
 		if(!somatorioValores.containsKey(chave)){
-			somatorioValores.put(chave, 0.0); 
+			somatorioValores.put(chave, 0.00); 
 		}
 		somatorioValores.put(chave, somatorioValores.get(chave) + valor); 
 	}
@@ -202,9 +213,44 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	public Double getSomatorio(String chave) {
 		return somatorioValores.containsKey(chave) ? somatorioValores.get(chave) : null;
 	}
+	
+	public Double getSomatorioPaginacao(String chave) {
+		return somatorioValoresPaginacao.containsKey(chave) ? somatorioValoresPaginacao.get(chave) : null;
+	}
 
 	public String getObject(String chave, HashMap<String, Object> mapa) {
-		return (String) mapa.get(chave);
+		String value = (String) mapa.get(chave);
+		Locale locale = new Locale("pt", "BR");
+        NumberFormat nf = NumberFormat.getInstance(locale);
+        nf.setMaximumFractionDigits(2);
+        nf.setMinimumFractionDigits(2);
+        if(value != null && !chave.equals(PagamentoVO.diasTrabalhadosColuna())){
+        	try {
+        		return mapa != null ? nf.format(Double.parseDouble(value.replace(".", "").replace(",", ".").toString())) : "";
+			} catch (Exception e) {}
+        }
+		return mapa != null ? (String) mapa.get(chave) : "";
+	}
+	
+	
+	
+	public void somarValor(String chave, HashMap<String, Object> mapa) {
+		
+		try {
+			if(!chave.equals(PagamentoVO.diasTrabalhadosColuna())){
+				String valor = getObject(chave, mapa);
+				valor = valor.replace(".", "").replace(",", ".");
+				Double value = Double.parseDouble(valor);
+				setTotaisValoresPaginacao(value, chave);
+			}
+		} catch (Exception e) {}
+	}
+	
+	private void setTotaisValoresPaginacao(Double valor, String chave) {
+		if(!somatorioValoresPaginacao.containsKey(chave)){
+			somatorioValoresPaginacao.put(chave, 0.00); 
+		}
+		somatorioValoresPaginacao.put(chave, somatorioValoresPaginacao.get(chave) + valor); 
 	}
 	
 	private Map<String, Object> getMapValueFields(Pagamento pagamento) throws IllegalArgumentException, IllegalAccessException {
@@ -278,6 +324,10 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			System.out.println("Erro ao exportar arquivo");
 		} 
 	} 
+	   
+	public void onPaginate(PageEvent event){
+		somatorioValoresPaginacao = new HashMap<String, Double>();
+	}
 
 	public List<Ano> getAnos() {
 		return anos;
@@ -320,72 +370,40 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.service = service;
 	}
 
-	public CargaHorariaPagamento getCargaHorariaPagamento() {
-		return cargaHorariaPagamento;
-	}
-
-	public void setCargaHorariaPagamento(CargaHorariaPagamento cargaHorariaPagamento) {
-		this.cargaHorariaPagamento = cargaHorariaPagamento;
-	}
-
 	public void setCargaHorariaPagamentoService(CargaHorariaPagamentoService cargaHorariaPagamentoService) {
 		this.cargaHorariaPagamentoService = cargaHorariaPagamentoService;
 	}
 
-	public List<Setor> getSetores() {
-		return setores;
+	public List<Cargo> getCargosDisponiveis() {
+		return cargosDisponiveis;
 	}
 
-	public void setSetores(List<Setor> setores) {
-		this.setores = setores;
+	public void setCargosDisponiveis(List<Cargo> cargosDisponiveis) {
+		this.cargosDisponiveis = cargosDisponiveis;
 	}
 
-	public List<Secretaria> getSecretarias() {
-		return secretarias;
+	public List<Cargo> getCargosSelecionados() {
+		return cargosSelecionados;
 	}
 
-	public void setSecretarias(List<Secretaria> secretarias) {
-		this.secretarias = secretarias;
+	public void setCargosSelecionados(List<Cargo> cargosSelecionados) {
+		this.cargosSelecionados = cargosSelecionados;
 	}
 
-	public List<Cargo> getCargos() {
-		return cargos;
+	public List<Setor> getSetoresDisponiveis() {
+		return setoresDisponiveis;
 	}
 
-	public void setCargos(List<Cargo> cargos) {
-		this.cargos = cargos;
+	public void setSetoresDisponiveis(List<Setor> setoresDisponiveis) {
+		this.setoresDisponiveis = setoresDisponiveis;
 	}
 
-	public Setor getSetor() {
-		return setor;
+	public List<Setor> getSetoresSelecionados() {
+		return setoresSelecionados;
 	}
 
-	public void setSetor(Setor setor) {
-		this.setor = setor;
-	}
-
-	public Secretaria getSecretaria() {
-		return secretaria;
-	}
-
-	public void setSecretaria(Secretaria secretaria) {
-		this.secretaria = secretaria;
-	}
-
-	public Cargo getCargo() {
-		return cargo;
-	}
-
-	public void setCargo(Cargo cargo) {
-		this.cargo = cargo;
-	}
-
-	public UnidadeTrabalho getUnidadeTrabalho() {
-		return unidadeTrabalho;
-	}
-
-	public void setUnidadeTrabalho(UnidadeTrabalho unidadeTrabalho) {
-		this.unidadeTrabalho = unidadeTrabalho;
+	public void setSetoresSelecionados(List<Setor> setoresSelecionados) {
+		this.setoresSelecionados = setoresSelecionados;
 	}
 
 	public void setUnidadeTrabalhoService(UnidadeTrabalhoService unidadeTrabalhoService) {
@@ -404,20 +422,52 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.cargoService = cargoService;
 	}
 
-	public List<UnidadeTrabalho> getUnidadesTrabalho() {
-		return unidadesTrabalho;
+	public List<UnidadeTrabalho> getUnidadesSelecionadas() {
+		return unidadesSelecionadas;
 	}
 
-	public void setUnidadesTrabalho(List<UnidadeTrabalho> unidadesTrabalho) {
-		this.unidadesTrabalho = unidadesTrabalho;
+	public void setUnidadesSelecionadas(List<UnidadeTrabalho> unidadesSelecionadas) {
+		this.unidadesSelecionadas = unidadesSelecionadas;
 	}
 
-	public List<NivelPagamento> getNiveisPagamento() {
-		return niveisPagamento;
+	public List<UnidadeTrabalho> getUnidadesDisponiveis() {
+		return unidadesDisponiveis;
 	}
 
-	public void setNiveisPagamento(List<NivelPagamento> niveisPagamento) {
-		this.niveisPagamento = niveisPagamento;
+	public void setUnidadesDisponiveis(List<UnidadeTrabalho> unidadesDisponiveis) {
+		this.unidadesDisponiveis = unidadesDisponiveis;
+	}
+
+	public List<NivelPagamento> getNiveisSelecionados() {
+		return niveisSelecionados;
+	}
+
+	public void setNiveisSelecionados(List<NivelPagamento> niveisSelecionados) {
+		this.niveisSelecionados = niveisSelecionados;
+	}
+
+	public List<NivelPagamento> getNiveisDisponiveis() {
+		return niveisDisponiveis;
+	}
+
+	public void setNiveisDisponiveis(List<NivelPagamento> niveisDisponiveis) {
+		this.niveisDisponiveis = niveisDisponiveis;
+	}
+
+	public List<CargaHorariaPagamento> getCargasDisponiveis() {
+		return cargasDisponiveis;
+	}
+
+	public void setCargasDisponiveis(List<CargaHorariaPagamento> cargasDisponiveis) {
+		this.cargasDisponiveis = cargasDisponiveis;
+	}
+
+	public List<CargaHorariaPagamento> getCargasSelecionados() {
+		return cargasSelecionados;
+	}
+
+	public void setCargasSelecionados(List<CargaHorariaPagamento> cargasSelecionados) {
+		this.cargasSelecionados = cargasSelecionados;
 	}
 
 	public void setNivelPagamentoService(NivelPagamentoService nivelPagamentoService) {
@@ -430,22 +480,6 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	public void setEventoPagamentoService(EventoPagamentoService eventoPagamentoService) {
 		this.eventoPagamentoService = eventoPagamentoService;
-	}
-
-	public NivelPagamento getNivelPagamento() {
-		return nivelPagamento;
-	}
-
-	public void setNivelPagamento(NivelPagamento nivelPagamento) {
-		this.nivelPagamento = nivelPagamento;
-	}
-
-	public List<CargaHorariaPagamento> getCargasHorariaPagamento() {
-		return cargasHorariaPagamento;
-	}
-
-	public void setCargasHorariaPagamento(List<CargaHorariaPagamento> cargasHorariaPagamento) {
-		this.cargasHorariaPagamento = cargasHorariaPagamento;
 	}
 
 	public List<Evento> getEventosDisponiveis() {
@@ -496,4 +530,28 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		this.somatorioValores = somatorioValores;
 	}
 
+	public static String getDiasTrabalhadosColuna(){
+		return PagamentoVO.getDiasTrabalhadosColuna();
+	}
+	
+	public boolean getNomesColunaSemDouble(String coluna){
+		return PagamentoVO.getNomesColunaSemDouble().contains(coluna);
+	}
+
+	public List<Secretaria> getSecretariasDisponiveis() {
+		return secretariasDisponiveis;
+	}
+
+	public void setSecretariasDisponiveis(List<Secretaria> secretariasDisponiveis) {
+		this.secretariasDisponiveis = secretariasDisponiveis;
+	}
+
+	public List<Secretaria> getSecretariasSelecionadas() {
+		return secretariasSelecionadas;
+	}
+
+	public void setSecretariasSelecionadas(List<Secretaria> secretariasSelecionadas) {
+		this.secretariasSelecionadas = secretariasSelecionadas;
+	}
+	
 }

@@ -63,6 +63,11 @@
 							<h:panelGroup  >
 								<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuração<b class="caret"></b></a>
 									<ul class="dropdown-menu">
+										<h:panelGroup rendered="#{sessionScope.perms.CARGO_R}">
+											<li>
+												<a href="#{request.contextPath}/pages/configuracao/cargo.jsf">Cargo</a>
+											</li>
+										</h:panelGroup>
 										<h:panelGroup rendered="#{sessionScope.perms.CIDADE_R}">
 											<li>
 												<a href="#{request.contextPath}/pages/configuracao/cidade.jsf">Cidade</a>
@@ -73,9 +78,9 @@
 												<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
 											</li>
 										</h:panelGroup>
-										<h:panelGroup rendered="#{sessionScope.perms.CARGO_R}">
+										<h:panelGroup rendered="#{sessionScope.perms.MATRICULA_R}">
 											<li>
-												<a href="#{request.contextPath}/pages/configuracao/cargo.jsf">Cargo</a>
+												<a href="#{request.contextPath}/pages/configuracao/matricula.jsf">Matrícula</a>
 											</li>
 										</h:panelGroup>
 										<h:panelGroup rendered="#{sessionScope.perms.NIVEL_PAGAMENTO_R}">

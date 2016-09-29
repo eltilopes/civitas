@@ -13,6 +13,7 @@ public class FactoryEnuns {
 			listaTipoArquivo.add(tipo);
 		}
 		listaTipoArquivo.remove(TipoArquivo.NENHUM);
+		listaTipoArquivo.sort((s1, s2) -> Integer.compare(s1.getDescricao().length(), s2.getDescricao().length()));
 		return listaTipoArquivo;
 	}
 

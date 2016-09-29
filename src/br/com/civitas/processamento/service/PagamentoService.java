@@ -47,8 +47,8 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, Cargo cargo, Secretaria secretaria, 
-			Setor setor, UnidadeTrabalho unidadeTrabalho, NivelPagamento nivelPagamento, CargaHorariaPagamento cargaHorariaPagamento) {
+	public List<Pagamento> getPagamentoPorArquivo(ArquivoPagamento arquivoPagamento, List<Cargo> cargosSelecionados, List<Secretaria> secretarias, 
+			List<Setor> setoresSelecionados, List<UnidadeTrabalho> unidadesSelecionadas, List<NivelPagamento> niveisSelecionados, List<CargaHorariaPagamento> cargasSelecionados) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT DISTINCT p FROM Pagamento p ");
 		sql.append("INNER JOIN FETCH p.arquivo ap ");
@@ -66,15 +66,15 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		sql.append("INNER JOIN FETCH ap.mes m ");
 		sql.append("INNER JOIN FETCH ap.ano a ");
 		sql.append("WHERE 1 = 1 ");
+		sql.append(checkIsNotNull(secretarias) ? " AND sec.id in ( " + convertListToString(secretarias) + " ) " : "");
+		sql.append(checkIsNotNull(setoresSelecionados) ? " AND setor.id in ( " + convertListToString(setoresSelecionados) + " ) " : "");
+		sql.append(checkIsNotNull(cargosSelecionados) ? " AND ca.id in ( " + convertListToString(cargosSelecionados) + " ) " : "");
+		sql.append(checkIsNotNull(cargasSelecionados) ? " AND chp.id in ( " + convertListToString(cargasSelecionados) + " ) " : "");
+		sql.append(checkIsNotNull(niveisSelecionados) ? " AND np.id in ( " + convertListToString(niveisSelecionados) + " ) " : "");
+		sql.append(checkIsNotNull(unidadesSelecionadas) ? " AND ut.id in ( " + convertListToString(unidadesSelecionadas) + " ) " : "");
 		sql.append(Objects.nonNull(arquivoPagamento.getCidade()) ? "AND c = :cidade " : "");
 		sql.append(Objects.nonNull(arquivoPagamento.getMes()) ? "AND m = :mes " : "");
 		sql.append(Objects.nonNull(arquivoPagamento.getAno()) ? "AND a = :ano " : "");
-		sql.append(Objects.nonNull(cargo) ? "AND ca = :cargo " : "");
-		sql.append(Objects.nonNull(secretaria) ? "AND sec = :secretaria " : "");
-		sql.append(Objects.nonNull(setor) ? "AND setor = :setor " : "");
-		sql.append(Objects.nonNull(unidadeTrabalho) ? "AND ut = :unidadeTrabalho " : "");
-		sql.append(Objects.nonNull(nivelPagamento) ? "AND np = :nivelPagamento " : "");
-		sql.append(Objects.nonNull(cargaHorariaPagamento) ? "AND chp = :cargaHorariaPagamento " : "");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		if(Objects.nonNull(arquivoPagamento.getCidade())){
 			query.setParameter("cidade", arquivoPagamento.getCidade());
@@ -85,26 +85,25 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		if(Objects.nonNull(arquivoPagamento.getAno())){
 			query.setParameter("ano", arquivoPagamento.getAno());
 		}
-		if(Objects.nonNull(cargo)){
-			query.setParameter("cargo", cargo);
+		if(Objects.nonNull(cargosSelecionados)){
+			query.setParameter("cargo", cargosSelecionados);
 		}
-		if(Objects.nonNull(secretaria)){
-			query.setParameter("secretaria", secretaria);
+		if(Objects.nonNull(setoresSelecionados)){
+			query.setParameter("setor", setoresSelecionados);
 		}
-		if(Objects.nonNull(setor)){
-			query.setParameter("setor", setor);
+		if(Objects.nonNull(unidadesSelecionadas)){
+			query.setParameter("unidadeTrabalho", unidadesSelecionadas);
 		}
-		if(Objects.nonNull(unidadeTrabalho)){
-			query.setParameter("unidadeTrabalho", unidadeTrabalho);
+		if(Objects.nonNull(niveisSelecionados)){
+			query.setParameter("nivelPagamento", niveisSelecionados);
 		}
-		if(Objects.nonNull(nivelPagamento)){
-			query.setParameter("nivelPagamento", nivelPagamento);
-		}
-		if(Objects.nonNull(cargaHorariaPagamento)){
-			query.setParameter("cargaHorariaPagamento", cargaHorariaPagamento);
+		if(Objects.nonNull(cargasSelecionados)){
+			query.setParameter("cargaHorariaPagamento", cargasSelecionados);
 		}
 		return query.list();
 	}
+	
+	
 	
 	@Transactional
 	public void inserirPagamentos(List<Pagamento> pagamentos, List<Evento> eventos, ArquivoPagamento arquivo)  {

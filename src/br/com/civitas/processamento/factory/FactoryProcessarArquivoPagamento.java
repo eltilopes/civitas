@@ -22,6 +22,9 @@ public class FactoryProcessarArquivoPagamento {
 		case ARQUIVO_TARGET:
 			service = "processarArquivoTargetService";
 			break;	
+		case ARQUIVO_DIGIMAX:
+			service = "processarArquivoDigimaxService";
+			break;	
 		}
 		return (IProcessarArquivoPagamento) FacesUtils.getBean(service);
 	}

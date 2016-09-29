@@ -92,14 +92,17 @@ public class Evento implements IEntity {
 		this.chave = chave;
 	}
 
-	@Override
 	public Map<String, Object> notEmptyFields() {
 		Map<String, Object> map = new HashMap<String, Object>();
-		if (id != null) {
+		if(id != null ){
 			map.put("id", id);
+		}if(cidade != null && cidade.getId() != null ){
+			map.put("cidade.id",cidade.getId() );
+		}if(tipoArquivo != null  ){
+			map.put("tipoArquivo",tipoArquivo.getCodigo() );
 		}
 		return map;
-	}
+	}	
 
 	public Cidade getCidade() {
 		return cidade;

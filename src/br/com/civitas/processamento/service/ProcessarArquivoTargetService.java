@@ -319,7 +319,11 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		try {
 			String unidadeTrabalhoString = linha.substring(linha.indexOf(IdentificadorArquivoTarget.LOTACAO.getDescricao()) + IdentificadorArquivoTarget.LOTACAO.getDescricao().length(), linha.length()).trim();
 			String codigo = unidadeTrabalhoString.substring(0, unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()));
-			unidadeTrabalhoString = unidadeTrabalhoString.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), "").length() < 2 ? "" :  unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) + IdentificadorArquivoTarget.HIFEN.getDescricao().length(), unidadeTrabalhoString.length()).trim();
+			unidadeTrabalhoString = unidadeTrabalhoString.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), "").length() < 2 ? 
+					"" :  unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) 
+							+ IdentificadorArquivoTarget.HIFEN.getDescricao().length(), 
+							unidadeTrabalhoString.length()).trim();
+			System.out.println("-" + unidadeTrabalhoString +  "-" );
 			if(StringUtils.notNullOrEmpty(unidadeTrabalhoString)){
 				unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 				unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
