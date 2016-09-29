@@ -85,21 +85,6 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		if(Objects.nonNull(arquivoPagamento.getAno())){
 			query.setParameter("ano", arquivoPagamento.getAno());
 		}
-		if(Objects.nonNull(cargosSelecionados)){
-			query.setParameter("cargo", cargosSelecionados);
-		}
-		if(Objects.nonNull(setoresSelecionados)){
-			query.setParameter("setor", setoresSelecionados);
-		}
-		if(Objects.nonNull(unidadesSelecionadas)){
-			query.setParameter("unidadeTrabalho", unidadesSelecionadas);
-		}
-		if(Objects.nonNull(niveisSelecionados)){
-			query.setParameter("nivelPagamento", niveisSelecionados);
-		}
-		if(Objects.nonNull(cargasSelecionados)){
-			query.setParameter("cargaHorariaPagamento", cargasSelecionados);
-		}
 		return query.list();
 	}
 	
