@@ -76,13 +76,14 @@ public abstract class ProcessarArquivoPagamento {
 	public void iniciarArquivos( ) {
 		try {
 			criarArquivoProcessamento();
+			PDDocument document = null;
 			document = PDDocument.load(new File(nomeArquivoTemporario));
 			document.getClass();
 			if (!document.isEncrypted()) {
 				PDFTextStripperByArea stripper = new PDFTextStripperByArea();
 				stripper.setSortByPosition(true);
 				PDFTextStripper Tstripper = new PDFTextStripper();
-				String conteudoArquivo = Tstripper.getText(document);
+				String conteudoArquivo = new String(Tstripper.getText(document).getBytes(Charset.defaultCharset()), "UTF-8");
 				String nomeArquivoTemporario = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivoPagamento.getNomeArquivo().substring(0, arquivoPagamento.getNomeArquivo().length() -3 ) + "txt";
 				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
 				buffWrite.append(conteudoArquivo);
@@ -90,6 +91,7 @@ public abstract class ProcessarArquivoPagamento {
 				fileReaderEvento = new FileReader(nomeArquivoTemporario);
 				filReaderPagamento = new FileReader(nomeArquivoTemporario);
 			}
+			this.document = document;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -97,11 +99,13 @@ public abstract class ProcessarArquivoPagamento {
 	
 	private void criarArquivoProcessamento() throws IOException {
 		nomeArquivoTemporario = "";
-		String filename = FilenameUtils.getName(new String(arquivoPagamento.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
+		String filename = FilenameUtils
+				.getName(new String(arquivoPagamento.getFile().getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
 	    InputStream input = arquivoPagamento.getFile().getInputstream();
 	    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
 	    OutputStream output = new FileOutputStream(file);
 	    nomeArquivoTemporario = file.getAbsolutePath();
+	    System.out.println(nomeArquivoTemporario);
 	    try {
 	        IOUtils.copy(input, output);
 	    } catch(Exception e){

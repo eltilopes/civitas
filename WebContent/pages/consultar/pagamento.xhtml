@@ -148,7 +148,7 @@
 									<h:outputText value="Selecione as Unidades de Trabalho para Consulta" />
 									<p:selectManyMenu id="unidades" style="height: 80px !important;"
 										value="#{bean.unidadesSelecionadas}" converter="entityConverter"
-										var="unidades" filter="true" filterMatchMode="endsWith"
+										var="unidade" filter="true" filterMatchMode="endsWith"
 										showCheckbox="true" styleClass="form-control">
 										<f:selectItems value="#{bean.unidadesDisponiveis}" var="u"
 											itemLabel="#{u.descricao}" itemValue="#{u}" />
