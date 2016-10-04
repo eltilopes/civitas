@@ -78,6 +78,11 @@
 												<a href="#{request.contextPath}/pages/configuracao/evento.jsf">Evento</a>
 											</li>
 										</h:panelGroup>
+										<h:panelGroup rendered="#{sessionScope.perms.MATRICULA_R}">
+											<li>
+												<a href="#{request.contextPath}/pages/configuracao/matricula.jsf">Matrícula</a>
+											</li>
+										</h:panelGroup>
 										<h:panelGroup rendered="#{sessionScope.perms.NIVEL_PAGAMENTO_R}">
 											<li>
 												<a href="#{request.contextPath}/pages/configuracao/nivelPagamento.jsf">Nível Pagamento</a>

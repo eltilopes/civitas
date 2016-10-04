@@ -22,7 +22,7 @@
     	</ui:define>
 
     	<ui:define name="tituloFieldSetFiltro">
-    		Eventos
+    		Cargos
 		</ui:define>
 		
 		<ui:define name="camposFiltro">
@@ -83,7 +83,7 @@
 	
 		<ui:define name="resultFiltro" >
 			<p:dataTable id="cargosInativos" styleClass="table table-responsive table-mobile" 
-		   			 widgetVar="tabelaCargosInativos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
+		   			 widgetVar="tabelaCargosInativos" rows="10" emptyMessage="Nenhum Cargo foi encontrado."
 			 		 value="#{bean.cargosInativos}" var="cargoInativo" paginator="#{bean.cargosInativos.size() > 0}"
 			 		 rendered="#{bean.cargosInativos.size() > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
@@ -112,8 +112,8 @@
 			
 			</p:dataTable> 
 		
-			<p:dataTable id="eventos" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaCargos" rows="10" emptyMessage="Nenhuma Evento foi encontrado."
+			<p:dataTable id="cargos" styleClass="table table-responsive table-mobile"
+		   			 widgetVar="tabelaCargos" rows="10" emptyMessage="Nenhum Cargo foi encontrado."
 			 		 value="#{bean.resultSearch}" var="cargo" paginator="#{bean.resultSearch.rowCount > 0}"
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">

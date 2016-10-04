@@ -102,6 +102,13 @@ public class Util {
 		}
 		return posicao;
 	}
+
+	public static boolean valorContemNumero(String palavra){
+		for(Character c : palavra.toCharArray()){
+			if(Character.isDigit(c))	return true;
+		}
+		return false;
+	}
 	
 	public static String logTime(DateTime dataInicio, DateTime dataFim){
 		PeriodFormatter periodFormatter = new PeriodFormatterBuilder().printZeroAlways()

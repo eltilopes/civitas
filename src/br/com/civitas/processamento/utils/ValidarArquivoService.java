@@ -104,7 +104,9 @@ public class ValidarArquivoService {
 			BufferedReader brEvento = prepararArquivoValidacao(document);
 			while (brEvento.ready() && !finalValidacao) {
 				String linha = brEvento.readLine();
-				validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
+				if(numeroLinha <= arquivo.getTipoArquivo().getFimProcessamento()){
+					validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
+				}
 				if (arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_TARGET)){
 					localizarCargo(linha);
 					linhaAnterior = linha;
@@ -203,6 +205,7 @@ public class ValidarArquivoService {
 		stripper.setSortByPosition(true);
 		PDFTextStripper Tstripper = new PDFTextStripper();
 		String conteudoArquivo = Tstripper.getText(document);
+//		conteudoArquivo = StringUtils.converteStringUTF8(conteudoArquivo);
 		nomeArquivoTxtTemporario = this.nomeArquivoPdfTemporario.substring(0, this.nomeArquivoPdfTemporario.length() - 3) + "txt";
 		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTxtTemporario));
 		buffWrite.append(conteudoArquivo);

@@ -287,18 +287,23 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarDiasTrabalhados(String linhaAtual) {
-		getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.SALARIO_BASE.getDescricao());
-		getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao());
+		if(linhaAtual.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao())){
+			getDiasTrabalhados(linhaAtual,IdentificadorArquivoTarget.SALARIO_BASE.getDescricao() );
+		}else if(linhaAtual.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE_LEI.getDescricao())){
+			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE_LEI.getDescricao());
+		}else if(linhaAtual.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())){
+			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao());
+		}else if(linhaAtual.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao())){
+			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao());
+		}
 	}
 
 	private void getDiasTrabalhados(String linhaAtual, String descricaoIdentificador) {
-		if(linhaAtual.contains(descricaoIdentificador)){
-			String dias = linhaAtual.substring(
-					linhaAtual.indexOf(descricaoIdentificador) 
-					+ descricaoIdentificador.length()).trim();
-			dias = dias.substring(0, dias.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao())).trim();
-			pagamento.setDiasTrabalhados(dias);
-		}
+		String dias = linhaAtual.substring(
+				linhaAtual.indexOf(descricaoIdentificador) 
+				+ descricaoIdentificador.length()).trim();
+		dias = dias.substring(0, dias.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao())).trim();
+		pagamento.setDiasTrabalhados(Util.valorContemNumero(dias) ? dias : pagamento.getDiasTrabalhados());
 	}
 
 	private void localizarSecretariaSetor(String linhaAtual) {

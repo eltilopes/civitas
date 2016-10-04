@@ -1,6 +1,7 @@
 package br.com.civitas.processamento.entity;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -169,8 +170,15 @@ public class Matricula implements IEntity {
 
 	@Override
 	public Map<String, Object> notEmptyFields() {
-		// TODO notEmptyFields matriculas
-		return null;
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(id != null ){
+			map.put("id", id);
+		}if(nomeFuncionario != null && nomeFuncionario != ""){
+			map.put("nomeFuncionario", nomeFuncionario);
+		}if(secretaria != null && secretaria.getCidade()!= null && secretaria.getCidade().getId() != null ){
+			map.put("secretaria.cidade.id",secretaria.getCidade().getId() );
+		}
+		return map;
 	}
 
 }
