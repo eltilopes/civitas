@@ -1,7 +1,9 @@
 package br.com.civitas.processamento.service;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.hibernate.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
@@ -39,11 +41,14 @@ public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 	public List<NivelPagamento> buscarCidade(Cidade cidade) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT n FROM NivelPagamento n ");
-		sql.append(" WHERE n.cidade = :cidade  ");
+		sql.append("WHERE 1 = 1 ");
+		sql.append(Objects.nonNull(cidade) ? "AND n.cidade = :cidade " : "");
 		sql.append(" ORDER BY n.descricao ASC ");
-		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
-				.setParameter("cidade", cidade)
-				.list();
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		if(Objects.nonNull(cidade)){
+			query.setParameter("cidade", cidade);
+		}
+		return query.list();
 	}
 	
 }

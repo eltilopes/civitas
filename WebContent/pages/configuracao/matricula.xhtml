@@ -22,7 +22,19 @@
     	</ui:define>
 
     	<ui:define name="tituloFieldSetFiltro">
-    		Eventos
+    		Matrículas
+		</ui:define>
+			
+		<ui:define name="botoesInsertFiltro">
+							 
+			<p:commandButton value="Atualizar Matrículas"
+				title="Atualizar Matrículas"
+				rendered="#{bean.habilitarBotaoAtualizarMatricula()}"
+				action="#{bean.prepareAtualizarMatriculas()}"
+				update=":painelGlobal"
+				styleClass="btn btn-primary"
+				ajax="false" />
+							 
 		</ui:define>
 		
 		<ui:define name="camposFiltro">
@@ -37,6 +49,9 @@
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
 										value="#{bean.cidades}" />
+								<p:ajax event="change" update=":painelGlobal"
+									listener="#{bean.carregarPorCidade}"
+									oncomplete="carregando.hide()" />
 							</h:selectOneMenu>
 							<h:message for="cidadeSearch" tooltip="true"
 							styleClass="error-messages" />
@@ -50,6 +65,49 @@
 						</div>
 					</div>
 				</div>	
+				<h:panelGroup id="panelPorCidade"
+					rendered="#{bean.entitySearch.secretaria.cidade != null}">
+					<div class="container-fluid">
+						<div class="row">
+							<h:panelGroup id="panelSecretarias"
+								rendered="#{!bean.secretariasDisponiveis.isEmpty()}">
+								<div class="col-md-4">
+									<div class="form-group">
+										<h:outputText value="Selecione as Secretarias para Consulta" />
+										<p:selectManyMenu id="secretarias" style="height: 80px !important;"
+											value="#{bean.secretariasSelecionadas}" converter="entityConverter"
+											var="secretaria" filter="true" filterMatchMode="endsWith"
+											showCheckbox="true" styleClass="form-control">
+											<f:selectItems value="#{bean.secretariasDisponiveis}" var="s"
+												itemLabel="#{s.descricao}" itemValue="#{s}" />
+											<p:column>
+												<h:outputText value="#{secretaria.descricao}" />
+											</p:column>
+										</p:selectManyMenu>
+									</div>
+								</div>
+							</h:panelGroup>
+							<h:panelGroup id="panelSetores"
+								rendered="#{!bean.setoresDisponiveis.isEmpty()}">
+								<div class="col-md-4">
+									<div class="form-group">
+										<h:outputText value="Selecione os Setores para Consulta" />
+										<p:selectManyMenu id="setores" style="height: 80px !important;"
+											value="#{bean.setoresSelecionados}" converter="entityConverter"
+											var="setor" filter="true" filterMatchMode="endsWith"
+											showCheckbox="true" styleClass="form-control">
+											<f:selectItems value="#{bean.setoresDisponiveis}" var="s"
+												itemLabel="#{s.descricao}" itemValue="#{s}" />
+											<p:column>
+												<h:outputText value="#{setor.descricao}" />
+											</p:column>
+										</p:selectManyMenu>
+									</div>
+								</div>
+							</h:panelGroup>	
+						</div>
+					</div>
+				</h:panelGroup>			
 			</fieldset>		
 		</ui:define>	
 		
@@ -59,20 +117,28 @@
 	
 		<ui:define name="resultFiltro" >
 			<p:dataTable id="matriculas" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaMatriculas" rows="10" emptyMessage="Nenhuma Matrícula foi encontrada."
+		   			 widgetVar="tabelaMatriculas" rows="30" emptyMessage="Nenhuma Matrícula foi encontrada."
 			 		 value="#{bean.resultSearch}" var="matricula" paginator="#{bean.resultSearch.rowCount > 0}"
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 			 		 
-			 		 <p:column headerText="" style="width:60px; text-align:center;" rendered="#{sessionScope.perms.MATRICULA_U }" >
-						<div class="colunaAcao">					    			
-							<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
-							    <i class="glyphicon glyphicon-edit" />
-							</h:commandLink>
-							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
-								showEffect="fade" trackMouse="true" />
-						</div>
-					 </p:column>
+					 <p:column style="width:60px; text-align:center;" rendered="#{sessionScope.perms.MATRICULA_U }"  >
+						<f:facet name="header" >
+							<p:selectBooleanCheckbox id="selecionarTodos" 
+													 value="#{bean.todosSelecionados}" 
+													 rendered="#{bean.resultSearch.rowCount > 0}" 
+													 onchange="carregando.show()">
+					            <p:ajax update=":painelGlobal" listener="#{bean.selecionarTodos}" oncomplete="carregando.hide()"/>
+					        </p:selectBooleanCheckbox>
+					        <p:tooltip id="toolTipSelecionarTodos" for="selecionarTodos" value="Selecionar todas as Matrículas"
+								showEffect="fade" trackMouse="true" />	
+						</f:facet>
+						
+						<p:selectBooleanCheckbox value="#{matricula.selecionado}" onchange="carregando.show()">
+				            <p:ajax update=":painelGlobal" oncomplete="carregando.hide()"/>
+				        </p:selectBooleanCheckbox>
+				        
+					</p:column >
 					
 			 		 <p:column headerText="Número Matrícula" >
 						<h:outputText value="#{matricula.numeroMatricula}" />
@@ -89,33 +155,60 @@
 			 		 <p:column headerText="Cargo" >
 						<h:outputText value="#{matricula.cargo.descricao}" />
 					 </p:column>
-			
 			</p:dataTable> 
 		</ui:define>
 		
-		<ui:define name="tituloFieldSetInsert">
-			<h4> Cadastro de Matrícula </h4>
+		<ui:define name="insertTitle">
+			<h4>Matrículas Selecionadas</h4>
 		</ui:define>
 		
 		<ui:define name="camposInsert">
-		<fieldset>
-			<legend>Cadastro de Matrícula</legend>
-			<div class="row" >
-				<div class="col-md-6 form-group">
-					<h:outputText value="Nome Funcionário:" style="font-weight: normal;"/>
-					<h:inputText id="nomeFuncionarioInsert" value="#{bean.entity.nomeFuncionario}" styleClass="form-control"  />
-					<h:message for="nomeFuncionarioInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			<div class="row" >	
-				<div class="col-md-9 form-group">
-					<div class="alert alert-warning" role="alert">
-						<span class="glyphicon glyphicon-exclamation-sign"></span>
-						Atenção ao atualizar o número de matrícula.
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+							<div class="form-group">
+							<h:outputText value="Nível Pagamento " />
+							<h:selectOneMenu id="nivelInsert"
+											 value="#{bean.nivelPagamento}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.niveisDisponiveis}" />
+							</h:selectOneMenu>
+							<h:message for="nivelInsert" tooltip="true"
+							styleClass="error-messages" />
+						</div>
 					</div>
 				</div>
-			</div>	
-		</fieldset>
+				<div class="row">
+					<p:dataTable id="matriculasSelecionadas" styleClass="table table-responsive table-mobile"
+			   			 widgetVar="tabelaMatriculasSelecionadas"  
+				 		 value="#{bean.listaMatriculaSelecionadas}" var="matricula" 
+				 		 rowStyleClass="bgLinha1,bgLinha2">
+				 		 
+				 		 <p:column headerText="Número Matrícula" >
+							<h:outputText value="#{matricula.numeroMatricula}" />
+						 </p:column>
+				 		 
+				 		 <p:column headerText="Nome Funcionário" >
+							<h:outputText value="#{matricula.nomeFuncionario}" />
+						 </p:column>
+				
+				 		 <p:column headerText="Secretaria" >
+							<h:outputText value="#{matricula.secretaria.descricao}" />
+						 </p:column>
+				
+				 		 <p:column headerText="Cargo" >
+							<h:outputText value="#{matricula.cargo.descricao}" />
+						 </p:column>
+				
+				 		 <p:column headerText="Nível Pagamento" >
+							<h:outputText value="#{matricula.nivelPagamento.descricao}" />
+						 </p:column>
+				
+					</p:dataTable> 
+				</div>
+			</fieldset>		
 	</ui:define>
 	
 	<ui:define name="botoesInsert">
@@ -123,7 +216,7 @@
 			<p></p>
 		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
 				actionListener="#{bean['update']}"
-				rendered="#{bean['editing']}"
+				rendered="#{bean['inserting']}"
 				oncomplete="carregando.hide(); mensagemAviso.show();"
 				update=":painelGlobal" onclick="carregando.show();"
 				ajax="false" />

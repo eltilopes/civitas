@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.Matricula;
+import br.com.civitas.processamento.entity.Secretaria;
+import br.com.civitas.processamento.entity.Setor;
 
 @Service
 public class MatriculaService extends AbstractPersistence<Matricula> {
@@ -21,7 +23,8 @@ public class MatriculaService extends AbstractPersistence<Matricula> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Matricula> getMatriculaPorNomeCidade(Matricula matricula) {
+	public List<Matricula> getMatriculaPorNomeSetorSecretaria(Matricula matricula,
+			List<Secretaria> secretariasSelecionadas, List<Setor> setoresSelecionados) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT DISTINCT m FROM Matricula m ");
 		sql.append("LEFT JOIN FETCH m.unidadeTrabalho ut ");
@@ -35,11 +38,13 @@ public class MatriculaService extends AbstractPersistence<Matricula> {
 		sql.append("WHERE 1 = 1 ");
 		sql.append(Objects.nonNull(matricula.getSecretaria().getCidade()) ? "AND c = :cidade " : "");
 		sql.append(StringUtils.notNullOrEmpty(matricula.getNomeFuncionario()) ? "AND UPPER(m.nomeFuncionario) LIKE UPPER('%"+ matricula.getNomeFuncionario() +"%' ) " : "");
+		sql.append(checkIsNotNull(secretariasSelecionadas) ? " AND sec.id in ( " + convertListToString(secretariasSelecionadas) + " ) " : "");
+		sql.append(checkIsNotNull(setoresSelecionados) ? " AND setor.id in ( " + convertListToString(setoresSelecionados) + " ) " : "");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
 		if(Objects.nonNull(matricula.getSecretaria().getCidade())){
 			query.setParameter("cidade", matricula.getSecretaria().getCidade());
 		}
-		return query.list();
+		return (List<Matricula>) query.list();
 	}
 	
 	@SuppressWarnings("unchecked")

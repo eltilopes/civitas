@@ -16,6 +16,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import br.com.civitas.arquitetura.entity.IEntity;
 
@@ -71,6 +72,9 @@ public class Matricula implements IEntity {
 	@Column(name = "dt_admissao")
 	@Temporal(TemporalType.DATE)
 	private Date dataAdmissao;
+
+	@Transient
+	private boolean selecionado;
 	
 	public Long getId() {
 		return id;
@@ -175,10 +179,16 @@ public class Matricula implements IEntity {
 			map.put("id", id);
 		}if(nomeFuncionario != null && nomeFuncionario != ""){
 			map.put("nomeFuncionario", nomeFuncionario);
-		}if(secretaria != null && secretaria.getCidade()!= null && secretaria.getCidade().getId() != null ){
-			map.put("secretaria.cidade.id",secretaria.getCidade().getId() );
 		}
 		return map;
+	}
+
+	public boolean isSelecionado() {
+		return selecionado;
+	}
+
+	public void setSelecionado(boolean selecionado) {
+		this.selecionado = selecionado;
 	}
 
 }

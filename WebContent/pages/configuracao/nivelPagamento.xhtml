@@ -1,207 +1,357 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
-		
-	<ui:composition template="/new-template/template-crud.xhtml">
-    
-    	<ui:define name="tituloPagina">
-    		<h:outputText value="Nível Pagamento" />
-    	</ui:define>
-    	
-		<ui:define name="parametros">
-    	   <ui:param name="bean" value="#{nivelPagamentoBean}" />
-    	</ui:define>
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
 
-    	<ui:define name="tituloFieldSetFiltro">
+<ui:composition template="/new-template/template-crud.xhtml">
+
+	<ui:define name="tituloPagina">
+		<h:outputText value="Nível Pagamento" />
+	</ui:define>
+
+	<ui:define name="parametros">
+		<ui:param name="bean" value="#{nivelPagamentoBean}" />
+	</ui:define>
+
+	<ui:define name="tituloFieldSetFiltro">
     		Nível Pagamento 
 		</ui:define>
-		
-		<ui:define name="camposFiltro">
-			<fieldset>
-				<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Cidade " />
-							<h:selectOneMenu id="cidadeSearch"
-											 value="#{bean.entitySearch.cidade}"
-											 converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
-										value="#{bean.cidades}" />
-							</h:selectOneMenu>
-							<h:message for="cidadeSearch" tooltip="true"
-							styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<h:outputText value="Ano " />
-							<h:selectOneMenu id="anoSearch"
-											 value="#{bean.entitySearch.ano}"
-											 converter="entityConverter" styleClass="form-control">
-								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
-										value="#{bean.anos}" />
-							</h:selectOneMenu>
-							<h:message for="anoSearch" tooltip="true"
-							styleClass="error-messages" />
-						</div>
-					</div>
-					<div class="col-md-4 ">
-						<div class="form-group">
-							<h:outputText value="Descrição: " style="font-weight: normal;"/>
-							<h:inputText id="nomeSearch" styleClass="form-control"  value="#{bean.entitySearch.descricao}" />
-							<h:message for="nomeSearch" tooltip="true"	styleClass="error-messages" />
-						</div>
-					</div>
-				</div>	
-			</fieldset>		
-		</ui:define>	
-		
-		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Nível Pagamento" />
-		</ui:define>
-	
-		<ui:define name="botoesInsertFiltro" />
-	
-		<ui:define name="resultFiltro" >
-			<p:dataTable id="niveisPagamento" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaNivelPagamento" rows="10" emptyMessage="Nenhum Nível Pagamento foi encontrado."
-			 		 value="#{bean.resultSearch}" var="nivelPagamento" paginator="#{bean.resultSearch.rowCount > 0}"
-			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
-			 		 rowStyleClass="bgLinha1,bgLinha2">
-			 		 
-		 		 	<p:column headerText="" style="width:60px; text-align:center;" >
-						<div class="colunaAcao">					    			
-							<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
-							    <i class="glyphicon glyphicon-edit" />
-							</h:commandLink>
-							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
-								showEffect="fade" trackMouse="true" />
-						</div>
-					</p:column>
-					
-			 		 <p:column headerText="Ano" style="text-align:left;">
-						<h:outputText value="#{nivelPagamento.ano.ano}" />
-					 </p:column>
-					 
-			 		 <p:column headerText="Cidade" style="text-align:center;">
-						<h:outputText value="#{nivelPagamento.cidade.descricao}" />
-					 </p:column>
-					 
-			 		 <p:column headerText="Secretaria" style="text-align:center;">
-						<h:outputText rendered="#{nivelPagamento.secretaria != null}" 
-							value="#{nivelPagamento.secretaria.descricao}" />
-					 </p:column>
-					 
-			 		 <p:column headerText="Tipo Arquivo" style="text-align:left;" >
-	   					<h:outputText id="tipoArquivo" value="#{nivelPagamento.tipoArquivo.descricao}" />
-	   				</p:column>
-	   			
-			 		 <p:column headerText="Descrição">
-						<h:outputText value="#{nivelPagamento.descricao.toUpperCase()}" />
-					 </p:column>
-					 
-			 		 <p:column headerText="Código">
-						<h:outputText value="#{nivelPagamento.codigo}" />
-					 </p:column>
-					 
-					<p:column headerText="Salário Base" style="text-align:right;"  >
-		   				<h:outputText value="#{nivelPagamento.salarioBase}"  converter="valorNumericoMoedaConverter" />
-		   			</p:column>
-	   			
-			</p:dataTable> 
-		</ui:define>
-		
-		<ui:define name="tituloFieldSetInsert">
-			<h4> Cadastro de Nível Pagamento </h4>
-		</ui:define>
-		
-		<ui:define name="camposInsert">
+
+	<ui:define name="camposFiltro">
 		<fieldset>
-			<legend>Cadastro de Nível Pagamento</legend>
-			<div class="row" >
-				<div class="col-md-6 form-group">
-					<h:outputText value="Cidade:" style="font-weight: normal;"/>
-					<h:inputText id="cidadeInsert" value="#{bean.entity.cidade.descricao}" disabled="true" styleClass="form-control"  />
-					<h:message for="cidadeInsert" tooltip="true" styleClass="error-messages" />
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Cidade " />
+						<h:selectOneMenu id="cidadeSearch"
+							value="#{bean.entitySearch.cidade}" converter="entityConverter"
+							styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}"
+								itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.cidades}" />
+						</h:selectOneMenu>
+						<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Ano " />
+						<h:selectOneMenu id="anoSearch" value="#{bean.entitySearch.ano}"
+							converter="entityConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+								value="#{bean.anos}" />
+						</h:selectOneMenu>
+						<h:message for="anoSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="col-md-4 ">
+					<div class="form-group">
+						<h:outputText value="Descrição: " style="font-weight: normal;" />
+						<h:inputText id="nomeSearch" styleClass="form-control"
+							value="#{bean.entitySearch.descricao}" />
+						<h:message for="nomeSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
 				</div>
 			</div>
-			<div class="row" >
-				<div class="col-md-6 form-group">
-					<h:outputText value="Ano:" style="font-weight: normal;"/>
-					<h:inputText id="anoInsert" value="#{bean.entity.ano.ano}" disabled="true" styleClass="form-control"  />
-					<h:message for="anoInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			<div class="row" >
-				<div class="col-md-6 form-group">
-					<h:outputText value="Secretaria" style="font-weight: normal;" rendered="#{bean.entity.secretaria != null}"  />
-					<h:inputText id="secretariaInsert" value="#{bean.entity.secretaria.descricao}" rendered="#{bean.entity.secretaria != null}"  disabled="true" styleClass="form-control"  />
-					<h:message for="secretariaInsert" tooltip="true" styleClass="error-messages"  rendered="#{bean.entity.secretaria != null}" />
-				</div>
-			</div>
-			<div class="row" >	
-				<div class="col-md-6 form-group">
-					<h:outputText value="Tipo Arquivo: " style="font-weight: normal;"/>
-					<h:inputText id="tipoArquivoInsert" styleClass="form-control" disabled="true"  value="#{bean.entity.tipoArquivo.descricao}" />
-					<h:message for="tipoArquivoInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			<div class="row" >	
-				<div class="col-md-6 form-group">
-					<h:outputText value="Descrição: " style="font-weight: normal;"/>
-					<h:inputText id="nomeInsert" styleClass="form-control" disabled="true" value="#{bean.entity.descricao}" />
-					<h:message for="nomeInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			<div class="row" >	
-				<div class="col-md-6 form-group">
-					<h:outputText value="Código: " style="font-weight: normal;"/>
-					<h:inputText id="codigoInsert" styleClass="form-control" disabled="true" value="#{bean.entity.codigo}" />
-					<h:message for="codigoInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			<div class="row" >	
-				<div class="col-md-6 form-group">
-					<script>
-						$(document).ready(function(){
-							$("#formCadastro\\:salarioBaseInsert").mask('###.##0,00', {reverse: true});
-						});
-					</script>
-		
-					<h:outputText value="Salário Base: " style="font-weight: normal;"/>
-					<h:inputText id="salarioBaseInsert" styleClass="form-control" value="#{bean.entity.salarioBase}" >
-						 <f:convertNumber  pattern="#0,00" maxIntegerDigits="6" minIntegerDigits="1" maxFractionDigits="2" minFractionDigits="2" />
-					</h:inputText>	
-					<h:message for="salarioBaseInsert" tooltip="true" styleClass="error-messages" />
-				</div>
-			</div>
-			
 		</fieldset>
 	</ui:define>
+
+	<ui:define name="tituloPainel">
+		<ui:param name="tituloPainel" value="Nível Pagamento" />
+	</ui:define>
+
+	<ui:define name="botoesInsertFiltro">
+		<p:commandButton value="Importar Níveis Pagamento"
+			actionListener="#{bean.prepararImportacaoArquivo()}"
+			rendered="#{sessionScope.perms.NIVEL_PAGAMENTO_C}"
+			styleClass="btn btn-primary" update=":painelGlobal" ajax="false" />
+
+	</ui:define>
+
+	<ui:define name="resultFiltro">
+		<p:dataTable id="niveisPagamento"
+			styleClass="table table-responsive table-mobile"
+			widgetVar="tabelaNivelPagamento" rows="10"
+			emptyMessage="Nenhum Nível Pagamento foi encontrado."
+			value="#{bean.resultSearch}" var="nivelPagamento"
+			paginator="#{bean.resultSearch.rowCount > 0}"
+			rendered="#{bean.resultSearch.rowCount > 0}"
+			paginatorPosition="bottom" rowStyleClass="bgLinha1,bgLinha2">
+
+			<p:column headerText="" style="width:60px; text-align:center;">
+				<div class="colunaAcao">
+					<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
+						<i class="glyphicon glyphicon-edit" />
+					</h:commandLink>
+					<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+						showEffect="fade" trackMouse="true" />
+				</div>
+			</p:column>
+
+			<p:column headerText="Ano" style="text-align:left;">
+				<h:outputText value="#{nivelPagamento.ano.ano}" />
+			</p:column>
+
+			<p:column headerText="Cidade" style="text-align:center;">
+				<h:outputText value="#{nivelPagamento.cidade.descricao}" />
+			</p:column>
+
+			<p:column headerText="Secretaria" style="text-align:center;">
+				<h:outputText rendered="#{nivelPagamento.secretaria != null}"
+					value="#{nivelPagamento.secretaria.descricao}" />
+			</p:column>
+
+			<p:column headerText="Tipo Arquivo" style="text-align:left;">
+				<h:outputText id="tipoArquivo"
+					value="#{nivelPagamento.tipoArquivo.descricao}" />
+			</p:column>
+
+			<p:column headerText="Descrição">
+				<h:outputText value="#{nivelPagamento.descricao.toUpperCase()}" />
+			</p:column>
+
+			<p:column headerText="Código">
+				<h:outputText value="#{nivelPagamento.codigo}" />
+			</p:column>
+
+			<p:column headerText="Salário Base" style="text-align:right;">
+				<h:outputText value="#{nivelPagamento.salarioBase}"
+					converter="valorNumericoMoedaConverter" />
+			</p:column>
+
+		</p:dataTable>
+	</ui:define>
+
+	<ui:define name="tituloFieldSetInsert">
+		<h4>Cadastro de Nível Pagamento</h4>
+	</ui:define>
 	
+	<ui:define name="insertTitle">
+   		<h:outputText value="#{bean.importarArquivo ? 'Importar Arquivo Nível Pagamento' :'Cadastro de Nível Pagamento' }" />
+	</ui:define>
+	
+	<ui:define name="camposInsert">
+		<fieldset>
+			<h:panelGroup rendered="#{!bean.importarArquivo}">
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Cidade:" style="font-weight: normal;" />
+						<h:inputText id="cidadeInsert"
+							value="#{bean.entity.cidade.descricao}" disabled="true"
+							styleClass="form-control" />
+						<h:message for="cidadeInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Ano:" style="font-weight: normal;" />
+						<h:inputText id="anoInsert" value="#{bean.entity.ano.ano}"
+							disabled="true" styleClass="form-control" />
+						<h:message for="anoInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Secretaria" style="font-weight: normal;"
+							rendered="#{bean.entity.secretaria != null}" />
+						<h:inputText id="secretariaInsert"
+							value="#{bean.entity.secretaria.descricao}"
+							rendered="#{bean.entity.secretaria != null}" disabled="true"
+							styleClass="form-control" />
+						<h:message for="secretariaInsert" tooltip="true"
+							styleClass="error-messages"
+							rendered="#{bean.entity.secretaria != null}" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Tipo Arquivo: " style="font-weight: normal;" />
+						<h:inputText id="tipoArquivoInsert" styleClass="form-control"
+							disabled="true" value="#{bean.entity.tipoArquivo.descricao}" />
+						<h:message for="tipoArquivoInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Descrição: " style="font-weight: normal;" />
+						<h:inputText id="nomeInsert" styleClass="form-control"
+							disabled="true" value="#{bean.entity.descricao}" />
+						<h:message for="nomeInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Código: " style="font-weight: normal;" />
+						<h:inputText id="codigoInsert" styleClass="form-control"
+							disabled="true" value="#{bean.entity.codigo}" />
+						<h:message for="codigoInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<script>
+							$(document).ready(
+									function() {
+										$("#formCadastro\\:salarioBaseInsert")
+												.mask('###.##0,00', {
+													reverse : true
+												});
+									});
+						</script>
+
+						<h:outputText value="Salário Base: " style="font-weight: normal;" />
+						<h:inputText id="salarioBaseInsert" styleClass="form-control"
+							value="#{bean.entity.salarioBase}">
+							<f:convertNumber pattern="#0,00" maxIntegerDigits="6"
+								minIntegerDigits="1" maxFractionDigits="2" minFractionDigits="2" />
+						</h:inputText>
+						<h:message for="salarioBaseInsert" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{bean.importarArquivo}">
+				<table class="table table-responsive table-mobile">
+					<tbody>
+						<tr >
+							<td >
+								<div class="row">
+									<div class="col-md-8">
+										<div class="form-group">
+											<h:outputText value="Cidade " />
+											<h:selectOneMenu id="cidadeImport" value="#{bean.cidade}"
+												converter="entityConverter" styleClass="form-control">
+												<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+												<f:selectItems var="o" itemValue="#{o}"
+													itemLabel="#{o.descricao.toUpperCase()}"
+													value="#{bean.cidades}" />
+												<p:ajax event="change" update=":painelGlobal"
+													listener="#{bean.carregarPorCidade}"
+													oncomplete="carregando.hide()" />
+											</h:selectOneMenu>
+											<h:message for="cidadeImport" tooltip="true"
+												styleClass="error-messages" />
+										</div>
+									</div>
+								</div> 
+								<h:panelGroup id="panelPorCidade"
+									rendered="#{bean.cidade != null}">
+									<div class="row">
+										<div class="col-md-8">
+											<div class="form-group">
+												<h:outputText value="Secretaria " />
+												<h:selectOneMenu id="secretariaImport"
+													value="#{bean.secretaria}" converter="entityConverter"
+													styleClass="form-control">
+													<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+													<f:selectItems var="o" itemValue="#{o}"
+														itemLabel="#{o.descricao}" value="#{bean.secretarias}" />
+												</h:selectOneMenu>
+												<h:message for="secretariaImport" tooltip="true"
+													styleClass="error-messages" />
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+								<div class="row">
+									<div class="col-md-8">
+										<div class="form-group">
+											<h:outputText value="Ano " />
+											<h:selectOneMenu id="anoImport" value="#{bean.ano}"
+												converter="entityConverter" styleClass="form-control">
+												<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+												<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
+													value="#{bean.anos}" />
+											</h:selectOneMenu>
+											<h:message for="anoImport" tooltip="true"
+												styleClass="error-messages" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8 form-group">
+										<h:outputText value="Tipo Arquivo " />
+										<h:selectOneMenu id="tipoArquivoImport"
+											value="#{bean.tipoArquivo}" required="true"
+											converter="enumConverter" styleClass="form-control">
+											<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+											<f:selectItems var="o" itemValue="#{o}"
+												itemLabel="#{o.descricao.toString().toUpperCase()}"
+												value="#{bean.tiposArquivos}" />
+										</h:selectOneMenu>
+										<h:message for="tipoArquivoImport" tooltip="true"
+											styleClass="error-messages" />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8 form-group">
+										<h:outputText value="Selecione o Arquivo " />
+										<p:fileUpload id="file" required="true" value="#{bean.file}"
+											styleClass="btn btn-primary" allowTypes="/(\.|\/)(pdf)$/"
+											process="@this" mode="simple" skinSimple="true" />
+										<h:message for="file" tooltip="true"
+											styleClass="error-messages" />
+									</div>
+								</div>
+							</td>
+							<td align="center" >
+								<div class="row">
+									<div class="col-md-8 form-group">
+										<h3><span class="label label-info">Informações da Importação</span></h3>
+									</div>
+								</div>
+								<div align="left" class="row">
+									<div class="col-md-8 form-group">
+										<div class="bs-callout bs-callout-info">
+									  		<c:forEach var="info" items="#{bean.getInformacoesImportacao()}" >
+											    <p>${info}</p>
+											</c:forEach>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8 form-group">
+										<h:outputLink value="#{bean.downloadArquivoExemplo()}">
+											<h:outputText value="Download Arquivo Exemplo" />
+										</h:outputLink>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</h:panelGroup>
+		</fieldset>
+	</ui:define>
+
 	<ui:define name="botoesInsert">
 		<h:panelGroup id="botoes">
 			<p></p>
-		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
-				actionListener="#{bean['update']}"
-				rendered="#{bean['editing']}"
+			<p:commandButton styleClass="btn btn-primary" value="Atualizar"
+				actionListener="#{bean['update']}" rendered="#{bean['editing']}"
 				oncomplete="carregando.hide(); mensagemAviso.show();"
-				update=":painelGlobal" onclick="carregando.show();"
-				ajax="false" />
-				
+				update=":painelGlobal" onclick="carregando.show();" ajax="false" />
+
 			<p:commandButton styleClass="btn btn-primary" value="Voltar"
 				actionListener="#{bean['cancel']}" immediate="true"
 				update=":painelGlobal" ajax="false" />
 			<p></p>
 		</h:panelGroup>
 	</ui:define>
-		
-    </ui:composition>
-	
+
+</ui:composition>
+
 </html>
