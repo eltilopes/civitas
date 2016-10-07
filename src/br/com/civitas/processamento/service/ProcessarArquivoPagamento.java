@@ -84,7 +84,6 @@ public abstract class ProcessarArquivoPagamento {
 				stripper.setSortByPosition(true);
 				PDFTextStripper Tstripper = new PDFTextStripper();
 				String conteudoArquivo = Tstripper.getText(document);
-//				conteudoArquivo = StringUtils.converteStringUTF8(conteudoArquivo);
 				String nomeArquivoTemporario = DiretorioProcessamento.getDiretorioTemporario() + "/" + arquivoPagamento.getNomeArquivo().substring(0, arquivoPagamento.getNomeArquivo().length() -3 ) + "txt";
 				BufferedWriter buffWrite = new BufferedWriter(new FileWriter(nomeArquivoTemporario));
 				buffWrite.append(conteudoArquivo);

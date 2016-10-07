@@ -10,13 +10,14 @@ import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.NivelPagamento;
+import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.enums.TipoArquivo;
 
 @Service
 public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 
 	private static final long serialVersionUID = -7055181734439951026L;
-
+	
 	@Override
 	protected Class<NivelPagamento> getClazz() {
 		return NivelPagamento.class;
@@ -38,6 +39,23 @@ public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<NivelPagamento> buscarTipoArquivoCidadeAnoSecretaria(Cidade cidade, TipoArquivo tipoArquivo, Ano ano, Secretaria secretaria ) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT n FROM NivelPagamento n ");
+		sql.append(" WHERE n.cidade = :cidade  ");
+		sql.append(" AND n.tipoArquivo = :tipoArquivo  ");
+		sql.append(" AND n.ano = :ano ");
+		sql.append(" AND n.secretaria = :secretaria ");
+		
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+				.setParameter("cidade", cidade)
+				.setParameter("tipoArquivo", tipoArquivo)
+				.setParameter("ano", ano)
+				.setParameter("secretaria", secretaria)
+				.list();
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List<NivelPagamento> buscarCidade(Cidade cidade) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT n FROM NivelPagamento n ");
@@ -50,5 +68,5 @@ public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 		}
 		return query.list();
 	}
-	
+
 }

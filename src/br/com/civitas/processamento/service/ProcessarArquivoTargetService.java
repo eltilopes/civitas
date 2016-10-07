@@ -223,7 +223,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			nivelPagamento.setDescricao(descricao.trim()); 
 			nivelPagamento.setAno(getArquivoPagamento().getAno());
 			nivelPagamento.setSecretaria(secretaria);
-			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricao)? getNumeroHashCode(descricao, 5) + "" : ""); 
+			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricao)? Util.getNumeroHashCode(descricao, nivelPagamento.getTamanhoMinimoCodigo()) + "" : ""); 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nível Pagamento. Linha: " + linhaAtual);
 		}
@@ -477,7 +477,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			numero = Integer.parseInt(numeroMatricula.replace("-", ""));
 		} catch (Exception e) {
 			try {
-				numero =  getNumeroHashCode(numeroMatricula, 8);
+				numero =  Util.getNumeroHashCode(numeroMatricula, 8);
 				numeroMatricula = numero.toString();
 			} catch (Exception e2) {
 				numeroMatricula = numero.toString().replace("-", "");
@@ -486,12 +486,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		return numeroMatricula;
 	}
 
-	private Integer getNumeroHashCode(String descricao, int posicaoFinal){
-		Integer numero = descricao.hashCode();
-		descricao = numero.toString().replace("-", "");
-		return Integer.parseInt(descricao.substring(0,posicaoFinal));
-	}
-	
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setSecretaria(secretaria);

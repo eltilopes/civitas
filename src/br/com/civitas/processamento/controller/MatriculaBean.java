@@ -158,6 +158,19 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 		setMatriculasSelecionadas(todosSelecionados);
 	}
 	
+	public void atualizarMatriculas(){
+		try {
+			for(Matricula m :listaMatriculaSelecionadas){
+				m.setNivelPagamento(getNivelPagamento());
+			}
+			service.updateAll(listaMatriculaSelecionadas);
+			addInfoMessage( getMessage( "SUCCESS_UPDATE" ) );
+			setCurrentState( STATE_SEARCH );
+		} catch (Exception e) {
+			addErrorMessage( getMessage( "ERROR_UPDATE" ) );
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void setMatriculasSelecionadas(Boolean selecionado) {
 		if(getResultSearch().getWrappedData() != null){

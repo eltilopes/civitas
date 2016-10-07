@@ -215,7 +215,7 @@
 		<h:panelGroup id="botoes">
 			<p></p>
 		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
-				actionListener="#{bean['update']}"
+				actionListener="#{bean.atualizarMatriculas()}"
 				rendered="#{bean['inserting']}"
 				oncomplete="carregando.hide(); mensagemAviso.show();"
 				update=":painelGlobal" onclick="carregando.show();"

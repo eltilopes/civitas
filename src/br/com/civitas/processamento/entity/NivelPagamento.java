@@ -56,6 +56,19 @@ public class NivelPagamento implements IEntity {
 	@JoinColumn(name = "cd_secretaria", nullable = false)
 	private Secretaria secretaria;
 
+	public NivelPagamento(){}
+	
+	public NivelPagamento(Ano ano, Cidade cidade, Secretaria secretaria, TipoArquivo tipoArquivo){
+		this.ano = ano;
+		this.cidade = cidade;
+		this.secretaria = secretaria;
+		this.tipoArquivo = tipoArquivo;
+	}
+	
+	public int getTamanhoMinimoCodigo(){
+		return 5;
+	}
+	
 	public Long getId() {
 		return id;
 	}

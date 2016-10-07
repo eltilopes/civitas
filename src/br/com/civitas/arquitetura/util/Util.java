@@ -29,6 +29,12 @@ public class Util {
 		return preco;
 	}
 	
+	public static Integer getNumeroHashCode(String descricao, int posicaoFinal){
+		Integer numero = descricao.hashCode();
+		descricao = numero.toString().replace("-", "");
+		return Integer.parseInt(descricao.substring(0,posicaoFinal));
+	}
+	
 	public static Double stringToDouble(String valor){
 		if(StringUtils.isBlank(valor)){
 			return null;

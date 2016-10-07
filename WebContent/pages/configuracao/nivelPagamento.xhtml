@@ -228,11 +228,11 @@
 					<tbody>
 						<tr >
 							<td >
-								<div class="row">
-									<div class="col-md-8">
+								<div  class="row">
+									<div class="col-md-10">
 										<div class="form-group">
 											<h:outputText value="Cidade " />
-											<h:selectOneMenu id="cidadeImport" value="#{bean.cidade}"
+											<h:selectOneMenu id="cidadeImport" value="#{bean.cidade}" required="true"
 												converter="entityConverter" styleClass="form-control">
 												<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 												<f:selectItems var="o" itemValue="#{o}"
@@ -247,30 +247,27 @@
 										</div>
 									</div>
 								</div> 
-								<h:panelGroup id="panelPorCidade"
-									rendered="#{bean.cidade != null}">
-									<div class="row">
-										<div class="col-md-8">
-											<div class="form-group">
-												<h:outputText value="Secretaria " />
-												<h:selectOneMenu id="secretariaImport"
-													value="#{bean.secretaria}" converter="entityConverter"
-													styleClass="form-control">
-													<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-													<f:selectItems var="o" itemValue="#{o}"
-														itemLabel="#{o.descricao}" value="#{bean.secretarias}" />
-												</h:selectOneMenu>
-												<h:message for="secretariaImport" tooltip="true"
-													styleClass="error-messages" />
-											</div>
+								<div class="row">
+									<div class="col-md-10">
+										<div class="form-group">
+											<h:outputText value="Secretaria " />
+											<h:selectOneMenu id="secretariaImport" disabled="#{bean.cidade == null}"
+												value="#{bean.secretaria}" converter="entityConverter" required="true"
+												styleClass="form-control">
+												<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+												<f:selectItems var="o" itemValue="#{o}"
+													itemLabel="#{o.descricao}" value="#{bean.secretarias}" />
+											</h:selectOneMenu>
+											<h:message for="secretariaImport" tooltip="true"
+												styleClass="error-messages" />
 										</div>
 									</div>
-								</h:panelGroup>
+								</div>
 								<div class="row">
-									<div class="col-md-8">
+									<div class="col-md-10">
 										<div class="form-group">
 											<h:outputText value="Ano " />
-											<h:selectOneMenu id="anoImport" value="#{bean.ano}"
+											<h:selectOneMenu id="anoImport" value="#{bean.ano}" required="true"
 												converter="entityConverter" styleClass="form-control">
 												<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 												<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
@@ -282,7 +279,7 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-md-8 form-group">
+									<div class="col-md-10 form-group">
 										<h:outputText value="Tipo Arquivo " />
 										<h:selectOneMenu id="tipoArquivoImport"
 											value="#{bean.tipoArquivo}" required="true"
@@ -297,36 +294,41 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-md-8 form-group">
+									<div class="col-md-10 form-group">
 										<h:outputText value="Selecione o Arquivo " />
 										<p:fileUpload id="file" required="true" value="#{bean.file}"
-											styleClass="btn btn-primary" allowTypes="/(\.|\/)(pdf)$/"
-											process="@this" mode="simple" skinSimple="true" />
+											styleClass="btn btn-primary" allowTypes="/(\.|\/)(csv)$/"
+											process="@this" mode="simple" skinSimple="true"  />
 										<h:message for="file" tooltip="true"
 											styleClass="error-messages" />
 									</div>
 								</div>
 							</td>
-							<td align="center" >
-								<div class="row">
-									<div class="col-md-8 form-group">
-										<h3><span class="label label-info">Informações da Importação</span></h3>
+							<td >
+								<div align="center"  class="row">
+									<div class="col-md-10 form-group">
+										<h3><span class="label label-warning">Informações da Importação</span></h3>
 									</div>
 								</div>
 								<div align="left" class="row">
-									<div class="col-md-8 form-group">
-										<div class="bs-callout bs-callout-info">
-									  		<c:forEach var="info" items="#{bean.getInformacoesImportacao()}" >
-											    <p>${info}</p>
-											</c:forEach>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-8 form-group">
-										<h:outputLink value="#{bean.downloadArquivoExemplo()}">
-											<h:outputText value="Download Arquivo Exemplo" />
-										</h:outputLink>
+									<div class="col-md-10 form-group">
+										  <div class="well">
+										  	   <p><b>A importação deverá seguir os seguintes passos:</b></p>
+										       <c:forEach var="info" items="#{bean.getInformacoesImportacao()}" >
+												    <p> <h:outputText value="#{info}" /> </p>
+											   </c:forEach>
+											   <p><b>Para maiores informações, consultar o 
+											   		<h:outputLink target="_blank"  value="#{bean.downloadManualImportacao()}">
+														<h:outputText value="Manual de Importação" />
+													</h:outputLink> .
+											   </b></p>
+											   <p><b>
+											   		Seguir como exemplo o arquivo disponibilizado para 
+											   		<h:outputLink value="#{bean.downloadArquivoExemplo()}">
+														<h:outputText value="download" />
+													</h:outputLink>.
+												</b></p>
+										  </div>
 									</div>
 								</div>
 							</td>
@@ -340,8 +342,8 @@
 	<ui:define name="botoesInsert">
 		<h:panelGroup id="botoes">
 			<p></p>
-			<p:commandButton styleClass="btn btn-primary" value="Atualizar"
-				actionListener="#{bean['update']}" rendered="#{bean['editing']}"
+			<p:commandButton styleClass="btn btn-primary" value="Importar Arquivo"
+				actionListener="#{bean.importarNiveis()}" rendered="#{bean['inserting']}"
 				oncomplete="carregando.hide(); mensagemAviso.show();"
 				update=":painelGlobal" onclick="carregando.show();" ajax="false" />
 
