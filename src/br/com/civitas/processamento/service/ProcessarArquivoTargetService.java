@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,8 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  boolean processamentoEventos = false;
 	private  boolean resumoSetor = false;
 	private  String linhaAnterior = "";
-
+	private  List<String> nomesCargos;
+	private String descricaoNivelPagamento;
 	
 	public void processar(ArquivoPagamento arquivoPagamento) throws Exception{
 		setArquivoPagamento(arquivoPagamento);
@@ -130,10 +132,12 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		setCargos(cargoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setVinculos(vinculoService.buscarPorCidade(getArquivoPagamento().getCidade()));
 		setEventos(eventoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		nomesCargos = getCargos().stream().map(cargo -> cargo.getDescricao()).collect(Collectors.toList());
 		processamentoPagamentoAtivo = false;
 		processamentoEventos = false;
 		resumoSetor = false;
 		linhaAnterior = "";
+		descricaoNivelPagamento = "";
 	}
 
 	private void localizarEvento(String linha) {
@@ -208,22 +212,32 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private NivelPagamento getNivelPagamento(String linhaAtual) {
 		NivelPagamento nivelPagamento = new NivelPagamento();
 		try {
-			String descricao = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao()) + IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao().length(),linhaAtual.length()).trim() ;
-			if(descricao.toUpperCase().contains(IdentificadorArquivoTarget.CARGO.getDescricao().toUpperCase())){
-				descricao = descricao.substring(0,descricao.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) ) + " " + 
-							descricao.substring(descricao.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) , descricao.length()).trim(); 
+			descricaoNivelPagamento = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao()) 
+					+ IdentificadorArquivoTarget.NIVEL_PAGAMENTO.getDescricao().length(),linhaAtual.length()).trim() ;
+			if(descricaoNivelPagamento.toUpperCase().contains(IdentificadorArquivoTarget.CARGO.getDescricao().toUpperCase())){
+				descricaoNivelPagamento = descricaoNivelPagamento.substring(0,descricaoNivelPagamento.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) ) + " " + 
+							descricaoNivelPagamento.substring(descricaoNivelPagamento.indexOf(IdentificadorArquivoTarget.CARGO.getDescricao()) , descricaoNivelPagamento.length()).trim(); 
 			}
-			descricao = descricao.replace(IdentificadorArquivoTarget.HIFEN.getDescricao(), " ")
+			descricaoNivelPagamento = descricaoNivelPagamento
 					.replace(IdentificadorArquivoTarget.CARGO.getDescricao(), "")
 					.replace(IdentificadorArquivoTarget.VIRGULA.getDescricao(), "")
 					.trim();
-			descricao = descricao.substring(Util.posicaoPrimeiraLetra(descricao), descricao.length());
+			descricaoNivelPagamento = descricaoNivelPagamento.equals(IdentificadorArquivoTarget.HIFEN.getDescricao()) ? "" : descricaoNivelPagamento;
+			descricaoNivelPagamento = descricaoNivelPagamento.substring(Util.posicaoPrimeiraLetra(descricaoNivelPagamento), descricaoNivelPagamento.length()).trim();
+			descricaoNivelPagamento = descricaoNivelPagamento.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao())==0 ? 
+					descricaoNivelPagamento.substring(1, descricaoNivelPagamento.length()).trim() : descricaoNivelPagamento;
+			if(StringUtils.notNullOrEmpty(descricaoNivelPagamento)){
+				List<String> resultado = nomesCargos.stream()
+						  .filter(nomeCargo -> descricaoNivelPagamento.contains(nomeCargo))
+						  .collect(Collectors.toList()); 
+				resultado.stream().forEach(r -> descricaoNivelPagamento = descricaoNivelPagamento.replace(r, ""));
+			}
 			nivelPagamento.setCidade(getArquivoPagamento().getCidade());
 			nivelPagamento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			nivelPagamento.setDescricao(descricao.trim()); 
+			nivelPagamento.setDescricao(descricaoNivelPagamento.trim()); 
 			nivelPagamento.setAno(getArquivoPagamento().getAno());
 			nivelPagamento.setSecretaria(secretaria);
-			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricao)? Util.getNumeroHashCode(descricao, nivelPagamento.getTamanhoMinimoCodigo()) + "" : ""); 
+			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricaoNivelPagamento)? Util.getNumeroHashCode(descricaoNivelPagamento, nivelPagamento.getTamanhoMinimoCodigo()) + "" : ""); 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nível Pagamento. Linha: " + linhaAtual);
 		}
@@ -328,7 +342,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 					"" :  unidadeTrabalhoString.substring(unidadeTrabalhoString.indexOf(IdentificadorArquivoTarget.HIFEN.getDescricao()) 
 							+ IdentificadorArquivoTarget.HIFEN.getDescricao().length(), 
 							unidadeTrabalhoString.length()).trim();
-			System.out.println("-" + unidadeTrabalhoString +  "-" );
 			if(StringUtils.notNullOrEmpty(unidadeTrabalhoString)){
 				unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 				unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());

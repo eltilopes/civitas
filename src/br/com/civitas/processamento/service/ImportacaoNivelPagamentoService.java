@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -39,6 +41,7 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 	
 	private UploadedFile file;
 	private String nomeArquivo;
+	private int quantidadeLinhasComNiveis;
 	private String nomeArquivoTemporario;
 	private List<NivelPagamento> niveisPagamento;
 	
@@ -47,36 +50,75 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 	private Secretaria secretaria;
 	private TipoArquivo tipoArquivo;
 	
-	public List<NivelPagamento> importarArquivo(String nomeArquivo, UploadedFile file, Ano ano, Cidade cidade, Secretaria secretaria,TipoArquivo tipoArquivo) throws Exception {
+	public Map<String, Object> importarArquivo(String nomeArquivo, UploadedFile file, Ano ano, Cidade cidade, Secretaria secretaria,
+			TipoArquivo tipoArquivo) throws Exception {
+		Map<String, Object> informacoesImportacao = new HashMap<String, Object>();
 		iniciarValores(file, nomeArquivo,  ano, cidade, secretaria, tipoArquivo);
 		importarValores();
 		salvarNiveis();
-		return niveisPagamento;
+		informacoesImportacao.put("quantidadeLinhasComNiveis", quantidadeLinhasComNiveis);
+		informacoesImportacao.put("niveisPagamento", niveisPagamento);
+		return informacoesImportacao;
 	}
 
-	private void iniciarValores(UploadedFile file, String nomeArquivo, Ano ano, Cidade cidade, Secretaria secretaria, TipoArquivo tipoArquivo) {
+	private void iniciarValores(UploadedFile file, String nomeArquivo, Ano ano, Cidade cidade, Secretaria secretaria, 
+			TipoArquivo tipoArquivo) {
 		this.file = file;
 		this.nomeArquivo = nomeArquivo;
 		this.ano = ano;
 		this.cidade = cidade;
 		this.secretaria = secretaria;
 		this.tipoArquivo = tipoArquivo;
+		quantidadeLinhasComNiveis = 1;
 		niveisPagamento = new ArrayList<NivelPagamento>();
 	}
 
 	private void salvarNiveis() {
-		//TODO ajustar essa regra
-		//List<NivelPagamento> niveisExistentes = nivelPagamentoService.buscarTipoArquivoCidadeAnoSecretaria(cidade, tipoArquivo, ano, secretaria);
+		quantidadeLinhasComNiveis = niveisPagamento.size();
 		if(!niveisPagamento.isEmpty()){
-			nivelPagamentoService.saveOrUpdateAll(niveisPagamento);
+			String codigos = "";
+			String descricoes = "";
+			String salariosBase = "";
+			for(NivelPagamento np : niveisPagamento){
+				codigos = codigos + "'" + np.getCodigo() + "',";
+				descricoes = descricoes + "'" + np.getDescricao() + "',";
+				salariosBase = salariosBase + np.getSalarioBase() + ",";
+			}
+			List<NivelPagamento> listaNiveisRemocao = removerNiveisExistentes(codigos.substring(0, codigos.length() - 1), 
+					descricoes.substring(0, descricoes.length() - 1), salariosBase.substring(0, salariosBase.length() - 1));
+			niveisPagamento.removeAll(listaNiveisRemocao);
+			if(!niveisPagamento.isEmpty()){
+				nivelPagamentoService.saveOrUpdateAll(niveisPagamento);
+			}
 		}
+	}
+
+	private List<NivelPagamento> removerNiveisExistentes(String codigos, String descricoes, String salariosBase) {
+		List<NivelPagamento> niveisExistentes = nivelPagamentoService.buscarTipoArquivoCidadeAnoSecretariaCodigoDescricaoSalario(
+				cidade, tipoArquivo, ano, secretaria, codigos, descricoes, salariosBase);
+		List<NivelPagamento> listaNiveisRemocao = new ArrayList<NivelPagamento>();
+		if(!niveisExistentes.isEmpty()){
+			for(NivelPagamento existente : niveisExistentes){
+				for(NivelPagamento novo : niveisPagamento){
+					if(novo.getCidade().getId().equals(existente.getCidade().getId()) &&
+							novo.getAno().getId().equals(existente.getAno().getId()) &&
+							novo.getSecretaria().getId().equals(existente.getSecretaria().getId()) &&
+							novo.getTipoArquivo().getCodigo()==existente.getTipoArquivo().getCodigo() && 
+							novo.getDescricao().equals(existente.getDescricao()) && 
+							novo.getSalarioBase().equals(existente.getSalarioBase()) &&
+							novo.getCodigo().equals(existente.getCodigo())){
+						listaNiveisRemocao.add(novo);
+					}
+				}
+			}
+		}
+		return listaNiveisRemocao;
 	}
 
 	private void importarValores() throws Exception {
 		criarArquivoImportacao();
 		try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivoTemporario))){
 			String linha;
-			int numeroLinha = 1;
 			boolean primeiraLinha = true;
 			boolean linhaComValores = true;
 			while ((linha = br.readLine()) != null && linhaComValores ) {
@@ -84,12 +126,14 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 				if (primeiraLinha) {
 					primeiraLinha = false;
 				}else{
-					niveisPagamento.add(getNivelPagamento(linha, numeroLinha));
-				}numeroLinha++;
+					niveisPagamento.add(getNivelPagamento(linha, quantidadeLinhasComNiveis));
+				}quantidadeLinhasComNiveis++;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ApplicationException("Ocorreu erro ao importar o arquivo. Contate o administrador!");
+		}finally {
+			deletarArquivos();
 		}	
 	}
 
@@ -161,6 +205,10 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 			IOUtils.closeQuietly(input);
 			IOUtils.closeQuietly(output);
 		}
+	}
+	
+	private void deletarArquivos() {
+		new File(nomeArquivoTemporario).delete();
 	}
 	
 }

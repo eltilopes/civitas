@@ -69,4 +69,25 @@ public class NivelPagamentoService extends AbstractPersistence<NivelPagamento> {
 		return query.list();
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<NivelPagamento> buscarTipoArquivoCidadeAnoSecretariaCodigoDescricaoSalario(Cidade cidade,
+			TipoArquivo tipoArquivo, Ano ano, Secretaria secretaria, String codigos, String descricoes, String salariosBase) {
+		
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT n FROM NivelPagamento n ");
+		sql.append(" WHERE n.cidade = :cidade  ");
+		sql.append(" AND n.tipoArquivo = :tipoArquivo  ");
+		sql.append(" AND n.ano = :ano ");
+		sql.append(" AND n.secretaria = :secretaria ");
+		sql.append(" AND n.codigo in ( " + codigos + " ) ");
+		sql.append(" AND n.descricao in ( " + descricoes + " ) ");
+		sql.append(" AND n.salarioBase in ( " + salariosBase + " ) ");
+		return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+				.setParameter("cidade", cidade)
+				.setParameter("tipoArquivo", tipoArquivo)
+				.setParameter("ano", ano)
+				.setParameter("secretaria", secretaria)
+				.list();
+	}
+	
 }

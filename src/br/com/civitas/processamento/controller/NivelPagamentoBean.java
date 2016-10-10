@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -68,7 +69,7 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 	private List<Secretaria> secretarias;
 	private List<Ano> anos;
 	private List<TipoArquivo> tiposArquivos;
-	private List<NivelPagamento> niveisImportados;
+	private Map<String, Object> niveisImportados;
 	
 	private Ano ano;
 	private Cidade cidade;
@@ -113,11 +114,15 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 		return path + File.separator + NOME_ARQUIVO_DOWNLOAD ;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void importarNiveis(){
 		if(validarEntidadesExtenssaoArquivo()){
 			try {
-				niveisImportados = importacaoNivelPagamentoService.importarArquivo(nomeArquivo, file,ano, cidade, secretaria, tipoArquivo );
-				FacesUtils.addInfoMessage("Arquivo Importado com Sucesso!");
+				niveisImportados = importacaoNivelPagamentoService.importarArquivo(nomeArquivo, file,ano, cidade, secretaria, tipoArquivo);
+				FacesUtils.addInfoMessage("Arquivo Importado com Sucesso! "
+						+ "O Arquivo continha "+niveisImportados.get("quantidadeLinhasComNiveis")+" Nível(s) a serem importados. "
+						+ "Foram importados "+ ((List<NivelPagamento>)niveisImportados.get("niveisPagamento")).size() +" Nível(s). "
+						+  getInformacaoNiveisExistentes((int) niveisImportados.get("quantidadeLinhasComNiveis")));
 			} catch (ApplicationException e) {
 				logErroProcessadorService.save(new LogErroProcessador(nomeArquivo, e.getMessage()));
 				FacesUtils.addErrorMessage(e.getMessage());
@@ -130,6 +135,12 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private String getInformacaoNiveisExistentes(int quantidadeLinhasComNiveis) {
+		return quantidadeLinhasComNiveis==niveisImportados.size() ? "" : "Já existiam " 
+				+ (quantidadeLinhasComNiveis - ((List<NivelPagamento>)niveisImportados.get("niveisPagamento")).size()) + " Nível(s) cadastrados.";
+	}
+
 	private boolean validarEntidadesExtenssaoArquivo()  {
 		try {
 			nomeArquivo = new String(file.getFileName().getBytes(Charset.defaultCharset()), "UTF-8");
@@ -289,14 +300,6 @@ public class NivelPagamentoBean extends AbstractCrudBean<NivelPagamento, NivelPa
 
 	public void setLogErroProcessadorService(LogErroProcessadorService logErroProcessadorService) {
 		this.logErroProcessadorService = logErroProcessadorService;
-	}
-
-	public List<NivelPagamento> getNiveisImportados() {
-		return niveisImportados;
-	}
-
-	public void setNiveisImportados(List<NivelPagamento> niveisImportados) {
-		this.niveisImportados = niveisImportados;
 	}
 
 }
