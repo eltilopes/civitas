@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.helpers.utils.StringUtils;
+import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Matricula;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
@@ -59,6 +60,25 @@ public class MatriculaService extends AbstractPersistence<Matricula> {
 		getSession().merge(matricula.getVinculo());
 		getSession().merge(matricula.getCargo());
 		return save(matricula);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Matricula> buscarCidade(Cidade cidade) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT DISTINCT m FROM Matricula m ");
+		sql.append("LEFT JOIN FETCH m.unidadeTrabalho ut ");
+		sql.append("LEFT JOIN FETCH m.nivelPagamento np ");
+		sql.append("LEFT JOIN FETCH m.cargaHorariaPagamento chp ");
+		sql.append("LEFT JOIN FETCH m.cargo ca ");
+		sql.append("LEFT JOIN FETCH m.secretaria sec ");
+		sql.append("LEFT JOIN FETCH m.setor setor ");
+		sql.append("LEFT JOIN FETCH m.vinculo v ");
+		sql.append("LEFT JOIN FETCH sec.cidade c ");
+		sql.append("WHERE 1 = 1 ");
+		sql.append("AND c = :cidade ");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		query.setParameter("cidade", cidade);
+		return (List<Matricula>) query.list();
 	}
 
 }

@@ -76,6 +76,12 @@ public class Matricula implements IEntity {
 	@Transient
 	private boolean selecionado;
 	
+	public Matricula() {}
+
+	public Matricula(String numeroMatricula) {
+		this.numeroMatricula = numeroMatricula;
+	}
+
 	public Long getId() {
 		return id;
 	}

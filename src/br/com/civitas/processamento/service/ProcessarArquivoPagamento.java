@@ -25,6 +25,7 @@ import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
+import br.com.civitas.processamento.entity.Matricula;
 import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
@@ -33,6 +34,9 @@ import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.utils.DiretorioProcessamento;
 
 public abstract class ProcessarArquivoPagamento {
+	
+	@Autowired
+	private  PagamentoService pagamentoService ;
 	
 	@Autowired
 	private  EventoService eventoService ;
@@ -58,6 +62,9 @@ public abstract class ProcessarArquivoPagamento {
 	@Autowired
 	private  VinculoService vinculoService;
 	
+	@Autowired
+	private  MatriculaService matriculaService;
+	
 	private String nomeArquivoTemporario;
 	private FileReader fileReaderEvento;
 	private FileReader filReaderPagamento;
@@ -72,6 +79,7 @@ public abstract class ProcessarArquivoPagamento {
 	private  List<CargaHorariaPagamento> cargasHorariaPagamento ;
 	private  List<Setor> setores ;
 	private  List<Vinculo> vinculos ;
+	private  List<Matricula> matriculas ;
 
 	public void iniciarArquivos( ) {
 		try {
@@ -398,6 +406,32 @@ public abstract class ProcessarArquivoPagamento {
 		return null;
 	}
 	
+	public Matricula getMatricula(Matricula matricula, String linha) throws ApplicationException {
+		Matricula matriculaAuxiliar = new Matricula();
+		try {
+			matriculaAuxiliar = getMatricula(matricula);
+			if(Objects.isNull(matriculaAuxiliar)){
+				matricula = matriculaService.save(matricula);
+				matriculas.add(matricula);
+			}else{
+				matricula = matriculaAuxiliar;
+			}
+		} catch (Exception e) {
+			throw new ApplicationException("Erro ao pegar a Matrícula. Linha: " + linha);
+		}
+		return matricula;
+	}
+	
+	public Matricula getMatricula(Matricula matricula) {
+		for(Matricula m :matriculas){
+			if(m.getNumeroMatricula().equals(matricula.getNumeroMatricula())){
+				matricula = m;
+				return matricula;
+			}
+		}
+		return null;
+	}
+	
 	public FileReader getFileReaderEvento() {
 		return fileReaderEvento;
 	}
@@ -484,6 +518,54 @@ public abstract class ProcessarArquivoPagamento {
 
 	public void setCargasHorariaPagamento(List<CargaHorariaPagamento> cargasHorariaPagamento) {
 		this.cargasHorariaPagamento = cargasHorariaPagamento;
+	}
+
+	public List<Matricula> getMatriculas() {
+		return matriculas;
+	}
+
+	public void setMatriculas(List<Matricula> matriculas) {
+		this.matriculas = matriculas;
+	}
+	
+	public MatriculaService getMatriculaService() {
+		return matriculaService;
+	}
+
+	public EventoService getEventoService() {
+		return eventoService;
+	}
+
+	public CargoService getCargoService() {
+		return cargoService;
+	}
+
+	public SecretariaService getSecretariaService() {
+		return secretariaService;
+	}
+
+	public SetorService getSetorService() {
+		return setorService;
+	}
+
+	public UnidadeTrabalhoService getUnidadeTrabalhoService() {
+		return unidadeTrabalhoService;
+	}
+
+	public NivelPagamentoService getNivelPagamentoService() {
+		return nivelPagamentoService;
+	}
+
+	public CargaHorariaPagamentoService getCargaHorariaPagamentoService() {
+		return cargaHorariaPagamentoService;
+	}
+
+	public VinculoService getVinculoService() {
+		return vinculoService;
+	}
+
+	public PagamentoService getPagamentoService() {
+		return pagamentoService;
 	}
 	
 }

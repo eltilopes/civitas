@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
@@ -30,33 +30,11 @@ import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 @Service
 public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento implements IProcessarArquivoPagamento{
 
-	@Autowired
-	private  PagamentoService pagamentoService;
-	
-	@Autowired
-	private  CargoService cargoService;
-	
-	@Autowired
-	private  SecretariaService secretariaService;
-	
-	@Autowired
-	private  CargaHorariaPagamentoService cargaHorariaPagamentoService;
-	
-	@Autowired
-	private  SetorService setorService;
-	
-	@Autowired
-	private  VinculoService vinculoService;
-	
-	@Autowired
-	private  EventoService eventoService ;
-	
 	private  Pagamento pagamento;
 	private  Matricula matricula;
 	private  Secretaria secretaria;
 	private  Setor setor;
 	private  List<Pagamento> pagamentos;
-	private  List<Matricula> matriculas;
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
 	private  boolean processamentoTotais = false;
@@ -94,7 +72,8 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		pagamento.getMatricula().setSetor(setor);
 		pagamentos.add(pagamento);
 		br.close();
-		pagamentoService.inserirPagamentos(pagamentos,getEventos(), getArquivoPagamento());
+		getMatriculaService().saveOrUpdateAll(pagamentos.stream().map(p -> p.getMatricula()).distinct().collect(Collectors.toCollection(ArrayList<Matricula> :: new)));
+		getPagamentoService().inserirPagamentos(pagamentos,getEventos(), getArquivoPagamento());
 	}
 
 	private boolean linhaTemImformacao(String linha) {
@@ -118,15 +97,15 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		pagamento = null;
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
-		matriculas = new ArrayList<Matricula>();
 		secretaria = null;
 		setor = null;
-		setCargasHorariaPagamento(cargaHorariaPagamentoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
-		setSetores(setorService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
-		setSecretarias(secretariaService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
-		setCargos(cargoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
-		setVinculos(vinculoService.buscarPorCidade(getArquivoPagamento().getCidade()));
-		setEventos(eventoService.buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setMatriculas(getMatriculaService().buscarCidade(getArquivoPagamento().getCidade()));
+		setCargasHorariaPagamento(getCargaHorariaPagamentoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setSetores(getSetorService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setSecretarias(getSecretariaService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setCargos(getCargoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
+		setVinculos(getVinculoService().buscarPorCidade(getArquivoPagamento().getCidade()));
+		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		processamentoPagamentoAtivo = false;
 		processamentoEventos = false;
 		processamentoTotais = false;
@@ -318,7 +297,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 				pagamentos.add(pagamento);
 			}
 			pagamento = new Pagamento();
-			novaMatricula(numeroMatricula, linhaAtual);
+			getMatricula(numeroMatricula, linhaAtual);
 		}
 	}
 	
@@ -351,18 +330,21 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		return numeroMatricula;
 	}
 
-	private  void novaMatricula(String numeroMatricula, String linha) throws ApplicationException {
-		if(linhaAnterior.contains(".498.988-43")){
-			System.out.println(linhaAnterior);
+	private void getMatricula(String numeroMatricula, String linhaAtual) {
+		matricula = getMatricula(new Matricula(numeroMatricula));
+		if(Objects.isNull(matricula)){
+			novaMatricula(numeroMatricula, linhaAtual);
 		}
+		pagamento.setMatricula(matricula);
+	}
+	
+	private  void novaMatricula(String numeroMatricula, String linha) throws ApplicationException {
 		matricula = new Matricula();
 		matricula.setNumeroMatricula(numeroMatricula);
 		matricula.setNomeFuncionario(getNomeFuncionario(linhaAnterior));;
 		matricula.setCargo(getCargo(getCargo(linhaAnterior), linhaAnterior));
 		matricula.setVinculo(getVinculo(getVinculo(linha), linha));
 		matricula.setDataAdmissao(getDataAdmissao(linha));;
-		matriculas.add(matricula);
-		pagamento.setMatricula(matricula);
 	}
 
 	private Cargo getCargo(String linha) throws ApplicationException {
@@ -417,14 +399,6 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		return linha.contains(IdentificadorArquivoDigimax.DATA_AFASTAMENTO.getDescricao()) ? 
 			linha.indexOf(IdentificadorArquivoDigimax.DATA_AFASTAMENTO.getDescricao())
 			: linha.length();
-	}
-
-	public void setPagamentoService(PagamentoService pagamentoService) {
-		this.pagamentoService = pagamentoService;
-	}
-
-	public void setEventoService(EventoService eventoService) {
-		this.eventoService = eventoService;
 	}
 
 }

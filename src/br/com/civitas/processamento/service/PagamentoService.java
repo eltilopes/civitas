@@ -25,9 +25,6 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 	private static final long serialVersionUID = 670233112671915705L;
 
 	@Autowired
-	private MatriculaService matriculaService;
-	
-	@Autowired
 	private EventoPagamentoService eventoPagamentoService;
 	
 	@Autowired
@@ -95,7 +92,6 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 		try {
 			arquivo = arquivoService.save(setResumoArquivo(pagamentos,eventos, arquivo));
 			for(Pagamento p : pagamentos){
-				p.setMatricula(matriculaService.salvar(p.getMatricula()));
 				p.setArquivo(arquivo);
 				p = save(p);
 				eventoPagamentoService.inserirEventosPagamento(p.getEventosPagamento());
