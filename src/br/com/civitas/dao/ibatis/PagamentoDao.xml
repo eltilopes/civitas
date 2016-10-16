@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="br.com.civitas.processamento.service.PagamentoService">
+
+	
+	<resultMap type="br.com.civitas.processamento.entity.Pagamento" id="resultPagamentos">
+		<id property="id" column="ci_pagamento"/>
+		<result property="diasTrabalhados" column="nr_dias_trabalhados" />
+		<result property="totalProventos" column="nr_total_proventos" />
+		<association property="matricula" javaType="br.com.civitas.processamento.entity.Matricula">
+			<id property="id" column="ci_matricula"/>
+			<result property="nomeFuncionario" column="nm_funcionario" />
+			<result property="dataAdmissao" column="dt_admissao" />
+			<association property="matriculaPagamento" javaType="br.com.civitas.processamento.entity.MatriculaPagamento">
+				<id property="id" column="ci_matricula_pagamento"/>
+				<association property="vinculo" javaType="br.com.civitas.processamento.entity.Vinculo">
+					<id property="id" column="ci_vinculo"/>
+					<result property="descricao" column="ds_vinculo"/>
+				</association>
+				<association property="secretaria" javaType="br.com.civitas.processamento.entity.Secretaria">
+					<id property="id" column="ci_secretaria"/>
+					<result property="descricao" column="ds_secretaria"/>
+				</association>
+				<association property="unidadeTrabalho" javaType="br.com.civitas.processamento.entity.UnidadeTrabalho">
+					<id property="id" column="ci_unidade_trabalho"/>
+					<result property="descricao" column="ds_unidade"/>
+				</association>
+				<association property="nivelPagamento" javaType="br.com.civitas.processamento.entity.NivelPagamento">
+					<id property="id" column="ci_nivel_pagamento"/>
+					<result property="descricao" column="ds_nivel"/>
+				</association>
+				<association property="cargaHorariaPagamento" javaType="br.com.civitas.processamento.entity.CargaHorariaPagamento">
+					<id property="id" column="ci_carga_horaria_pagamento"/>
+					<result property="descricao" column="ds_carga"/>
+				</association>
+				<association property="setor" javaType="br.com.civitas.processamento.entity.Setor">
+					<id property="id" column="ci_setor"/>
+					<result property="descricao" column="ds_setor"/>
+				</association>
+				<association property="cargo" javaType="br.com.civitas.processamento.entity.Cargo">
+					<id property="id" column="ci_cargo"/>
+					<result property="descricao" column="ds_cargo"/>
+				</association>
+			</association>
+		</association>
+		<collection property="eventosPagamento" javaType="br.com.civitas.processamento.entity.EventoPagamento">
+		    <id property="id" column="ci_evento_pagamento"/>
+		    <result property="valor" column="nr_valor"/>
+		    <association property="evento" javaType="br.com.civitas.processamento.entity.Evento">
+		    	<id property="id" column="ci_evento"/>
+				<result property="nome" column="nm_nome"/>
+				<result property="chave" column="nm_chave"/>
+			</association>
+		</collection>	
+	</resultMap>
+	
+	
+	<select id="getPagamentoPorArquivo" resultMap="resultPagamentos" parameterType="Map">
+		SELECT DISTINCT 
+			 p.ci_pagamento 
+			,p.nr_dias_trabalhados
+			,p.nr_total_proventos
+			,mm.ci_matricula
+			,mm.nm_funcionario
+			,mm.dt_admissao
+			,m.ci_matricula_pagamento
+			,v.ci_vinculo
+			,v.ds_descricao ds_vinculo
+			,sec.ci_secretaria
+			,sec.ds_descricao ds_secretaria
+			,ut.ci_unidade_trabalho
+			,ut.ds_descricao ds_unidade
+			,np.ci_nivel_pagamento
+			,np.ds_descricao ds_nivel
+			,chp.ci_carga_horaria_pagamento
+			,chp.ds_descricao ds_carga
+			,setor.ds_descricao ds_setor
+			,setor.ci_setor
+			,ca.ci_cargo
+			,ca.ds_descricao ds_cargo
+			,evp.ci_evento_pagamento
+			,evp.nr_valor
+			,ev.ci_evento
+			,ev.nm_nome
+			,ev.nm_chave
+			 
+		FROM tb_pagamento p  
+		INNER JOIN tb_arquivo_pagamento ap on ap.ci_arquivo_pagamento = p.cd_arquivo 
+		INNER JOIN tb_matricula_pagamento m on m.cd_mes = ap.cd_mes and m.cd_ano = ap.cd_ano 
+		INNER JOIN tb_matricula mm on mm.ci_matricula = p.cd_matricula and mm.ci_matricula = m.cd_matricula 
+		LEFT JOIN  tb_unidade_trabalho ut on m.cd_unidade_trabalho = ut.ci_unidade_trabalho
+		LEFT JOIN  tb_evento_pagamento evp on evp.cd_pagamento = p.ci_pagamento
+		LEFT JOIN  tb_evento ev on ev.ci_evento = evp.cd_evento
+		LEFT JOIN  tb_nivel_pagamento np on np.ci_nivel_pagamento = m.cd_nivel_pagamento
+		LEFT JOIN  tb_carga_horaria_pagamento chp on chp.ci_carga_horaria_pagamento = m.cd_carga_horaria_pagamento  
+		INNER JOIN  tb_cargo ca on ca.ci_cargo = m.cd_cargo 
+		INNER JOIN  tb_secretaria sec on sec.ci_secretaria = m.cd_secretaria
+		LEFT JOIN  tb_setor setor on setor.ci_setor  = m.cd_setor 
+		INNER JOIN  tb_vinculo v on v.ci_vinculo = m.cd_vinculo 
+	</select>
+	
+</mapper>

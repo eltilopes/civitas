@@ -58,17 +58,18 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	private List<NivelPagamento> niveisDisponiveis;
 	private NivelPagamento nivelPagamento;
 	
+	private Secretaria secretaria;
 	private boolean todosSelecionados = false;
 	
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarTodasAtivas();
-		getEntitySearch().setSecretaria(new Secretaria());
+		setSecretaria(new Secretaria());
 	}
 
 	@SuppressWarnings("unchecked")
 	public void prepareAtualizarMatriculas(){
-		niveisDisponiveis = nivelPagamentoService.buscarCidade(getEntitySearch().getSecretaria().getCidade());
+		niveisDisponiveis = nivelPagamentoService.buscarCidade(getSecretaria().getCidade());
 		if(niveisDisponiveis.isEmpty()){
 			FacesUtils.addWarnMessage("Não existe Níveis de Pagamento para a Cidade selecionada!");
 		}else{
@@ -87,7 +88,7 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	public void atualizarMatriculasSelecionadas() {
 		if(Objects.nonNull(nivelPagamento)){
 			for(Matricula m : listaMatriculaSelecionadas){
-				m.setNivelPagamento(nivelPagamento);
+				m.getMatriculaPagamento().setNivelPagamento(nivelPagamento);
 			}
 			try{
 				service.updateAll(listaMatriculaSelecionadas );
@@ -107,11 +108,11 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	
 	@SuppressWarnings("unchecked")
 	public void find(ActionEvent event) {
-		if(Objects.nonNull(getEntitySearch().getSecretaria().getCidade())){
+		if(Objects.nonNull(getEntitySearch().getMatriculaPagamento().getSecretaria().getCidade())){
 			try {
 				limpaListas();
 				List<Matricula> list = null;
-				list = service.getMatriculaPorNomeSetorSecretaria(getEntitySearch(), getSecretariasSelecionadas(), getSetoresSelecionados());
+				list = service.getMatriculaPorNomeSetorSecretaria(getEntitySearch(), getSecretaria(), getSecretariasSelecionadas(), getSetoresSelecionados());
 				if (list.isEmpty()) {
 					throw new ApplicationException("Consulta sem resultados.");
 				}
@@ -146,9 +147,9 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	}
 	
 	public void carregarPorCidade() {
-		if (Objects.nonNull(getEntitySearch().getSecretaria().getCidade())) {
-			setSecretariasDisponiveis(secretariaService.buscarCidade(getEntitySearch().getSecretaria().getCidade()));
-			setSetoresDisponiveis(setorService.buscarCidade(getEntitySearch().getSecretaria().getCidade()));
+		if (Objects.nonNull(getSecretaria().getCidade())) {
+			setSecretariasDisponiveis(secretariaService.buscarCidade(getSecretaria().getCidade()));
+			setSetoresDisponiveis(setorService.buscarCidade(getSecretaria().getCidade()));
 			setSetoresSelecionados(new ArrayList<Setor>());
 			setSecretariasSelecionadas(new ArrayList<Secretaria>());
 		}
@@ -161,7 +162,7 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	public void atualizarMatriculas(){
 		try {
 			for(Matricula m :listaMatriculaSelecionadas){
-				m.setNivelPagamento(getNivelPagamento());
+				m.getMatriculaPagamento().setNivelPagamento(getNivelPagamento());
 			}
 			service.updateAll(listaMatriculaSelecionadas);
 			addInfoMessage( getMessage( "SUCCESS_UPDATE" ) );
@@ -275,6 +276,14 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 
 	public void setNivelPagamento(NivelPagamento nivelPagamento) {
 		this.nivelPagamento = nivelPagamento;
+	}
+
+	public Secretaria getSecretaria() {
+		return secretaria;
+	}
+
+	public void setSecretaria(Secretaria secretaria) {
+		this.secretaria = secretaria;
 	}
 
 }

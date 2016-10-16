@@ -102,8 +102,7 @@ public class EmailService  extends AbstractPersistence<Email>  {
 	}
 
 	@Override
-	protected Class getClazz() {
-		// TODO Auto-generated method stub
-		return null;
+	protected Class<Email> getClazz() {
+		return Email.class;
 	}
 }

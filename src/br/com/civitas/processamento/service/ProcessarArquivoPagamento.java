@@ -39,6 +39,9 @@ public abstract class ProcessarArquivoPagamento {
 	private  PagamentoService pagamentoService ;
 	
 	@Autowired
+	private  MatriculaPagamentoService matriculaPagamentoService ;
+	
+	@Autowired
 	private  EventoService eventoService ;
 	
 	@Autowired
@@ -566,6 +569,10 @@ public abstract class ProcessarArquivoPagamento {
 
 	public PagamentoService getPagamentoService() {
 		return pagamentoService;
+	}
+
+	public MatriculaPagamentoService getMatriculaPagamentoService() {
+		return matriculaPagamentoService;
 	}
 	
 }

@@ -38,13 +38,13 @@ public class PagamentoVO {
 	public PagamentoVO(Pagamento pagamento) {
 		nomeFuncionario = pagamento.getMatricula().getNomeFuncionario();
 		admissao = new SimpleDateFormat("dd/MM/yyyy").format(pagamento.getMatricula().getDataAdmissao());
-		vinculo = Objects.nonNull(pagamento.getMatricula().getVinculo()) ? pagamento.getMatricula().getVinculo().getDescricao() : "";
-		secretaria = Objects.nonNull(pagamento.getMatricula().getSecretaria()) ? pagamento.getMatricula().getSecretaria().getDescricao() : "";
-		unidadeTrabalho = Objects.nonNull(pagamento.getMatricula().getUnidadeTrabalho()) ? pagamento.getMatricula().getUnidadeTrabalho().getDescricao() : "";
-		nivelPagamento = Objects.nonNull(pagamento.getMatricula().getNivelPagamento()) ? pagamento.getMatricula().getNivelPagamento().getDescricao() : "";
-		cargaHorariaPagamento = Objects.nonNull(pagamento.getMatricula().getCargaHorariaPagamento()) ? pagamento.getMatricula().getCargaHorariaPagamento().getDescricao() : "";
-		setor = Objects.nonNull(pagamento.getMatricula().getSetor()) ? pagamento.getMatricula().getSetor().getDescricao() : "";
-		funcao = Objects.nonNull(pagamento.getMatricula().getCargo()) ? pagamento.getMatricula().getCargo().getDescricao() : "";
+		vinculo = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getVinculo()) ? pagamento.getMatricula().getMatriculaPagamento().getVinculo().getDescricao() : "";
+		secretaria = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getSecretaria()) ? pagamento.getMatricula().getMatriculaPagamento().getSecretaria().getDescricao() : "";
+		unidadeTrabalho = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getUnidadeTrabalho()) ? pagamento.getMatricula().getMatriculaPagamento().getUnidadeTrabalho().getDescricao() : "";
+		nivelPagamento = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getNivelPagamento()) ? pagamento.getMatricula().getMatriculaPagamento().getNivelPagamento().getDescricao() : "";
+		cargaHorariaPagamento = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getCargaHorariaPagamento()) ? pagamento.getMatricula().getMatriculaPagamento().getCargaHorariaPagamento().getDescricao() : "";
+		setor = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getSetor()) ? pagamento.getMatricula().getMatriculaPagamento().getSetor().getDescricao() : "";
+		funcao = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getCargo()) ? pagamento.getMatricula().getMatriculaPagamento().getCargo().getDescricao() : "";
 		diasTrabalhados = pagamento.getDiasTrabalhados();
 		proventos = String.format("%.2f", pagamento.getTotalProventos());
 	}

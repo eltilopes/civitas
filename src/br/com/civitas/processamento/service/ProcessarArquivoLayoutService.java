@@ -18,6 +18,7 @@ import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Matricula;
+import br.com.civitas.processamento.entity.MatriculaPagamento;
 import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.Secretaria;
@@ -61,7 +62,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
 		}
-		pagamento.getMatricula().setVinculo(getVinculo(getVinculo(ultimaLinha),ultimaLinha));
+		pagamento.getMatricula().getMatriculaPagamento().setVinculo(getVinculo(getVinculo(ultimaLinha),ultimaLinha));
 		pagamentos.add(pagamento);
 		br.close();
 		getPagamentoService().inserirPagamentos(pagamentos,getEventos(), getArquivoPagamento());
@@ -84,7 +85,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		nivelPagamento = null;
 		secretaria = null;
 		setor = null;
-		setMatriculas(getMatriculaService().buscarCidade(getArquivoPagamento().getCidade()));
+		setMatriculas(getMatriculaService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setNiveisPagamento(getNivelPagamentoService().buscarTipoArquivoCidadeAno(getArquivoPagamento().getCidade(), 
 				getArquivoPagamento().getTipoArquivo(),getArquivoPagamento().getAno()));
 		setCargasHorariaPagamento(getCargaHorariaPagamentoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -150,14 +151,14 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		if(linhaAtual.contains(IdentificadorArquivoLayout.NIVEL.getDescricao()) 
 				&& !linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())){
 			nivelPagamento = getNivelPagamento(getNivelPagamento(linhaAtual), linhaAtual);
-			matricula.setNivelPagamento(nivelPagamento);
-			matricula.setCargaHorariaPagamento(getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual));
+			matricula.getMatriculaPagamento().setNivelPagamento(nivelPagamento);
+			matricula.getMatriculaPagamento().setCargaHorariaPagamento(getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual));
 		}
 	}
 
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())){
-			matricula.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
+			matricula.getMatriculaPagamento().setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
 		}
 	}
 
@@ -448,18 +449,29 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			novaMatricula(numeroMatricula, linhaAtual);
 			matricula = getMatricula(matricula, linhaAtual);
 		}
+		setMatriculaPagamento(linhaAtual);
+		matricula.setNomeFuncionario(getNomeFuncionario(linhaAnterior));
+		getMatriculaService().update(matricula);
 		pagamento.setMatricula(matricula);
 	}
 	
 	private  void novaMatricula(String numeroMatricula, String linhaAtual) throws ApplicationException {
 		matricula = new Matricula();
-		matricula.setSecretaria(secretaria);
-		matricula.setSetor(setor);
 		matricula.setNumeroMatricula(numeroMatricula);
-		matricula.setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
-		matricula.setVinculo(getVinculo(getVinculo(linhaAnterior), linhaAnterior));
-		matricula.setCargaHoraria(getCargaHoraria());
-		matricula.setNomeFuncionario(getNomeFuncionario(linhaAnterior));;
+		matricula.setNomeFuncionario(numeroMatricula);
+	}
+
+	private void setMatriculaPagamento(String linhaAtual) {
+		matricula.setMatriculaPagamento(new MatriculaPagamento());
+		matricula.getMatriculaPagamento().setSecretaria(secretaria);
+		matricula.getMatriculaPagamento().setSetor(setor);
+		matricula.getMatriculaPagamento().setCargo(getCargo(getCargo(linhaAtual), linhaAtual));
+		matricula.getMatriculaPagamento().setVinculo(getVinculo(getVinculo(linhaAnterior), linhaAnterior));
+		matricula.getMatriculaPagamento().setCargaHoraria(getCargaHoraria());
+		matricula.getMatriculaPagamento().setAno(getArquivoPagamento().getAno());
+		matricula.getMatriculaPagamento().setMes(getArquivoPagamento().getMes());
+		matricula.getMatriculaPagamento().setMatricula(matricula);
+		getMatriculaPagamentoService().salvar(matricula.getMatriculaPagamento());
 	}
 
 	private Cargo getCargo(String linhaAtual) throws ApplicationException {
@@ -484,7 +496,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			Integer posicaoInicial = getPosicaoInicialNomeFuncionario(linha);
 			nome = linha.subSequence(
 				posicaoInicial,
-				linha.indexOf(matricula.getVinculo().getDescricao())
+				linha.indexOf(matricula.getMatriculaPagamento().getVinculo().getDescricao())
 			).toString().trim();
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);

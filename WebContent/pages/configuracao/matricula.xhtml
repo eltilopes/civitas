@@ -44,7 +44,7 @@
 							<div class="form-group">
 							<h:outputText value="Cidade " />
 							<h:selectOneMenu id="cidadeSearch"
-											 value="#{bean.entitySearch.secretaria.cidade}"
+											 value="#{bean.secretaria.cidade}"
 											 converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
@@ -66,7 +66,7 @@
 					</div>
 				</div>	
 				<h:panelGroup id="panelPorCidade"
-					rendered="#{bean.entitySearch.secretaria.cidade != null}">
+					rendered="#{bean.secretaria.cidade != null}">
 					<div class="container-fluid">
 						<div class="row">
 							<h:panelGroup id="panelSecretarias"
