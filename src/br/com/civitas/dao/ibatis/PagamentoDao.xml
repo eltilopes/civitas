@@ -100,6 +100,34 @@
 		INNER JOIN  tb_secretaria sec on sec.ci_secretaria = m.cd_secretaria
 		LEFT JOIN  tb_setor setor on setor.ci_setor  = m.cd_setor 
 		INNER JOIN  tb_vinculo v on v.ci_vinculo = m.cd_vinculo 
+		WHERE 1 = 1 
+		<if test="secretarias != null and secretarias != '' ">
+			 AND sec.ci_secretaria in ( ${secretarias} )
+		</if>
+		<if test="setoresSelecionados != null and setoresSelecionados != '' ">
+			 AND setor.ci_setor in ( ${setoresSelecionados} )
+		</if>
+		<if test="cargosSelecionados != null and cargosSelecionados != '' ">
+			 AND ca.ci_cargo in ( ${cargosSelecionados} )
+		</if>
+		<if test="cargasSelecionados != null and cargasSelecionados != '' ">
+			 AND chp.ci_carga_horaria_pagamento in ( ${cargasSelecionados} )
+		</if>
+		<if test="niveisSelecionados != null and niveisSelecionados != '' ">
+			 AND np.ci_nivel_pagamento in ( ${niveisSelecionados} )
+		</if>
+		<if test="unidadesSelecionadas != null and unidadesSelecionadas != '' ">
+			 AND ut.ci_unidade_trabalho in ( ${unidadesSelecionadas} )
+		</if>
+		<if test="idCidade != null ">
+			 AND ap.cd_cidade = ${idCidade} 
+		</if>
+		<if test="idAno != null ">
+			 AND ap.cd_ano = ${idAno} 
+		</if>
+		<if test="idMes != null ">
+			 AND ap.cd_mes = ${idMes} 
+		</if>
 	</select>
 	
 </mapper>
