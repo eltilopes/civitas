@@ -1,5 +1,7 @@
 package br.com.civitas.processamento.service;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
@@ -16,8 +18,8 @@ public class MatriculaPagamentoService extends AbstractPersistence<MatriculaPaga
 	}
 	
 	public MatriculaPagamento salvar(MatriculaPagamento matriculaPagamento){
-		getSession().merge(matriculaPagamento.getVinculo());
-		getSession().merge(matriculaPagamento.getCargo());
+		if(Objects.nonNull(matriculaPagamento.getVinculo()))getSession().merge(matriculaPagamento.getVinculo());
+		if(Objects.nonNull(matriculaPagamento.getCargo()))getSession().merge(matriculaPagamento.getCargo());
 		return save(matriculaPagamento);
 	}
 

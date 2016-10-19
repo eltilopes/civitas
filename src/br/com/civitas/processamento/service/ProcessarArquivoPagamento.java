@@ -196,6 +196,9 @@ public abstract class ProcessarArquivoPagamento {
 	}
 	
 	public Cargo getCargo(Cargo cargo, String linha) {
+		if(cargo == null){
+			return null;
+		}
 		Cargo cargoAuxiliar = new Cargo();
 		try {
 			cargoAuxiliar = getCargo(cargo);
