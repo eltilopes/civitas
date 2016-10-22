@@ -146,7 +146,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			setNiveisDisponiveis(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setCargasDisponiveis(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
 			setEventosDisponiveis(eventoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setEventosSelecionados(new ArrayList<Evento>());
+			setEventosSelecionados(getEventosDisponiveis());
 			setCargosSelecionados(new ArrayList<Cargo>());
 			setSetoresSelecionados(new ArrayList<Setor>());
 			setCargasSelecionados(new ArrayList<CargaHorariaPagamento>());
@@ -186,21 +186,37 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			setTotaisValores(pagamento.getTotalProventos(), PagamentoVO.proventosColuna());
 			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
 			if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
-				int i = 0;
 				for(Evento evento : eventosSelecionados){
+					Double valorEvento = 0D;
+					EventoPagamento eventoPagamentoZerado = getEventoValorZerado(evento);
+					pagamento.getEventosPagamentoSelecionados().add(eventoPagamentoZerado);
 					for(EventoPagamento ep : pagamento.getEventosPagamento()){
 						if(evento.getChave().equals(ep.getEvento().getChave())){
-							pagamento.getEventosPagamentoSelecionados().add(ep);
-							setTotaisValores(ep.getValor(), evento.getNome());
+							adicionarValorEventoPagamento(pagamento, ep, eventoPagamentoZerado);
+							valorEvento = ep.getValor();
+							setTotaisValores(valorEvento, evento.getNome());
 						}
 					}
-					if(pagamento.getEventosPagamentoSelecionados().size() == i++){
-						pagamento.getEventosPagamentoSelecionados().add(getEventoValorZerado(evento));
+					if(valorEvento.equals(0D)){
+						setTotaisValores(valorEvento, evento.getNome());
 					}
 				}	
 			}
 			pagamentosMap.add( getMapValueFields(pagamento));
 		}
+	}
+
+	private void adicionarValorEventoPagamento(Pagamento pagamento, EventoPagamento ep, EventoPagamento eventoPagamentoZerado) {
+		if(ep.getEvento().getNome().equals("EMPRESTIMO CAIXA ECON.FEDERAL")){
+			System.out.println(pagamento.getMatricula().getNomeFuncionario() +" : "+ ep.getEvento().getNome()+" : "+ep.getValor());
+		}
+		EventoPagamento eventoPagamento = ep;
+		int index = pagamento.getEventosPagamentoSelecionados().indexOf(eventoPagamentoZerado);
+		if(index != -1){
+			eventoPagamento = pagamento.getEventosPagamentoSelecionados().get(index);
+			eventoPagamento.setValor(eventoPagamento.getValor() + ep.getValor());
+		}
+		pagamento.getEventosPagamentoSelecionados().add(eventoPagamento);
 	}
 
 	private void setTotaisValores(Double valor, String chave) {
@@ -262,7 +278,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		}
 		if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
 			for (EventoPagamento eventoPagamento : pagamento.getEventosPagamentoSelecionados()) {
-				pagamentosMap.put(eventoPagamento.getEvento().getChave(),String.format("%.2f", eventoPagamento.getValor()) );
+					pagamentosMap.put(eventoPagamento.getEvento().getChave(), String.format("%.2f", eventoPagamento.getValor()));
 			}
 		}
 		return pagamentosMap;

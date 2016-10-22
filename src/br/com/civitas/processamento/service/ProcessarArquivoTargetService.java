@@ -121,6 +121,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private String getChaveEvento(String linha) {
+		if(linha.contains(IdentificadorArquivoTarget.ANUENIO.getDescricao())){
+			return IdentificadorArquivoTarget.ANUENIO.getDescricao();
+		}
 		try {
 			int posicaoInicialIdentificador = 0 ;
 			int posicaoPrimeiraVirgula = linha.lastIndexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) ;
@@ -128,7 +131,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
 			posicaoEspacoLinhaInvertida = posicaoEspacoLinhaInvertida  + 1 + linhaInvertida.substring(posicaoEspacoLinhaInvertida + 1).indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()) ;
 			return linha.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida).trim();
-			
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Chave Evento. Linha: " + linha);
 		}
@@ -260,12 +262,15 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarEventosPagamento(String linhaAtual) {
+		if(linhaAtual.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())){
+			System.out.println(linhaAtual);
+		}
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
 		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
 			localizarDiasTrabalhados(linhaAtual);
 			for(Evento evento : getEventos()){
-				if(linhaAtual.toUpperCase().contains(evento.getNome().toUpperCase())){
+				if(getChaveEvento(linhaAtual.toUpperCase()).equals(evento.getNome().toUpperCase())){
 						pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
 				}
 			}		

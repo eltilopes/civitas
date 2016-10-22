@@ -17,6 +17,7 @@ public enum IdentificadorArquivoTarget {
 		CARGO("Cargo 2"), 
 		CPF("CPF:"), 
 		TOTAIS("Totais"), 
+		ANUENIO("ANUENIO"), 
 		LOTACAO("Lotação.:"), 
 		ADMISSAO("Dta. Admiss.:"), 
 		NIVEL_PAGAMENTO("Nivel Salarial:"), 
