@@ -141,10 +141,6 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 		return StringUtils.notNullOrEmpty(linha) && linha.length() > 3 ; //A linha deve possuir no minimo 3 virgulas
 	}
 
-	private int contarVezesPalavraNaFrase(String frase, String palavra) {
-		  return (frase.split(palavra)).length -1;   
-		}
-	
 	private NivelPagamento getNivelPagamento(String linha, int numeroLinha) {
 		String delimitador = getDelimitador(linha);
 		String[] valores = linha.split(delimitador);
@@ -156,9 +152,9 @@ public class ImportacaoNivelPagamentoService implements Serializable {
 	}
 
 	private String getDelimitador(String linha) {
-		if(contarVezesPalavraNaFrase(linha, PONTO_VIRGULA_CSV) >= 2){
+		if(StringUtils.contarVezesPalavraNaFrase(linha, PONTO_VIRGULA_CSV) >= 2){
 			return PONTO_VIRGULA_CSV;
-		}else if(contarVezesPalavraNaFrase(linha, DELIMITADOR_CSV) >= 2){
+		}else if(StringUtils.contarVezesPalavraNaFrase(linha, DELIMITADOR_CSV) >= 2){
 			return DELIMITADOR_CSV;
 		}
 		throw new ApplicationException("O arquivo esta com delimitador inválido. Veja os delimitadores permitidos no Manual de Importação.");

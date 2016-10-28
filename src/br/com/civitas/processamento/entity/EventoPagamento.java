@@ -38,6 +38,12 @@ public class EventoPagamento implements IEntity {
 	@Column(name = "nr_valor", nullable = false)
 	private Double valor;
 	
+	public EventoPagamento(){}
+	
+	public EventoPagamento(Evento evento){
+		this.evento = evento;
+	}
+	
 	public Long getId() {
 		return id;
 	}

@@ -6,15 +6,15 @@ import java.security.NoSuchAlgorithmException;
 import java.nio.charset.Charset;
 
 public class StringUtils {
-	
-	//Matches a person's full name
+
+	// Matches a person's full name
 	public static final String REGEX_FULL_NAME = "^(?!.{52,})[\\p{L}'-]{1,50}(?:\\s?[\\p{L}'-]{1,50})+$";
 	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
-	
-	public static boolean notNullOrEmpty(String string){
+
+	public static boolean notNullOrEmpty(String string) {
 		return (string != null && !string.isEmpty());
 	}
-	
+
 	public static String md5(String senha) {
 		String sen;
 		MessageDigest md = null;
@@ -25,22 +25,31 @@ public class StringUtils {
 		}
 		BigInteger hash = new BigInteger(1, md.digest(senha.getBytes()));
 		sen = hash.toString(16);
-		while (sen.length() < 32) {  
-			sen = "0" + sen;  
-		}  
+		while (sen.length() < 32) {
+			sen = "0" + sen;
+		}
 		return sen;
 	}
-	
+
+	public static int contarVezesPalavraNaFrase(String frase, String palavra) {
+		try {
+			return (frase.split(palavra)).length - 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
 	public static String decodeUTF8(byte[] bytes) {
-	    return new String(bytes, UTF8_CHARSET);
+		return new String(bytes, UTF8_CHARSET);
 	}
 
 	public static byte[] encodeUTF8(String string) {
-	    return string.getBytes(UTF8_CHARSET);
+		return string.getBytes(UTF8_CHARSET);
 	}
-	
-	public static String converteStringUTF8(String valor){
+
+	public static String converteStringUTF8(String valor) {
 		return decodeUTF8(encodeUTF8(valor));
 	}
-	
+
 }
