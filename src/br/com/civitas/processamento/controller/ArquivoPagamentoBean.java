@@ -2,6 +2,7 @@ package br.com.civitas.processamento.controller;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,11 +17,14 @@ import org.primefaces.model.UploadedFile;
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
+import br.com.civitas.arquitetura.util.Util;
 import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.LogErroProcessador;
 import br.com.civitas.processamento.entity.Mes;
+import br.com.civitas.processamento.entity.ResumoSetor;
+import br.com.civitas.processamento.enums.IdentificadorArquivoLayout;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.factory.FactoryEnuns;
 import br.com.civitas.processamento.service.AnoService;
@@ -64,6 +68,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private List<Mes> meses;
 	private List<TipoArquivo> tiposArquivos;
 	private UploadedFile file;
+	private List<ResumoSetor> resumos;
 
 	@PostConstruct
 	public void init() {
@@ -71,6 +76,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		anos = anoService.buscarTodos();
 		meses = mesService.buscarTodos();
 		tiposArquivos = FactoryEnuns.listaTipoArquivo();
+		resumos = new ArrayList<ResumoSetor>();
 	}
 
 	@Override
@@ -91,11 +97,12 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	}
 	
 	public void processarArquivo() {
+		resumos = new ArrayList<ResumoSetor>();
 		try {
 			arquivo.setNomeArquivo(new String(file.getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
 			arquivo.setFile(file);
 			validarArquivoService.validarArquivo(file, arquivo);
-			service.processarArquivo(arquivo);
+			resumos = service.processarArquivo(arquivo);
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (ApplicationException e) {
 			logger.error(e);
@@ -106,10 +113,26 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
 		}finally {
-			arquivo = new ArquivoPagamento();
+//			arquivo = new ArquivoPagamento();
 		}
 	}
 
+	public boolean valoresResumoConferidos(ResumoSetor resumoSetor){
+		if (!resumoSetor.getTotalDescontos().equals(Util.arredondarDoubleTeto(
+				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao()), 2))) {
+			return false;
+		}
+		if (!resumoSetor.getTotalProventos().equals(Util.arredondarDoubleTeto(
+				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao()), 2))) {
+			return false;
+		}
+		if (!resumoSetor.getTotalRemuneracao().equals(Util.arredondarDoubleTeto(
+				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao()), 2))) {
+			return false;
+		}
+		return true;
+	}
+	
 	public void setEventoService(EventoService eventoService) {
 		this.eventoService = eventoService;
 	}
@@ -185,6 +208,14 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	public void setFile(UploadedFile file) {
 		this.file = file;
+	}
+
+	public List<ResumoSetor> getResumos() {
+		return resumos;
+	}
+
+	public void setResumos(List<ResumoSetor> resumos) {
+		this.resumos = resumos;
 	}
 
 }

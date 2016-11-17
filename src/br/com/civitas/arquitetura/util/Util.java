@@ -1,5 +1,7 @@
 package br.com.civitas.arquitetura.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.text.NumberFormat;
@@ -27,6 +29,13 @@ public class Util {
 		String string = fmt.format(precoDouble);
 		double preco = Double.parseDouble(string.replaceAll(",", "."));
 		return preco;
+	}
+	
+	public static Double arredondarDoubleTeto(Double valor, int casasDecimais) {
+		if (valor == null) {
+			return 0D;
+		}
+		return new BigDecimal(valor).setScale(casasDecimais, RoundingMode.HALF_EVEN).doubleValue();
 	}
 	
 	public static Integer getNumeroHashCode(String descricao, int posicaoFinal){

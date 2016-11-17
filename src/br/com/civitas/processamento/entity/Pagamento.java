@@ -60,6 +60,9 @@ public class Pagamento implements IEntity {
 
 	@Column(name = "nr_dias_trabalhados")
 	private String diasTrabalhados;
+	  
+	@Transient
+	private MatriculaPagamento matriculaPagamento;
 	
 	public Pagamento(){
 		eventosPagamento = new ArrayList<EventoPagamento>();
@@ -127,6 +130,14 @@ public class Pagamento implements IEntity {
 
 	public void setArquivo(ArquivoPagamento arquivo) {
 		this.arquivo = arquivo;
+	}
+
+	public MatriculaPagamento getMatriculaPagamento() {
+		return matriculaPagamento;
+	}
+
+	public void setMatriculaPagamento(MatriculaPagamento matriculaPagamento) {
+		this.matriculaPagamento = matriculaPagamento;
 	}
 
 	public String getDiasTrabalhados() {

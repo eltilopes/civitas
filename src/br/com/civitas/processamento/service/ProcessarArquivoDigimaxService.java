@@ -22,6 +22,7 @@ import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Matricula;
 import br.com.civitas.processamento.entity.MatriculaPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
+import br.com.civitas.processamento.entity.ResumoSetor;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.Vinculo;
@@ -43,9 +44,11 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 	private  String linhaAnterior = "";
 	private  String linhaAnteriorQuebraPagina = "";
 	
-	public void processar(ArquivoPagamento arquivoPagamento) throws Exception{
+	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception{
+		//TODO: ajustar List<ResumoSetor>
 		setArquivoPagamento(arquivoPagamento);
 		processar();
+		return null;
 	}
 	
 	private void processar() throws Exception {

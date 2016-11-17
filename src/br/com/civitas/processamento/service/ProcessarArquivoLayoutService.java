@@ -2,13 +2,13 @@ package br.com.civitas.processamento.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -43,8 +43,10 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private NivelPagamento nivelPagamento;
 	private Setor setor;
 	private Setor setorResumo;
+	private Secretaria secretariaResumo;
 	private ResumoSetor resumoSetor;
 	private List<Pagamento> pagamentos;
+	private List<ResumoSetor> resumosSetores;
 	private List<String> nomeEventos;
 	private boolean processamentoPagamento = false;
 	private boolean processamentoEventos = false;
@@ -52,13 +54,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private String ultimaLinha = "";
 	private String linhaAnterior = "";
 	private String descricaoLinha;
-	private Double valorTotalProventos = 0D;
-	private Double valorTotalDescontos = 0D;
-	private int qtdPagamentos = 0;
-
-	public void processar(ArquivoPagamento arquivoPagamento) throws Exception {
+	private Map<String, Double> totaisEventos;
+	
+	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception {
 		setArquivoPagamento(arquivoPagamento);
 		processar();
+		return resumosSetores;
 	}
 
 	private void processar() throws Exception {
@@ -100,6 +101,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		secretaria = null;
 		setor = null;
 		resumoSetor = null;
+		resumosSetores = new ArrayList<ResumoSetor>();
 		setMatriculas(getMatriculaService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setNiveisPagamento(getNivelPagamentoService().buscarTipoArquivoCidadeAno(getArquivoPagamento().getCidade(),
 				getArquivoPagamento().getTipoArquivo(), getArquivoPagamento().getAno()));
@@ -173,32 +175,97 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			processamentoResumo = true;
 			resumoSetor = new ResumoSetor();
 			setorResumo = setor;
+			secretariaResumo = secretaria;
 		}
 		if (processamentoResumo && linha.contains(IdentificadorArquivoLayout.FIM_RESUMO.getDescricao())) {
 			processamentoResumo = false;
-			verificarResumoSetor();
 		}
 	}
 
 	private void verificarResumoSetor() {
 		// TODO: ajustar verificarResumo
-		int qtd = 0;
-		List<Pagamento> pagamentosSetor = new ArrayList<>();
-		for (Pagamento p : pagamentos) {
-			if (p.getMatricula().getMatriculaPagamento().getSetor().equals(setorResumo)) {
-				qtd = qtd + 1;
-				pagamentosSetor.add(p);
+		List<Pagamento> pagamentosSetor = pagamentos.stream()
+				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
+						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
+				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+		totaisEventos = new HashMap<String, Double>();
+		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
+		resumoSetor.setSetor(setorResumo);
+		resumoSetor.setSecretaria(secretariaResumo);
+		pagamentosSetor.stream().forEach(p -> {
+			adicionarTotaisPagamento(p.getTotalDescontos(), IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao());
+			adicionarTotaisPagamento(p.getTotalProventos(), IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao());
+			adicionarTotaisPagamento(p.getTotalRemuneracao(),	IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao());
+			p.getEventosPagamento().stream().filter(
+					ep -> ep.getEvento().getChave().equals(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao()))
+					.forEach(ep -> {
+						adicionarTotaisPagamento(ep.getValor(), ep.getEvento().getChave());
+					});
+		});
+		resumoSetor.setTotaisPagamentos(totaisEventos);
+		resumosSetores.add(resumoSetor);
+		verificarTotaisResumo();
+		resumoSetor = null;
+	}
+
+	private void adicionarTotaisPagamento(Double valor, String chave) {
+		if (!totaisEventos.containsKey(chave)) {
+			totaisEventos.put(chave, 0.00);
+		}
+		totaisEventos.put(chave, totaisEventos.get(chave) + valor);
+	}
+
+	@SuppressWarnings("unused")
+	private void verificarValorTotalEvento(EventoPagamento ep) {
+		if (!totaisEventos.containsKey(ep.getEvento().getChave())) {
+			throw new ApplicationException("Total do Evento: '" + ep.getEvento().getChave()
+					+ "' não localizado no Arquivo. Contate o Adiministrador!");
+		}
+		if (!ep.getValor()
+				.equals(Util.arredondarDoubleTeto(totaisEventos.get(ep.getEvento().getChave()), DUAS_CASAS_DECIMAIS))) {
+			throw new ApplicationException(
+					"Valor Total do Evento: '" + ep.getEvento().getChave() + "' no Resumo do Setor: '"
+							+ secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() + "' não esta batendo. Contate o Administrador!");
+		}
+	}
+
+	private void verificarTotaisResumo() {
+		System.out.println("Resumo Setor: " + secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() 
+		+ ". Quantidade Pagamentos: " + resumoSetor.getQuantidadePagamentos());
+
+		System.out.println("Total Descontos: " + resumoSetor.getTotalDescontos());
+		System.out.println("Total Proventos: " + resumoSetor.getTotalProventos());
+		System.out.println("Total Remuneração: " + resumoSetor.getTotalRemuneracao());
+		System.out.println("Resumo Descontos: " + Util.arredondarDoubleTeto(
+				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao()), DUAS_CASAS_DECIMAIS));
+		System.out.println("Resumo Proventos: " + Util.arredondarDoubleTeto(
+				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao()), DUAS_CASAS_DECIMAIS));
+		System.out.println("Resumo Remuneração: " + Util.arredondarDoubleTeto(
+				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao()), DUAS_CASAS_DECIMAIS));
+		resumoSetor.getEventosPagamento().stream().forEach(ep -> {
+			if (totaisEventos.containsKey(ep.getEvento().getChave())) {
+				System.out.println("    Evento - : " + ep.getEvento().getChave() + " : " + ep.getValor() +" / "
+						+ Util.arredondarDoubleTeto(totaisEventos.get(ep.getEvento().getChave()), DUAS_CASAS_DECIMAIS) );
 			}
-		}
-		System.out.println(pagamentosSetor.size() + " - qtdPagamentos:" + qtdPagamentos + " - qtd:" + qtd);
-		BigDecimal bd = new BigDecimal(valorTotalDescontos).setScale(2, RoundingMode.HALF_EVEN);
-		valorTotalDescontos = bd.doubleValue();
-		System.out.println(valorTotalDescontos);
-		if (!resumoSetor.getTotalDescontos().equals(valorTotalDescontos)) {
-			throw new ApplicationException("Valor do Resumo não esta batendo");
-		}
-		valorTotalProventos = 0D;
-		valorTotalDescontos = 0D;
+		});
+//		if (!resumoSetor.getTotalDescontos().equals(Util.arredondarDoubleTeto(
+//				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao()), DUAS_CASAS_DECIMAIS))) {
+//			throw new ApplicationException("Valor Total Descontos do Resumo do Setor: '" 
+//				+ secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() 
+//				+ "' não esta batendo. Contate o Administrador!");
+//		}
+//		if (!resumoSetor.getTotalProventos().equals(Util.arredondarDoubleTeto(
+//				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao()), DUAS_CASAS_DECIMAIS))) {
+//			throw new ApplicationException("Valor Total de Proventos do Resumo do Setor: '" 
+//				+ secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() 
+//				+ "' não esta batendo. Contate o Administrador!");
+//		}
+//		if (!resumoSetor.getTotalRemuneracao().equals(Util.arredondarDoubleTeto(
+//				totaisEventos.get(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao()), DUAS_CASAS_DECIMAIS))) {
+//			throw new ApplicationException("Valor Total da Remuneração do Resumo do Setor: '"
+//					+ secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() 
+//					+ "' não esta batendo. Contate o Administrador!");
+//		}
 	}
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
@@ -214,11 +281,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		verificarIdentificadorResumo(linhaAtual);
 		if (processamentoResumo && Util.valorContemNumero(linhaAtual)) {
 			getTotaisResumo(linhaAtual);
-			for (Evento e : getEventos()) {
-				if (linhaAtual.contains(e.getChave())) {
-					getResumoSetor(linhaAtual, e);
-				}
+			if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao())) {
+				getResumoSetor(linhaAtual, new Evento(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao()));
 			}
+		}
+		if (processamentoPagamento && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+			verificarResumoSetor();
 		}
 	}
 
@@ -229,9 +297,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		if (linhaAtual.contains(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao())) {
 			resumoSetor.setTotalProventos(getValorTotalResumo(linhaAtual));
 		}
-		// if(linhaAtual.contains(IdentificadorArquivoLayout.VALOR_LIQUIDO_TOTAL.getDescricao())){
-		// resumoSetor.setTotalLiquido(getValorTotalResumo(linhaAtual));
-		// }
+		if (linhaAtual.contains(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao())) {
+			resumoSetor.setTotalRemuneracao(getValorTotalResumo(linhaAtual));
+		}
 	}
 
 	private Double getValorTotalResumo(String linhaAtual) {
@@ -247,7 +315,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 				linhaAtual.length());
 		eventoPagamento.setValor(Double.parseDouble(getValorEvento(linhaComValor,
 				linhaComValor.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()))));
-		resumoSetor.getEventosPagamento().add(eventoPagamento);
+		if (!resumoSetor.getEventosPagamento().contains(eventoPagamento)) {
+			resumoSetor.getEventosPagamento().add(eventoPagamento);
+		}
 	}
 
 	private void localizarNivelGrupoPagamento(String linhaAtual) {
@@ -370,6 +440,13 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 						linhaAtual.length());
 				descricao = descricao.substring(descricao.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()) + 1,
 						descricao.length()).trim();
+			} else if (linhaAtual.contains(IdentificadorArquivoLayout.PAGINA.getDescricao())) {
+				descricao = linhaAtual.substring(
+						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
+						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
+				descricao = descricao
+						.substring(0, descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
+						.trim();
 			}
 
 			secretaria.setCidade(getArquivoPagamento().getCidade());
@@ -391,6 +468,10 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 					.substring(descricao.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
 							descricao.length() - 3)
 					.trim();
+			String codigo = linhaAtual
+					.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
+			codigo = codigo.substring(Util.posicaoPrimeiraNumero(codigo), codigo.indexOf(descricao)).trim();
+			setor.setCodigo(Integer.parseInt(codigo));
 			setor.setCidade(getArquivoPagamento().getCidade());
 			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			setor.setDescricao(descricao);
@@ -437,13 +518,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 					.parseDouble(linha.substring(finalLiquido, finalProventos).replace(".", "").replace(",", ".")));
 			pagamento.setTotalDescontos(Double
 					.parseDouble(linha.substring(finalProventos, finalDescontos).replace(".", "").replace(",", ".")));
-			valorTotalDescontos = valorTotalDescontos + pagamento.getTotalDescontos();
-			valorTotalProventos = valorTotalProventos + pagamento.getTotalProventos();
-			qtdPagamentos = qtdPagamentos + 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private void getEventoPagamento(String linhaOriginal, Evento evento) {
@@ -545,15 +622,14 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarMatricula(String linhaAtual) throws Exception {
-		
+
 		if (linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao())) {
 			ultimaLinha = linhaAnterior;
 			if (linhaAtual.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())) {
 				processamentoPagamento = true;
 			}
 			String numeroMatricula = getNumeroMatricula();
-			if (Objects.nonNull(pagamento) && Objects.nonNull(matricula)
-					&& !matricula.getNumeroMatricula().equals(numeroMatricula)) {
+			if (Objects.nonNull(pagamento) && Objects.nonNull(matricula)) {
 				pagamentos.add(pagamento);
 			}
 			pagamento = new Pagamento();
@@ -583,7 +659,10 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		} catch (Exception e) {
 			try {
 				Vinculo vinculo = getVinculo(linhaAnterior);
-				numero = linhaAnterior.substring(0, linhaAnterior.indexOf(vinculo.getDescricao())).trim().hashCode();
+				String nomeInvertido = new StringBuffer(
+						linhaAnterior.substring(0, linhaAnterior.indexOf(vinculo.getDescricao())).trim()).reverse()
+								.toString();
+				numero = nomeInvertido.hashCode();
 				numeroMatricula = numero.toString().replace("-", "").substring(0, 8);
 			} catch (Exception e2) {
 				numeroMatricula = numero.toString().replace("-", "");
@@ -600,7 +679,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		}
 		setMatriculaPagamento(linhaAtual);
 		matricula.setNomeFuncionario(getNomeFuncionario(linhaAnterior));
-		getMatriculaService().update(matricula);
+		matricula = getMatriculaService().update(matricula);
+		pagamento.setMatriculaPagamento(matricula.getMatriculaPagamento());
 		pagamento.setMatricula(matricula);
 	}
 

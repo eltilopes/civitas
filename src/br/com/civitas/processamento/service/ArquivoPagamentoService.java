@@ -16,6 +16,7 @@ import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.arquitetura.report.Extensao;
 import br.com.civitas.arquitetura.report.ReportService;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.ResumoSetor;
 import br.com.civitas.processamento.factory.FactoryProcessarArquivoPagamento;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -38,9 +39,9 @@ public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagament
 		return ArquivoPagamento.class;
 	}
 
-	public void processarArquivo(ArquivoPagamento arquivoPagamento) throws Exception {
+	public List<ResumoSetor> processarArquivo(ArquivoPagamento arquivoPagamento) throws Exception {
 		processarArquivoPagamento = factoryProcessarArquivoPagamento.getInstanciaProcessamento(arquivoPagamento.getTipoArquivo());
-		processarArquivoPagamento.processar(arquivoPagamento);
+		return processarArquivoPagamento.processar(arquivoPagamento);
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -1,9 +1,12 @@
 package br.com.civitas.processamento.interfac;
 
+import java.util.List;
+
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.ResumoSetor;
 
 public interface IProcessarArquivoPagamento {
 
-	 void processar(ArquivoPagamento arquivo) throws Exception ;
+	List<ResumoSetor> processar(ArquivoPagamento arquivo) throws Exception ;
 	 
 }

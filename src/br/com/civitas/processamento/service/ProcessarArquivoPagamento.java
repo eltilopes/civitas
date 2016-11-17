@@ -74,6 +74,8 @@ public abstract class ProcessarArquivoPagamento {
 	private ArquivoPagamento arquivoPagamento;
 	private PDDocument document;
 	
+	protected static final int DUAS_CASAS_DECIMAIS = 2;
+	
 	private  List<Evento> eventos ;
 	private  List<Cargo> cargos ;
 	private  List<Secretaria> secretarias ;
@@ -358,6 +360,9 @@ public abstract class ProcessarArquivoPagamento {
 	public Setor getSetor(Setor setor, String linha) {
 		Setor setorAuxiliar = new Setor();
 		try {
+			if (setor.getDescricao().contains("40%")){
+				System.out.println(setor.getDescricao());
+			}
 			setorAuxiliar = getSetor(setor);
 			if(Objects.isNull(setorAuxiliar)){
 				setor = setorService.save(setor);
@@ -376,6 +381,7 @@ public abstract class ProcessarArquivoPagamento {
 		for(Setor s : setores){
 			if(s.getCidade().getId().equals(setor.getCidade().getId()) && 
 					s.getTipoArquivo().getCodigo()==setor.getTipoArquivo().getCodigo() && 
+					s.getCodigo().equals(setor.getCodigo()) && 
 					s.getDescricao().equals(setor.getDescricao())){
 				setor = s;
 				return setor;
