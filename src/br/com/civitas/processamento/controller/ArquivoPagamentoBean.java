@@ -133,6 +133,10 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		return true;
 	}
 	
+	public String getEstiloResumo(ResumoSetor resumoSetor){
+		return valoresResumoConferidos(resumoSetor) ? "label label-success" : "label label-danger";
+	}
+
 	public void setEventoService(EventoService eventoService) {
 		this.eventoService = eventoService;
 	}

@@ -263,57 +263,43 @@
 				</div>	
 			</fieldset>		
 			<ui:repeat value="#{bean.resumos}" var="resumo" >
-				<div class="card-view">
-					<h4 class="mdl-card__title-text">#{resumo.secretaria.descricao} / #{resumo.setor.descricao}</h4>
-					<div class="card-view-content-header">
-						<div class="row" >
-							Total Proventos: <h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" />
-						</div>		
+				<div align="center" class="row col-md-8">
+					<div class="card-view">
+						<div class="card-view-content-header">
+							<div class="row " >
+									<h5>#{resumo.secretaria.descricao} / #{resumo.setor.descricao}</h5>
+							</div>	
+						</div>
+						<div class="card-view-content">
+								<div class="row " >
+									<h:outputText value="Total Proventos: " /> <h:outputText   value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" />
+								</div>
+								<div class="row " >
+									<h:outputText value="Total Líquido: " /> <h:outputText   value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" />
+								</div>
+								<div class="row " >
+									<h:outputText value="Total Descontos: " /> <h:outputText  value="#{resumo.totalDescontos}" converter="valorNumericoMoedaConverter" />
+								</div>
+								<div class="row " >
+									<h:outputText value="Total Remuneração: " /> <h:outputText  value="#{resumo.totalRemuneracao}" converter="valorNumericoMoedaConverter" />
+								</div>
+								<div class="row " >
+									<h:outputText value="Nº Pagamentos: " /> <h:outputText  value="#{resumo.quantidadePagamentos}" />
+								</div>
+							</div>
+						<div class="card-view-content-footer">
+							<div class="row " >
+								<h6>
+									<span class="#{bean.getEstiloResumo(resumo)}">
+										<h:outputText value="#{bean.valoresResumoConferidos(resumo) ? 'Resumo Ok' : 'Resumo Não está com os valores batendo.'}" />
+									</span>
+								</h6>
+							</div>
+						</div>
 					</div>
-				</div>
+				</div>	
 			 </ui:repeat>						
 			
-				<div class="row" >
-					<p:dataTable id="resumos" styleClass="table table-responsive table-mobile"
-				   			 widgetVar="tabelaResumos"  emptyMessage="Nenhum Resumo de Setor foi encontrado."
-					 		 value="#{bean.resumos}" var="resumo" 
-					 		 rendered="#{!bean.resumos.isEmpty()}"
-					 		 rowStyleClass="bgLinha1,bgLinha2">
-				        
-						<p:column headerText="Secretaria" style="text-align:left;" >
-			   				<h:outputText id="nomeSecretaria" value="#{resumo.secretaria.descricao}" />
-			   			</p:column>
-			   			
-			   			<p:column headerText="Setor" style="text-align:left;" >
-			   				<h:outputText id="nomeSetor" value="#{resumo.setor.descricao}" />
-			   			</p:column>
-			   			
-						<p:column headerText="Nº Pagamentos" style="text-align:right;" >
-			   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" />
-			   			</p:column>
-			   			
-						<p:column headerText="Total Proventos" style="text-align:right;" >
-			   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" />
-			   			</p:column>
-			   			
-						<p:column headerText="Total Líquido" style="text-align:right;" >
-			   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" />
-			   			</p:column>
-			   			
-						<p:column headerText="Total Descontos" style="text-align:right;" >
-			   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" />
-			   			</p:column>
-			   			
-						<p:column headerText="Total Remuneração" style="text-align:right;" >
-			   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
-			   			</p:column>
-						
-						<p:column headerText="Valores Conferidos" style="text-align:right;" >
-							<p:selectBooleanCheckbox id="valoresConferidos" disable="true" value="#{bean.valoresResumoConferidos(resumo)}" />
-			   			</p:column>
-		        		
-					</p:dataTable> 
-				</div>	
 		</ui:define>	
     </ui:composition>
 </html>
