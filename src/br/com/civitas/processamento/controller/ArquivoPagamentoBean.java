@@ -69,7 +69,8 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private List<TipoArquivo> tiposArquivos;
 	private UploadedFile file;
 	private List<ResumoSetor> resumos;
-
+	private boolean valoresResumoConferidos = true;
+	
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarTodasAtivas();
@@ -98,6 +99,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	
 	public void processarArquivo() {
 		resumos = new ArrayList<ResumoSetor>();
+		valoresResumoConferidos = true;
 		try {
 			arquivo.setNomeArquivo(new String(file.getFileName().getBytes(Charset.defaultCharset()), "UTF-8"));
 			arquivo.setFile(file);
@@ -120,21 +122,24 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	public boolean valoresResumoConferidos(ResumoSetor resumoSetor){
 		if (!resumoSetor.getTotalDescontos().equals(Util.arredondarDoubleTeto(
 				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao()), 2))) {
+			valoresResumoConferidos = false;
 			return false;
 		}
 		if (!resumoSetor.getTotalProventos().equals(Util.arredondarDoubleTeto(
 				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao()), 2))) {
+			valoresResumoConferidos = false;
 			return false;
 		}
 		if (!resumoSetor.getTotalRemuneracao().equals(Util.arredondarDoubleTeto(
 				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao()), 2))) {
+			valoresResumoConferidos = false;
 			return false;
 		}
 		return true;
 	}
 	
-	public String getEstiloResumo(ResumoSetor resumoSetor){
-		return valoresResumoConferidos(resumoSetor) ? "label label-success" : "label label-danger";
+	public String getEstiloResumo(){
+		return valoresResumoConferidos  ? "label label-success" : "label label-danger";
 	}
 
 	public void setEventoService(EventoService eventoService) {
@@ -220,6 +225,14 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	public void setResumos(List<ResumoSetor> resumos) {
 		this.resumos = resumos;
+	}
+
+	public boolean isValoresResumoConferidos() {
+		return valoresResumoConferidos;
+	}
+
+	public void setValoresResumoConferidos(boolean valoresResumoConferidos) {
+		this.valoresResumoConferidos = valoresResumoConferidos;
 	}
 
 }

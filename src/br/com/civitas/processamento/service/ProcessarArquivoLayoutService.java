@@ -331,10 +331,17 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarUnidadeTrabalho(String linhaAtual) {
-		if (linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())) {
+		if (linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao()) && temUnidadeTrabalho(linhaAtual)) {
 			matricula.getMatriculaPagamento()
 					.setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
 		}
+	}
+
+	private boolean temUnidadeTrabalho(String linhaAtual) {
+		return StringUtils.notNullOrEmpty(linhaAtual.replace(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao(), "")
+		.replace(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao(), "")
+		.replace(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2.getDescricao(), "")
+		.replace(IdentificadorArquivoLayout.HIFEN.getDescricao(), "").trim());
 	}
 
 	private void localizarSecretariaSetor(String linhaAtual) {
@@ -394,13 +401,21 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			String codigo = linhaAtual
 					.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
 			codigo = codigo.trim();
-			codigo = codigo.substring(0, codigo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
-					.trim();
-			String descricaoUnidadeTrabalho = linhaAtual.substring(linhaAtual.indexOf(codigo) + codigo.length(),
-					linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2.getDescricao())).trim();
+			codigo = codigo.substring(0, codigo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).trim();
+			String descricaoUnidadeTrabalho;
+			if(linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao())){
+				descricaoUnidadeTrabalho = linhaAtual.substring(linhaAtual.indexOf(codigo) + codigo.length(),
+						linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao())).trim();
+			}else{
+				descricaoUnidadeTrabalho = linhaAtual.substring(linhaAtual.indexOf(codigo) + codigo.length(),
+						linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2.getDescricao())).trim();
+			}
 			Integer inicioCodigoUnidadeDois = temInteiro(descricaoUnidadeTrabalho);
 			if (Objects.nonNull(inicioCodigoUnidadeDois)) {
 				descricaoUnidadeTrabalho = descricaoUnidadeTrabalho.substring(0, inicioCodigoUnidadeDois).trim();
+			}
+			if(descricaoUnidadeTrabalho.substring(0,1).equals(IdentificadorArquivoLayout.HIFEN.getDescricao())){
+				descricaoUnidadeTrabalho = descricaoUnidadeTrabalho.replace(IdentificadorArquivoLayout.HIFEN.getDescricao(), "").trim();
 			}
 			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
