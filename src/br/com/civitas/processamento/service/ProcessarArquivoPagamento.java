@@ -39,6 +39,9 @@ public abstract class ProcessarArquivoPagamento {
 	private  PagamentoService pagamentoService ;
 	
 	@Autowired
+	private  ResumoSetorService resumoSetorService;
+	
+	@Autowired
 	private  MatriculaPagamentoService matriculaPagamentoService ;
 	
 	@Autowired
@@ -558,6 +561,10 @@ public abstract class ProcessarArquivoPagamento {
 
 	public SetorService getSetorService() {
 		return setorService;
+	}
+
+	public ResumoSetorService getResumoSetorService() {
+		return resumoSetorService;
 	}
 
 	public UnidadeTrabalhoService getUnidadeTrabalhoService() {

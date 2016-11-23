@@ -82,6 +82,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		pagamentos.add(pagamento);
 		br.close();
 		getPagamentoService().inserirPagamentos(pagamentos, getEventos(), getArquivoPagamento());
+		getResumoSetorService().insertAll(resumosSetores);
 	}
 
 	private void carregarEventos() throws IOException {
@@ -192,6 +193,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
 		resumoSetor.setSetor(setorResumo);
 		resumoSetor.setSecretaria(secretariaResumo);
+		resumoSetor.setArquivoPagamento(getArquivoPagamento());
 		pagamentosSetor.stream().forEach(p -> {
 			adicionarTotaisPagamento(p.getTotalDescontos(), IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao());
 			adicionarTotaisPagamento(p.getTotalProventos(), IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao());
