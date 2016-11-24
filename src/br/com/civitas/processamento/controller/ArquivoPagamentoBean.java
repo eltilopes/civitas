@@ -17,14 +17,12 @@ import org.primefaces.model.UploadedFile;
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
-import br.com.civitas.arquitetura.util.Util;
 import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.LogErroProcessador;
 import br.com.civitas.processamento.entity.Mes;
 import br.com.civitas.processamento.entity.ResumoSetor;
-import br.com.civitas.processamento.enums.IdentificadorArquivoLayout;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.factory.FactoryEnuns;
 import br.com.civitas.processamento.service.AnoService;
@@ -105,6 +103,11 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			arquivo.setFile(file);
 			validarArquivoService.validarArquivo(file, arquivo);
 			resumos = service.processarArquivo(arquivo);
+			resumos.parallelStream().forEach(r-> {
+				if(!r.valoresResumoConferidos()){
+					valoresResumoConferidos = r.valoresResumoConferidos(); 
+				}
+			});
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (ApplicationException e) {
 			logger.error(e);
@@ -115,31 +118,16 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
 		}finally {
-//			arquivo = new ArquivoPagamento();
+			arquivo = new ArquivoPagamento();
 		}
 	}
 
-	public boolean valoresResumoConferidos(ResumoSetor resumoSetor){
-		if (!resumoSetor.getTotalDescontos().equals(Util.arredondarDoubleTeto(
-				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_DESCONTOS.getDescricao()), 2))) {
-			valoresResumoConferidos = false;
-			return false;
-		}
-		if (!resumoSetor.getTotalProventos().equals(Util.arredondarDoubleTeto(
-				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_PROVENTOS.getDescricao()), 2))) {
-			valoresResumoConferidos = false;
-			return false;
-		}
-		if (!resumoSetor.getTotalRemuneracao().equals(Util.arredondarDoubleTeto(
-				resumoSetor.getTotaisPagamentos().get(IdentificadorArquivoLayout.TOTAL_REMUNERACAO.getDescricao()), 2))) {
-			valoresResumoConferidos = false;
-			return false;
-		}
-		return true;
-	}
-	
 	public String getEstiloResumo(){
 		return valoresResumoConferidos  ? "label label-success" : "label label-danger";
+	}
+	
+	public String getEstiloLinha(ResumoSetor resumoSetor){
+		return resumoSetor.valoresResumoConferidos()  ? "color:#4f4f4f !important;" : "color:#d9534f !important;";
 	}
 
 	public void setEventoService(EventoService eventoService) {

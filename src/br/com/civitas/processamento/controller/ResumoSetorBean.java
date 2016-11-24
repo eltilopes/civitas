@@ -65,6 +65,10 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 		}
 	}
 	
+	public String getEstiloLinha(ResumoSetor resumoSetor){
+		return resumoSetor.valoresResumoConferidos()  ? "color:#4f4f4f !important;" : "color:#d9534f !important;";
+	}
+
 	public CidadeService getCidadeService() {
 		return cidadeService;
 	}

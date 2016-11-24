@@ -42,7 +42,7 @@
 		</ui:define>	
 		
 		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Resumos Setores - #{bean.secretaria.cidade.descricao}"  />
+			<ui:param name="tituloPainel" value="Resumos Setores  #{bean.secretaria.cidade.descricao}"  />
 		</ui:define>
 	
 		<ui:define name="botoesInsertFiltro" />
@@ -55,37 +55,52 @@
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 			 		 
-					
-			 		 <p:column headerText="Arquivo" >
-						<h:outputText value="#{resumo.arquivoPagamento.nomeArquivo}" />
-					 </p:column>
-			 		 
-			 		 <p:column headerText="Secretaria" >
-						<h:outputText value="#{resumo.secretaria.descricao}" />
-					 </p:column>
-			 		 
-			 		  <p:column headerText="Setor" >
-						<h:outputText value="#{resumo.setor.descricao}" />
-					 </p:column>
-			 		 
-			 		 <p:column headerText="Nº Pagamentos" style="text-align:right;" >
-		   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" />
+					 <p:column headerText="Ok" style="text-align:center;" >
+							<p:selectBooleanCheckbox id="valoresConferidos" disabled="true" value="#{resumo.valoresResumoConferidos()}" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+	        		
+					<p:column headerText="Secretaria" style="text-align:left;" >
+		   				<h:outputText id="descricaoSecretaria" value="#{resumo.secretaria.descricao}" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+		   			<p:column headerText="Setor" style="text-align:left;" >
+		   				<h:outputText id="descricaoSetor" value="#{resumo.setor.codigo} - #{resumo.setor.descricao}" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+					<p:column headerText="Nº Pagamentos" style="text-align:right;" >
+		   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
 					<p:column headerText="Total Proventos" style="text-align:right;" >
-		   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" />
+		   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
 					<p:column headerText="Total Líquido" style="text-align:right;" >
-		   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" />
+		   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
 					<p:column headerText="Total Descontos" style="text-align:right;" >
-		   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" />
+		   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
 					<p:column headerText="Total Remuneração" style="text-align:right;" >
-		   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
+		   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+		   			<p:column headerText="Somatório Proventos" style="text-align:right;" >
+		   				<h:outputText id="somatorioProventos"  value="#{resumo.somatorioProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+					<p:column headerText="Somatório Líquido" style="text-align:right;" >
+		   				<h:outputText id="somatorioLiquido"  value="#{resumo.somatorioLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+					<p:column headerText="Somatório Descontos" style="text-align:right;" >
+		   				<h:outputText id="somatorioDescontos" value="#{resumo.somatorioDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
+		   			</p:column>
+		   			
+					<p:column headerText="Somatório Remuneração" style="text-align:right;" >
+		   				<h:outputText id="somatorioRemuneracao"  value="#{resumo.somatorioRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 			</p:dataTable> 
 		</ui:define>

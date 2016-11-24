@@ -283,39 +283,39 @@
 						 		 rowStyleClass="bgLinha1,bgLinha2">
 					        	
 					        <p:column headerText="Valores Conferidos" style="text-align:center;" >
-								<p:selectBooleanCheckbox id="valoresConferidos" disabled="true" value="#{bean.valoresResumoConferidos(resumo)}" />
+								<p:selectBooleanCheckbox id="valoresConferidos" disabled="true" value="#{resumo.valoresResumoConferidos()}" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 			        		
 							<p:column headerText="Secretaria" style="text-align:left;" >
-				   				<h:outputText id="descricaoSecretaria" value="#{resumo.secretaria.descricao}" />
+				   				<h:outputText id="descricaoSecretaria" value="#{resumo.secretaria.descricao}" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 				   			<p:column headerText="Código Setor" style="text-align:left;" >
-				   				<h:outputText id="codigoSetor" value="#{resumo.setor.codigo}" />
+				   				<h:outputText id="codigoSetor" value="#{resumo.setor.codigo}" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 				   			<p:column headerText="Setor" style="text-align:left;" >
-				   				<h:outputText id="descricaoSetor" value="#{resumo.setor.descricao}" />
+				   				<h:outputText id="descricaoSetor" value="#{resumo.setor.descricao}" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 							<p:column headerText="Nº Pagamentos" style="text-align:right;" >
-				   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" />
+				   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 							<p:column headerText="Total Proventos" style="text-align:right;" >
-				   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" />
+				   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 							<p:column headerText="Total Líquido" style="text-align:right;" >
-				   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" />
+				   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 							<p:column headerText="Total Descontos" style="text-align:right;" >
-				   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" />
+				   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
 							<p:column headerText="Total Remuneração" style="text-align:right;" >
-				   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" />
+				   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 						</p:dataTable> 
 					</div>	

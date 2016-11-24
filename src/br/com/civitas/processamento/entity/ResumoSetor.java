@@ -1,7 +1,5 @@
 package br.com.civitas.processamento.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -14,9 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import br.com.civitas.arquitetura.entity.IEntity;
+import br.com.civitas.arquitetura.util.Util;
 
 @Entity
 @Table(name = "tb_resumo_setor")
@@ -69,16 +67,6 @@ public class ResumoSetor implements IEntity {
 	@Column(name = "nr_somatorio_remuneracao", nullable = false)  
 	private Double somatorioRemuneracao = 0d;
 
-	@Transient
-	private Map<String, Double> totaisPagamentos;
-
-	@Transient
-	private List<EventoPagamento> eventosPagamento;
-
-	public ResumoSetor(){
-		eventosPagamento = new ArrayList<EventoPagamento>();
-	}
-
 	public ArquivoPagamento getArquivoPagamento() {
 		return arquivoPagamento;
 	}
@@ -93,14 +81,6 @@ public class ResumoSetor implements IEntity {
 
 	public void setSetor(Setor setor) {
 		this.setor = setor;
-	}
-
-	public List<EventoPagamento> getEventosPagamento() {
-		return eventosPagamento;
-	}
-
-	public void setEventosPagamento(List<EventoPagamento> eventosPagamento) {
-		this.eventosPagamento = eventosPagamento;
 	}
 
 	public Double getTotalProventos() {
@@ -141,14 +121,6 @@ public class ResumoSetor implements IEntity {
 
 	public void setQuantidadePagamentos(Integer quantidadePagamentos) {
 		this.quantidadePagamentos = quantidadePagamentos;
-	}
-
-	public Map<String, Double> getTotaisPagamentos() {
-		return totaisPagamentos;
-	}
-
-	public void setTotaisPagamentos(Map<String, Double> totaisPagamentos) {
-		this.totaisPagamentos = totaisPagamentos;
 	}
 
 	public Secretaria getSecretaria() {
@@ -195,6 +167,18 @@ public class ResumoSetor implements IEntity {
 		this.id = id;
 	}
 
+	public void arredondarValoresResumo(){
+		somatorioDescontos = Util.arredondarDoubleTeto(somatorioDescontos, 2);
+		somatorioLiquido = Util.arredondarDoubleTeto(somatorioLiquido, 2);
+		somatorioRemuneracao = Util.arredondarDoubleTeto(somatorioRemuneracao, 2);
+		somatorioProventos = Util.arredondarDoubleTeto(somatorioProventos, 2);
+	}
+		
+	public boolean valoresResumoConferidos(){
+		return totalDescontos.equals(somatorioDescontos) && totalProventos.equals(somatorioProventos) 
+				&& totalRemuneracao.equals(somatorioRemuneracao) && totalLiquido.equals(somatorioLiquido) ;
+	}
+	
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		// TODO Auto-generated method stub
