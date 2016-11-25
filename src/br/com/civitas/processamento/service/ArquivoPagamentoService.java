@@ -16,6 +16,7 @@ import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.arquitetura.report.Extensao;
 import br.com.civitas.arquitetura.report.ReportService;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
+import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.ResumoSetor;
 import br.com.civitas.processamento.factory.FactoryProcessarArquivoPagamento;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
@@ -65,6 +66,20 @@ public class ArquivoPagamentoService extends AbstractPersistence<ArquivoPagament
 									  .setParameter("cidade", arquivo.getCidade())
 									  .setParameter("tipoArquivo", arquivo.getTipoArquivo())
 									  .uniqueResult();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ArquivoPagamento> buscarPorCidade(Cidade cidade) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT DISTINCT a FROM ArquivoPagamento a ");
+		sql.append("LEFT JOIN FETCH  a.mes m ");
+		sql.append("LEFT JOIN FETCH  a.ano ano");
+		sql.append("LEFT JOIN FETCH  a.cidade c ");
+		sql.append("WHERE 1 = 1 ");
+		sql.append("AND c = :cidade ");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		query.setParameter("cidade", cidade);
+		return (List<ArquivoPagamento>) query.list();
 	}
 
 	public void imprimirRelatorio(ArquivoPagamento arquivo, List<ArquivoPagamento> arquivos, String nomeRelatorio){

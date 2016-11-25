@@ -13,9 +13,10 @@ import javax.faces.event.ActionEvent;
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.ResumoSetor;
-import br.com.civitas.processamento.entity.Secretaria;
+import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.ResumoSetorService;
 
@@ -31,22 +32,31 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 	@ManagedProperty("#{resumoSetorService}")
 	private ResumoSetorService service;
 
+	@ManagedProperty("#{arquivoPagamentoService}")
+	private ArquivoPagamentoService arquivoPagamentoService;
+
+	private Cidade cidade;
 	private List<Cidade> cidades;
-	private Secretaria secretaria;
+	private List<ArquivoPagamento> arquivoPagamentos;
 	
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarTodasAtivas();
-		setSecretaria(new Secretaria());
+	}
+	
+	public void carregarPorCidade() {
+		if (Objects.nonNull(getCidade())) {
+			arquivoPagamentos = arquivoPagamentoService.buscarPorCidade(getCidade());
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void find(ActionEvent event) {
-		if(Objects.nonNull(getSecretaria().getCidade())){
+		if(Objects.nonNull(getEntitySearch().getArquivoPagamento()) && Objects.nonNull(getCidade())){
 			try {
 				limpaListas();
 				List<ResumoSetor> list = null;
-				list = service.buscarPorCidade(getSecretaria().getCidade());
+				list = service.buscarPorArquivoPagamento(getEntitySearch().getArquivoPagamento());
 				if (list.isEmpty()) {
 					throw new ApplicationException("Consulta sem resultados.");
 				}
@@ -61,7 +71,7 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 				FacesUtils.addErrorMessage(getMessage("ERROR_MESSAGE"));
 			}
 		}else{
-			FacesUtils.addWarnMessage("Selecione uma cidade para Consulta.");
+			FacesUtils.addWarnMessage("Selecione a Cidade, Ano e Mês para Consulta.");
 		}
 	}
 	
@@ -90,12 +100,24 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 		this.service = service;
 	}
 
-	public Secretaria getSecretaria() {
-		return secretaria;
+	public void setArquivoPagamentoService(ArquivoPagamentoService arquivoPagamentoService) {
+		this.arquivoPagamentoService = arquivoPagamentoService;
 	}
 
-	public void setSecretaria(Secretaria secretaria) {
-		this.secretaria = secretaria;
+	public List<ArquivoPagamento> getArquivoPagamentos() {
+		return arquivoPagamentos;
+	}
+
+	public void setArquivoPagamentos(List<ArquivoPagamento> arquivoPagamentos) {
+		this.arquivoPagamentos = arquivoPagamentos;
+	}
+
+	public Cidade getCidade() {
+		return cidade;
+	}
+
+	public void setCidade(Cidade cidade) {
+		this.cidade = cidade;
 	}
 
 }

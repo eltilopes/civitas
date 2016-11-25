@@ -24,25 +24,46 @@
 			<fieldset>
 				<div class="row">
 					<div class="col-md-4">
-							<div class="form-group">
+						<div class="form-group">
 							<h:outputText value="Cidade " />
 							<h:selectOneMenu id="cidadeSearch" 
-											 value="#{bean.secretaria.cidade}"
+											 value="#{bean.cidade}"
 											 converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
 										value="#{bean.cidades}" />
+								<p:ajax event="change" update=":painelGlobal"
+									listener="#{bean.carregarPorCidade}"
+									oncomplete="carregando.hide()" />
 							</h:selectOneMenu>
 							<h:message for="cidadeSearch" tooltip="true"
 							styleClass="error-messages" />
 						</div>
 					</div>
+					<h:panelGroup id="panelPorCidade"
+						rendered="#{bean.cidade != null}">
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputText value="Ano / Mês" />
+								<h:selectOneMenu id="arquivoPagamentoSearch"
+									value="#{bean.entitySearch.arquivoPagamento}"
+									converter="entityConverter" styleClass="form-control">
+									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano.ano} / #{o.mes.descricao}"
+										value="#{bean.arquivoPagamentos}" />
+								</h:selectOneMenu>
+								<h:message for="arquivoPagamentoSearch" tooltip="true"
+									styleClass="error-messages" />
+							</div>
+						</div>
+					</h:panelGroup>	
 				</div>	
 			</fieldset>		
 		</ui:define>	
 		
 		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Resumos Setores  #{bean.secretaria.cidade.descricao}"  />
+			<ui:param name="tituloPainel" value="Resumos Setores #{bean.cidade.descricao} 
+			 #{bean.entitySearch.arquivoPagamento.mes.descricao}  #{bean.entitySearch.arquivoPagamento.ano.ano}" />
 		</ui:define>
 	
 		<ui:define name="botoesInsertFiltro" />

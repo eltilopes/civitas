@@ -6,7 +6,7 @@ import org.hibernate.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
-import br.com.civitas.processamento.entity.Cidade;
+import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.ResumoSetor;
 
 @Service
@@ -28,17 +28,16 @@ public class ResumoSetorService extends AbstractPersistence<ResumoSetor> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ResumoSetor> buscarPorCidade(Cidade cidade) {
+	public List<ResumoSetor> buscarPorArquivoPagamento(ArquivoPagamento arquivoPagamento) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT DISTINCT r FROM ResumoSetor r ");
 		sql.append("LEFT JOIN FETCH  r.secretaria sec ");
 		sql.append("LEFT JOIN FETCH  r.setor setor ");
 		sql.append("LEFT JOIN FETCH  r.arquivoPagamento a ");
-		sql.append("LEFT JOIN FETCH  sec.cidade c ");
 		sql.append("WHERE 1 = 1 ");
-		sql.append("AND c = :cidade ");
+		sql.append("AND a = :arquivo ");
 		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
-		query.setParameter("cidade", cidade);
+		query.setParameter("arquivo", arquivoPagamento);
 		return (List<ResumoSetor>) query.list();
 	}
 

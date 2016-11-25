@@ -121,7 +121,6 @@ public abstract class ProcessarArquivoPagamento {
 	    File file = new File(DiretorioProcessamento.getDiretorioTemporario(), filename);
 	    OutputStream output = new FileOutputStream(file);
 	    nomeArquivoTemporario = file.getAbsolutePath();
-	    System.out.println(nomeArquivoTemporario);
 	    try {
 	        IOUtils.copy(input, output);
 	    } catch(Exception e){
@@ -363,9 +362,6 @@ public abstract class ProcessarArquivoPagamento {
 	public Setor getSetor(Setor setor, String linha) {
 		Setor setorAuxiliar = new Setor();
 		try {
-			if (setor.getDescricao().contains("40%")){
-				System.out.println(setor.getDescricao());
-			}
 			setorAuxiliar = getSetor(setor);
 			if(Objects.isNull(setorAuxiliar)){
 				setor = setorService.save(setor);

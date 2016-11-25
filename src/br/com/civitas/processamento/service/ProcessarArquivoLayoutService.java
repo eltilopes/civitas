@@ -196,20 +196,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		});
 		resumoSetor.arredondarValoresResumo();
 		resumosSetores.add(resumoSetor);
-		verificarTotaisResumo();
 		resumoSetor = null;
-	}
-
-	private void verificarTotaisResumo() {
-		System.out.println("Resumo Setor: " + secretariaResumo.getDescricao() + "/" + setorResumo.getDescricao() 
-		+ ". Quantidade Pagamentos: " + resumoSetor.getQuantidadePagamentos());
-
-		System.out.println("Total Descontos: " + resumoSetor.getTotalDescontos());
-		System.out.println("Total Proventos: " + resumoSetor.getTotalProventos());
-		System.out.println("Total Remuneração: " + resumoSetor.getTotalRemuneracao());
-		System.out.println("Resumo Descontos: " + resumoSetor.getSomatorioDescontos());
-		System.out.println("Resumo Proventos: " + resumoSetor.getSomatorioProventos());
-		System.out.println("Resumo Remuneração: " + resumoSetor.getSomatorioRemuneracao());
 	}
 
 	private void localizarPagamentos(String linhaAtual) throws Exception {
