@@ -29,7 +29,12 @@ public enum IdentificadorArquivoDigimax {
 		TOTAIS_PAGAMENTO("INSS CONT.     TOT.DEP.           TOT.VANT.           TOT.DESC.         TOT.LIQUIDO"),
 		FIM_TOTAIS_PAGAMENTO("------------------------------------------------------------------------------------------------------------------------------------"),
 		DATA_ADMISSAO("DT. ADM:"),
-		DATA_AFASTAMENTO("DT. AFASTAMENTO:");
+		DATA_AFASTAMENTO("DT. AFASTAMENTO:"), 
+		INICIO_RESUMO("TOTAL DO DEPARTAMENTO"), 
+		FIM_RESUMO("----------------------------------------------------------------------------------"), 
+		TOTAL_DESCONTOS("Total de descontos do departamento"), 
+		SALARIO_BASE("SALARIO BASE"), 
+		TOTAL_PROVENTOS("Total de vantagens do departamento");
 	
 		private String descricao;
 		
