@@ -52,7 +52,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private String ultimaLinha = "";
 	private String linhaAnterior = "";
 	private String descricaoLinha;
-	private double valorRecisao = 0d;
+	private double valorRecisao;
 	
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception {
 		setArquivoPagamento(arquivoPagamento);
@@ -196,7 +196,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
 			resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
 			p.getEventosPagamento().stream().forEach(e->{
-				if(e.getEvento().getChave().equals(IdentificadorArquivoLayout.RESC_FERIAS_PROPORCIONAIS.getDescricao())){
+				if(e.getEvento().getChave().equals(IdentificadorArquivoLayout.RESC_13_SALARIO_PROPORCIONAL.getDescricao())){
 					valorRecisao = valorRecisao + e.getValor();
 				}
 			});
