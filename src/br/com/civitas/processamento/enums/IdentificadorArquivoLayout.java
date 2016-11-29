@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public enum IdentificadorArquivoLayout {
 
 		// 0 - IDENTIFICADOR
+
 		INICIO_EVENTO("PROVENTOS VALORREF DESCONTOS VALORREF"),
 		FIM_EVENTO("LÍQUIDO: DESCONTOS:REMUNERAÇÃO: PROVENTOS:"), 
 		ESPACO_NA_LINHA(" ")	,	
@@ -49,6 +50,7 @@ public enum IdentificadorArquivoLayout {
 		INICIO_RESUMO("RESUMO DA FOLHA DE PAGAMENTO"), 
 		RESC_FERIAS_PROPORCIONAIS("RESC FERIAS PROPORCIONAIS"), 
 		FIM_RESUMO("CARGO: CARGO 2:");
+
 	
 		private String descricao;
 		
