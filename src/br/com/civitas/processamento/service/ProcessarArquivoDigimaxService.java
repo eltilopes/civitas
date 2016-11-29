@@ -41,7 +41,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 	private ResumoSetor resumoSetor;
 	private List<Pagamento> pagamentos;
 	private List<ResumoSetor> resumosSetores;
-	private boolean processamentoPagamentoAtivoAtivo = false;
+	private boolean processamentoPagamento = false;
 	private boolean processamentoEventos = false;
 	private boolean processamentoResumo = false;
 	private boolean processamentoTotais = false;
@@ -124,7 +124,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		setVinculos(getVinculoService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(),
 				getArquivoPagamento().getTipoArquivo()));
-		processamentoPagamentoAtivoAtivo = false;
+		processamentoPagamento = false;
 		processamentoEventos = false;
 		processamentoTotais = false;
 		processamentoResumo = false;
@@ -183,11 +183,11 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 	private void verificarIdentificadorEvento(String linha) {
 		if (linha.contains(IdentificadorArquivoDigimax.INICIO_EVENTO.getDescricao())) {
 			processamentoEventos = true;
-			processamentoPagamentoAtivoAtivo = true;
+			processamentoPagamento = true;
 		}
 		if ((linha.contains(IdentificadorArquivoDigimax.FIM_EVENTO.getDescricao()))) {
 			processamentoEventos = false;
-			processamentoPagamentoAtivoAtivo = false;
+			processamentoPagamento = false;
 		}
 	}
 	
@@ -196,7 +196,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		if (processamentoResumo && Util.valorContemNumero(linhaAtual)) {
 			getTotaisResumo(linhaAtual);
 		}
-		if (processamentoPagamentoAtivoAtivo && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+		if (processamentoPagamento && !processamentoResumo && Objects.nonNull(resumoSetor)) {
 			verificarResumoSetor();
 		}
 	}
@@ -235,27 +235,21 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 	}
 
 	private void verificarResumoSetor() {
-		try {
-			
-			List<Pagamento> pagamentosSetor = pagamentos.stream()
-					.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
-							&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
-					.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
-			resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
-			resumoSetor.setSetor(setorResumo);
-			resumoSetor.setSecretaria(secretariaResumo);
-			resumoSetor.setArquivoPagamento(getArquivoPagamento());
-			pagamentosSetor.stream().forEach(p -> {
-				resumoSetor.setSomatorioRemuneracao(resumoSetor.getSomatorioRemuneracao() + p.getTotalRemuneracao());
-				resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
-				resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
-			});
-			resumoSetor.arredondarValoresResumo();
-			resumosSetores.add(resumoSetor);
-			resumoSetor = null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		List<Pagamento> pagamentosSetor = pagamentos.stream()
+				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
+						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
+				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
+		resumoSetor.setSetor(setorResumo);
+		resumoSetor.setSecretaria(secretariaResumo);
+		resumoSetor.setArquivoPagamento(getArquivoPagamento());
+		pagamentosSetor.stream().forEach(p -> {
+			resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
+			resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
+		});
+		resumoSetor.arredondarValoresResumo();
+		resumosSetores.add(resumoSetor);
+		resumoSetor = null;
 	}
 	
 	private void localizarSecretariaSetor(String linhaAtual) {
@@ -341,7 +335,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		verificarIdentificadorEvento(linha);
 		verificarTotais(linha);
 		for (Evento e : getEventos()) {
-			if (processamentoPagamentoAtivoAtivo
+			if (processamentoPagamento
 					&& !(linha.contains(IdentificadorArquivoDigimax.INICIO_EVENTO.getDescricao()))
 					&& getChaveEvento(linha).equals(e.getChave())) {
 				pagamento.getEventosPagamento().add(getEventoPagamento(linha, e));

@@ -39,7 +39,10 @@ public enum IdentificadorArquivoTarget {
 		FIM_PAGAMENTOS("CPF:"), 
 		FUNDO_RESERVA("Fundo de Reserva"), 
 		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
-		TIPO("Tipo:"); 
+		TIPO("Tipo:"), 
+		TOTAL_DESCONTOS("Total de Descontos"), 
+		TOTAL_PROVENTOS("Total de Proventos"), 
+		TOTAL_LIQUIDO("Total Líquido"); 
 	
 		private String descricao;
 		

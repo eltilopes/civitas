@@ -52,6 +52,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private String ultimaLinha = "";
 	private String linhaAnterior = "";
 	private String descricaoLinha;
+	private double valorRecisao = 0d;
 	
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception {
 		setArquivoPagamento(arquivoPagamento);
@@ -181,6 +182,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void verificarResumoSetor() {
+		valorRecisao = 0d;
 		List<Pagamento> pagamentosSetor = pagamentos.stream()
 				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
 						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
@@ -193,7 +195,13 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			resumoSetor.setSomatorioRemuneracao(resumoSetor.getSomatorioRemuneracao() + p.getTotalRemuneracao());
 			resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
 			resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
+			p.getEventosPagamento().stream().forEach(e->{
+				if(e.getEvento().getChave().equals(IdentificadorArquivoLayout.RESC_FERIAS_PROPORCIONAIS.getDescricao())){
+					valorRecisao = valorRecisao + e.getValor();
+				}
+			});
 		});
+		resumoSetor.setSomatorioRemuneracao(resumoSetor.getSomatorioRemuneracao() + valorRecisao);
 		resumoSetor.arredondarValoresResumo();
 		resumosSetores.add(resumoSetor);
 		resumoSetor = null;
