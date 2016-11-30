@@ -31,6 +31,15 @@ public class Util {
 		return preco;
 	}
 	
+	public static boolean palavraSomenteNumeros(String palavra) {
+		try {
+			Integer.parseInt(palavra);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
 	public static Double arredondarDoubleTeto(Double valor, int casasDecimais) {
 		if (valor == null) {
 			return 0D;

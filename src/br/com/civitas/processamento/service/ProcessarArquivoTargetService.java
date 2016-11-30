@@ -48,6 +48,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private List<Pagamento> pagamentos;
 	private List<ResumoSetor> resumosSetores;
 	private  boolean processamentoPagamento = false;
+	private  boolean processandoPagamentos = false;
 	private  boolean processamentoEventos = false;
 	private  boolean processamentoResumo = false;
 	private  String linhaAnterior = "";
@@ -64,6 +65,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		iniciarArquivos();
 		iniciarValores();
 		carregarEventos();
+		processandoPagamentos = true;
 		carregarPagamentos();
 		finalizarArquivos();
 	}
@@ -115,6 +117,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		nomesCargos = getCargos().stream().map(cargo -> cargo.getDescricao()).collect(Collectors.toList());
 		processamentoPagamento = false;
+		processandoPagamentos = false;
 		processamentoEventos = false;
 		processamentoResumo = false;
 		linhaAnterior = "";
@@ -167,9 +170,11 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void verificarIdentificadorResumoSetor(String linha) {
 		if(linha.contains(IdentificadorArquivoTarget.INICIO_RESUMO_SETOR.getDescricao())){ 
 			processamentoResumo = true;
-			resumoSetor = new ResumoSetor();
-			setorResumo = setor;
-			secretariaResumo = secretaria;
+			if(processandoPagamentos){
+				resumoSetor = new ResumoSetor();
+				setorResumo = setor;
+				secretariaResumo = secretaria;
+			}
 		}
 		if(processamentoResumo && linha.contains(IdentificadorArquivoTarget.FIM_RESUMO_SETOR.getDescricao())){ 
 			processamentoResumo = false;
@@ -192,10 +197,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	
 	private void verificarResumo(String linhaAtual) {
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if (processamentoResumo && Util.valorContemNumero(linhaAtual)) {
+		if (processandoPagamentos && processamentoResumo && Util.valorContemNumero(linhaAtual)) {
 			getTotaisResumo(linhaAtual);
 		}
-		if (processamentoPagamento && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+		if (processandoPagamentos && processamentoPagamento && !processamentoResumo && Objects.nonNull(resumoSetor)) {
 			verificarResumoSetor();
 		}
 	}
@@ -205,6 +210,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
 						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
 				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+		if(Objects.isNull(pagamento.getMatriculaPagamento().getSecretaria()) && Objects.isNull(pagamento.getMatriculaPagamento().getSetor())){
+			pagamentosSetor.add(pagamento);
+		}
 		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
 		resumoSetor.setSetor(setorResumo);
 		resumoSetor.setSecretaria(secretariaResumo);
@@ -226,11 +234,18 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		if (linhaAtual.contains(IdentificadorArquivoTarget.TOTAL_PROVENTOS.getDescricao())) {
 			resumoSetor.setTotalProventos(getValorTotalResumo(linhaAtual));
 		}
-		if (linhaAtual.contains(IdentificadorArquivoTarget.TOTAL_LIQUIDO.getDescricao())) {
+		if (linhaComTotalLiquido(linhaAtual)) {
 			resumoSetor.setTotalLiquido(getValorTotalResumo(linhaAtual));
 		}
 	}
 	
+	private boolean linhaComTotalLiquido(String linhaAtual) {
+		return linhaAtual.contains(IdentificadorArquivoTarget.TOTAL_LIQUIDO.getDescricao())
+				&& Util.palavraSomenteNumeros(linhaAtual.replace(IdentificadorArquivoTarget.TOTAL_LIQUIDO.getDescricao(),"")
+				.replace(".","")
+				.replace(",","").trim());
+	}
+
 	private Double getValorTotalResumo(String linhaAtual) {
 		int posicaoPrimeiroNumero = Util.posicaoPrimeiraNumero(linhaAtual);
 		linhaAtual = linhaAtual.substring(posicaoPrimeiroNumero - 1, linhaAtual.length());
@@ -410,7 +425,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private Setor getSetor() throws ApplicationException {
 		Setor setor = new Setor();
 		try {
-			String codigo = linhaAnterior.substring(Util.posicaoPrimeiraNumero(linhaAnterior), linhaAnterior.length()).trim();
+			String linhaInvertida = new StringBuffer(linhaAnterior).reverse().toString();
+			int posicaoFimCodigo = Util.posicaoPrimeiraLetra(linhaInvertida);
+			String codigo = linhaAnterior.substring(linhaAnterior.length() - posicaoFimCodigo, 
+					linhaAnterior.length()).trim();
 			String descricao = linhaAnterior.replace(codigo, "").trim();
 			setor.setCidade(getArquivoPagamento().getCidade());
 			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());

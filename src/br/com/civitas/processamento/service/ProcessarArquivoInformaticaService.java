@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
+import br.com.civitas.arquitetura.util.Util;
 import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.CargaHorariaPagamento;
@@ -140,7 +141,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		String nomeVerificado = "";
 		String[] palavras = nome.split(" ");
 		for(String palavra : palavras){
-			if(!existeCaractereInvalido(palavra) || !palavraSomenteNumeros(palavra)){
+			if(!existeCaractereInvalido(palavra) || !Util.palavraSomenteNumeros(palavra)){
 				nomeVerificado = nomeVerificado + palavra + " ";
 			}
 		}
@@ -173,21 +174,12 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		String[] palavras = linha.split(" ");
 		boolean primeiraPalavra = true;
 		for(String palavra : palavras){
-			if(palavra.length()==4 && palavraSomenteNumeros(palavra) && !primeiraPalavra){
+			if(palavra.length()==4 && Util.palavraSomenteNumeros(palavra) && !primeiraPalavra){
 				return linha.substring(4,linha.length()).indexOf(palavra) + 4;
 			}
 			primeiraPalavra = false;
 		}
 		return 0;
-	}
-
-	private boolean palavraSomenteNumeros(String palavra) {
-		try {
-			Integer.parseInt(palavra);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 	private void verificarIdentificadorEvento(String linha) {
@@ -272,7 +264,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if( processamentoPagamentoAtivo && linhaAtual.substring(0, 5).equals(IdentificadorArquivoInformatica.IDENTIFICADOR_UNIDADE_TRABALHO.getDescricao())){
 			matricula.getMatriculaPagamento().setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(linhaAtual), linhaAtual));
-		}else if(palavraSomenteNumeros(linhaAtual.substring(0, 6))){
+		}else if(Util.palavraSomenteNumeros(linhaAtual.substring(0, 6))){
 			int posicaoInicialUnidadeTrabalho = verificarPosicaoSegundoEvento(linhaAtual);
 			matricula.getMatriculaPagamento().setUnidadeTrabalho(getUnidadeTrabalho(getUnidadeTrabalho(" " + linhaAtual.substring(posicaoInicialUnidadeTrabalho)), linhaAtual));
 		}
