@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+		
+	<ui:composition template="/new-template/template-crud.xhtml">
+    
+    	<ui:define name="tituloPagina">
+    		<h:outputText value="Gráficos" />
+    	</ui:define>
+    	
+    	<ui:define name="pageScript">
+			<script type="text/javascript">
+			  function customExtender() {
+			    this.cfg.highlighter = {
+			      show:true,
+       			  tooltipContentEditor:tooltipContentEditor
+			    }
+			  };
+
+			function tooltipContentEditor(str, seriesIndex, pointIndex, plot) {
+			    // display series_label, x-axis_tick, y-axis value
+			    return plot.options.axes.xaxis.ticks[pointIndex] + ": " + plot.data[seriesIndex][pointIndex];
+			}
+			  
+			</script>
+		</ui:define>
+    	
+		<ui:define name="parametros">
+    	   <ui:param name="bean" value="#{graficoBean}" />
+    	</ui:define>
+
+    	<ui:define name="tituloFieldSetFiltro">
+    		Gráficos
+		</ui:define>
+		
+		<ui:define name="camposFiltro">
+			<fieldset>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<h:outputText value="Cidade " />
+							<h:selectOneMenu id="cidadeSearch" 
+											 value="#{bean.cidade}"
+											 converter="entityConverter" styleClass="form-control">
+								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
+										value="#{bean.cidades}" />
+								<p:ajax event="change" update=":painelGlobal"
+									listener="#{bean.carregarPorCidade}"
+									oncomplete="carregando.hide()" />
+							</h:selectOneMenu>
+							<h:message for="cidadeSearch" tooltip="true"
+							styleClass="error-messages" />
+						</div>
+					</div>
+					<h:panelGroup id="panelPorCidade"
+						rendered="#{bean.cidade != null}">
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputText value="Ano / Mês" />
+								<h:selectOneMenu id="arquivoPagamentoSearch"
+									value="#{bean.entitySearch.arquivoPagamento}"
+									converter="entityConverter" styleClass="form-control">
+									<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+									<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano.ano} / #{o.mes.descricao}"
+										value="#{bean.arquivoPagamentos}" />
+								</h:selectOneMenu>
+								<h:message for="arquivoPagamentoSearch" tooltip="true"
+									styleClass="error-messages" />
+							</div>
+						</div>
+					</h:panelGroup>	
+				</div>	
+			</fieldset>		
+		</ui:define>	
+			
+		<ui:define name="botoesFiltro">
+			<p:commandButton value="Visualizar"
+						 actionListener="#{bean.visualizarGrafico()}" 
+						 styleClass="btn btn-primary"
+						 update=":painelGlobal"
+						 ajax="false"/>
+
+		</ui:define>
+	
+		<ui:define name="botoesInsertFiltro" />
+
+		<ui:define name="tituloPainel">
+			<ui:param name="tituloPainel" value="Setores do Pagamento" />
+		</ui:define>
+	
+		<ui:define name="resultFiltro" >
+			<h:panelGroup id="garficoSetor" rendered="#{!bean.resumosSetores.isEmpty()}">
+				<p:chart type="bar" yaxisFormat="#,##0.##" xaxisGrid="false"  model="#{bean.setoresBarra}" style="height:300px"/>
+			</h:panelGroup>	
+		</ui:define>
+    </ui:composition>
+</html>
