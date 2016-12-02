@@ -47,6 +47,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private ResumoSetor resumoSetor;
 	private List<Pagamento> pagamentos;
 	private List<ResumoSetor> resumosSetores;
+	private  boolean aguardandoDadosMatricula = false;
 	private  boolean processamentoPagamento = false;
 	private  boolean processandoPagamentos = false;
 	private  boolean processamentoEventos = false;
@@ -116,6 +117,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		setVinculos(getVinculoService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		nomesCargos = getCargos().stream().map(cargo -> cargo.getDescricao()).collect(Collectors.toList());
+		aguardandoDadosMatricula = false;
 		processamentoPagamento = false;
 		processandoPagamentos = false;
 		processamentoEventos = false;
@@ -206,6 +208,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 	
 	private void verificarResumoSetor() {
+		if(setorResumo.getDescricao().contains("NUCLEO DE SERVICOS GERAIS")){
+			System.out.println(linhaAnterior);
+		}
 		List<Pagamento> pagamentosSetor = pagamentos.stream()
 				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
 						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
@@ -289,7 +294,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			nivelPagamento.setSecretaria(secretaria);
 			nivelPagamento.setCodigo(StringUtils.notNullOrEmpty(descricaoNivelPagamento)? Util.getNumeroHashCode(descricaoNivelPagamento, nivelPagamento.getTamanhoMinimoCodigo()) + "" : ""); 
 		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Nível Pagamento. Linha: " + linhaAtual);
+			throw new ApplicationException("Erro ao pegar o Nï¿½vel Pagamento. Linha: " + linhaAtual);
 		}
 		return nivelPagamento;
 	}
@@ -475,9 +480,13 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  void localizarMatricula(String linhaAtual) throws Exception {
 		if(processamentoPagamento  &&	localizarCargo(linhaAtual)	){
 			cargo = getCargo();
-			String numeroMatricula = getNumeroMatricula();
-			verificarPagamento(numeroMatricula);
-			getMatricula(numeroMatricula, linhaAtual);
+			if(aguardandoDadosMatricula){
+				System.out.println("Aplicar regra aqui");
+			}else{
+				String numeroMatricula = getNumeroMatricula();
+				verificarPagamento(numeroMatricula);
+				getMatricula(numeroMatricula, linhaAtual);
+			}
 		}
 	}
 
@@ -517,7 +526,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			cargaHoraria = cargaHoraria.substring(cargaHoraria.lastIndexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao(), cargaHoraria.length())).trim();
 			cargaHorariaNumero = Integer.parseInt(cargaHoraria);
 		} catch (Exception e) {
-			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAtual);
+			throw new ApplicationException ("Erro ao pegar o Carga Horï¿½ria. Linha: " + linhaAtual);
 		}
 		return cargaHorariaNumero;
 	}
@@ -534,7 +543,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			return (Date)formatter.parse(linhaAtual.substring(0,10).trim());
 		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar a Data de Admissão. Linha: " + linhaAtual);
+			throw new ApplicationException("Erro ao pegar a Data de Admissï¿½o. Linha: " + linhaAtual);
 		}
 	}
 
@@ -555,6 +564,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void getMatricula(String numeroMatricula, String linhaAtual) {
+		if(linhaAnterior.contains("MARIA JOSE BARROS DE OLIVEIRA")){
+			System.out.println(linhaAtual);
+		}
 		matricula = getMatricula(new Matricula(numeroMatricula));
 		if(Objects.isNull(matricula)){
 			novaMatricula(numeroMatricula, linhaAtual);
@@ -606,7 +618,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			vinculo.setDescricao(descricao);
 			vinculo.setCidade(getArquivoPagamento().getCidade());
 		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Vínculo. Linha: " + linha);
+			throw new ApplicationException("Erro ao pegar o Vï¿½nculo. Linha: " + linha);
 		}
 		return vinculo;
 	}

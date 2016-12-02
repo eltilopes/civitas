@@ -20,7 +20,10 @@ public enum IdentificadorArquivoInformatica {
 		INICIO_PAGAMENTOS("COD. SERVIDOR/CARGO FUNÇÃO/LOTAÇÃO NATUREZA/CC  ADMISSÃO"), 
 		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
 		SEPARADOR_ARQUIVO("------------------------------------------------------------------------------------------------------------------------------------"), 
-		IDENTIFICADOR_UNIDADE_TRABALHO("00000");
+		IDENTIFICADOR_UNIDADE_TRABALHO("00000"), 
+		TOTAL_DESCONTOS("DESCONTO:"), 
+		TOTAL_PROVENTOS("VANTAGEM:"), 
+		TOTAL_LIQUIDO("LÍQUIDO.:");
 	
 		private String descricao;
 		

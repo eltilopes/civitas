@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.enums.IdentificadorArquivoInformatica;
+import br.com.civitas.processamento.enums.IdentificadorArquivoInformatica;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 
 @Service
@@ -38,17 +40,20 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private  Secretaria secretaria;
 	private  CargaHorariaPagamento cargaHorariaPagamento;
 	private  Setor setor;
-	private  List<Pagamento> pagamentos;
+	private Setor setorResumo;
+	private Secretaria secretariaResumo;
+	private ResumoSetor resumoSetor;
+	private List<Pagamento> pagamentos;
+	private List<ResumoSetor> resumosSetores;
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
-	private  boolean resumoSetor = false;
+	private  boolean processamentoResumo = false;
 	private  String linhaAnterior = "";
 	
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception{
-		//TODO: ajustar List<ResumoSetor>
 		setArquivoPagamento(arquivoPagamento);
 		processar();
-		return null;
+		return resumosSetores;
 	}
 	
 	private void processar() throws Exception {
@@ -70,6 +75,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		pagamentos.add(pagamento);
 		br.close();
 		getPagamentoService().inserirPagamentos(pagamentos,getEventos(), getArquivoPagamento());
+		getResumoSetorService().insertAll(resumosSetores);
 	}
 
 	private void carregarEventos() throws IOException{
@@ -89,6 +95,8 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		setor = null;
 		cargaHorariaPagamento = null;
 		pagamentos = new ArrayList<Pagamento>();
+		resumoSetor = null;
+		resumosSetores = new ArrayList<ResumoSetor>();
 		setMatriculas(getMatriculaService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setUnidadesTrabalho(getUnidadeTrabalhoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		setCargasHorariaPagamento(getCargaHorariaPagamentoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
@@ -99,14 +107,14 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		processamentoPagamentoAtivo = false;
 		processamentoEventos = false;
-		resumoSetor = false;
+		processamentoResumo = false;
 		linhaAnterior = "";
 	}
 
 	private void localizarEvento(String linha) {
 		verificarIdentificadorEvento(linha);
 		verificarIdentificadorResumoSetor(linha);
-		if(processamentoEventos && !resumoSetor && !linha.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
+		if(processamentoEventos && !processamentoResumo && !linha.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
 			List<Evento> eventosNaLinha = getEventoNaLinha(linha);
 			for(Evento e : eventosNaLinha){
 				getEvento(e, linha);
@@ -196,11 +204,16 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private void verificarIdentificadorResumoSetor(String linha) {
 		if(linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_SETOR.getDescricao())
 			|| linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_GERAL.getDescricao())){ 
-			resumoSetor = true;
+			processamentoResumo = true;
+			if(processamentoPagamentoAtivo){
+				resumoSetor = new ResumoSetor();
+				setorResumo = setor;
+				secretariaResumo = secretaria;
+			}
 		}
-		if((linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_SETOR.getDescricao()))
+		if(processamentoResumo && (linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_SETOR.getDescricao()))
 			|| linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_GERAL.getDescricao())){ 
-			resumoSetor = false;
+			processamentoResumo = false;
 		}
 	}
 
@@ -211,6 +224,67 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		localizarMatricula(linhaAtual);
 		localizarEventosPagamento(linhaAtual);
 		finalizarPagamento(linhaAtual);
+		verificarResumo(linhaAtual);
+	}
+	
+	private void verificarResumo(String linhaAtual) {
+		verificarIdentificadorResumoSetor(linhaAtual);
+		if (processamentoPagamentoAtivo && processamentoResumo && Util.valorContemNumero(linhaAtual)) {
+			getTotaisResumo(linhaAtual);
+		}
+		if (processamentoPagamentoAtivo && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+			verificarResumoSetor();
+		}
+	}
+	
+	//TODO: Ajustar aqui
+	private void verificarResumoSetor() {
+		List<Pagamento> pagamentosSetor = pagamentos.stream()
+				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
+						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
+				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+		if(Objects.isNull(pagamento.getMatriculaPagamento().getSecretaria()) && Objects.isNull(pagamento.getMatriculaPagamento().getSetor())){
+			pagamentosSetor.add(pagamento);
+		}
+		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
+		resumoSetor.setSetor(setorResumo);
+		resumoSetor.setSecretaria(secretariaResumo);
+		resumoSetor.setArquivoPagamento(getArquivoPagamento());
+		pagamentosSetor.stream().forEach(p -> {
+			resumoSetor.setSomatorioLiquido(resumoSetor.getSomatorioLiquido() + p.getTotalLiquido());
+			resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
+			resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
+		});
+		resumoSetor.arredondarValoresResumo();
+		resumosSetores.add(resumoSetor);
+		resumoSetor = null;
+	}
+	
+	private void getTotaisResumo(String linhaAtual) {
+		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_DESCONTOS.getDescricao())) {
+			resumoSetor.setTotalDescontos(getValorTotalResumo(linhaAtual));
+		}
+		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_PROVENTOS.getDescricao())) {
+			resumoSetor.setTotalProventos(getValorTotalResumo(linhaAtual));
+		}
+		if (linhaComTotalLiquido(linhaAtual)) {
+			resumoSetor.setTotalLiquido(getValorTotalResumo(linhaAtual));
+		}
+	}
+	
+	private boolean linhaComTotalLiquido(String linhaAtual) {
+		return linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao())
+				&& Util.palavraSomenteNumeros(linhaAtual.replace(IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao(),"")
+				.replace(".","")
+				.replace(",","").trim());
+	}
+
+	
+	private Double getValorTotalResumo(String linhaAtual) {
+		int posicaoPrimeiroNumero = Util.posicaoPrimeiraNumero(linhaAtual);
+		linhaAtual = linhaAtual.substring(posicaoPrimeiroNumero - 1, linhaAtual.length());
+		return Double.parseDouble(
+				getValorEvento(linhaAtual, linhaAtual.indexOf(IdentificadorArquivoInformatica.VIRGULA.getDescricao())));
 	}
 	
 	private void finalizarPagamento(String linhaAtual) {
@@ -233,7 +307,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private void localizarEventosPagamento(String linhaAtual) {
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if(processamentoEventos && processamentoPagamentoAtivo && !resumoSetor && !linhaAtual.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
+		if(processamentoEventos && processamentoPagamentoAtivo && !processamentoResumo && !linhaAtual.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
 			getDiasTrabalhados(linhaAtual);
 			List<Evento> eventosNaLinha = getEventoNaLinha(linhaAtual);
 			List<String> eventosLinha = carregarEventosLinha(linhaAtual, verificarPosicaoSegundoEvento(linhaAtual));
