@@ -53,6 +53,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  boolean processamentoEventos = false;
 	private  boolean processamentoResumo = false;
 	private  String linhaAnterior = "";
+	private  String linhaComCargo = "";
 	private  List<String> nomesCargos;
 	private String descricaoNivelPagamento;
 	
@@ -76,13 +77,24 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine(); 
+			if(linha.contains("MARIA JOSE BARROS DE OLIVEIRA")){
+				System.out.println(linha);
+			}
 			localizarPagamentos(linha);
+			getLinhaComCargo(linha);
 			linhaAnterior = linha;
 		}
 		pagamentos.add(pagamento);
 		br.close();
 		getPagamentoService().inserirPagamentos(pagamentos,getEventos(), getArquivoPagamento());
 		getResumoSetorService().insertAll(resumosSetores);
+	}
+
+	private void getLinhaComCargo(String linha) {
+		if( !linhaAnterior.contains(IdentificadorArquivoTarget.PREFEITURA_MUNICIPAL.getDescricao()) 
+				&& StringUtils.notNullOrEmpty(linha) && linha.length()>6 && Util.palavraSomenteNumeros(linha.substring(linha.length()-7, linha.length()))){
+			linhaComCargo = linha;
+		}
 	}
 
 	private void carregarEventos() throws IOException{
@@ -123,6 +135,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		processamentoEventos = false;
 		processamentoResumo = false;
 		linhaAnterior = "";
+		linhaComCargo = "";
 		descricaoNivelPagamento = "";
 	}
 
@@ -478,6 +491,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
+		if(linhaAtual.contains("01/08/2014")){
+			System.out.println(linhaAtual);
+		}
 		if(processamentoPagamento  &&	localizarCargo(linhaAtual)	){
 			cargo = getCargo();
 			if(aguardandoDadosMatricula){
@@ -564,9 +580,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void getMatricula(String numeroMatricula, String linhaAtual) {
-		if(linhaAnterior.contains("MARIA JOSE BARROS DE OLIVEIRA")){
-			System.out.println(linhaAtual);
-		}
 		matricula = getMatricula(new Matricula(numeroMatricula));
 		if(Objects.isNull(matricula)){
 			novaMatricula(numeroMatricula, linhaAtual);
@@ -597,7 +610,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	
 	private Cargo getCargo() {
 		for(Cargo cargo : getCargos()){
-			if(linhaAnterior.contains(cargo.getDescricao())){
+			if(linhaComCargo.contains(cargo.getDescricao())){
 				return cargo;
 			}
 		}
@@ -605,7 +618,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private String getNomeFuncionario() throws ApplicationException {
-		return linhaAnterior.substring(0,linhaAnterior.indexOf(cargo.getDescricao())).trim();
+		return linhaComCargo.substring(0,linhaComCargo.indexOf(cargo.getDescricao())).trim();
 	}
 
 	private Vinculo getVinculo(String linha) throws ApplicationException {

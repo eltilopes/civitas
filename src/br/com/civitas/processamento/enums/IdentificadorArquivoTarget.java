@@ -42,7 +42,8 @@ public enum IdentificadorArquivoTarget {
 		TIPO("Tipo:"), 
 		TOTAL_DESCONTOS("Total de Descontos"), 
 		TOTAL_PROVENTOS("Total de Proventos"), 
-		TOTAL_LIQUIDO("Total Líquido"); 
+		TOTAL_LIQUIDO("Total Líquido"), 
+		PREFEITURA_MUNICIPAL("PREFEITURA MUNICIPAL"); 
 	
 		private String descricao;
 		

@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
+import br.com.civitas.arquitetura.util.Util;
+import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.enums.IdentificadorArquivoTarget;
@@ -132,6 +134,9 @@ public class ValidarArquivoService {
 				if(linha.contains(cargo.getDescricao())){
 					cargosValidados.add(linha);
 				}
+				if(linha.contains("MARIA JOSE BARROS DE OLIVEIRA")){
+					System.out.println(linha);
+				}
 			}
 		}
 		linhasComCargo.removeAll(cargosValidados);
@@ -171,6 +176,12 @@ public class ValidarArquivoService {
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.FUNDO_RESERVA.getDescricao())
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao())){
 			linhasComCargo.add(linhaAnterior);
+		}else if(!linhaAnterior.contains(IdentificadorArquivoTarget.PREFEITURA_MUNICIPAL.getDescricao()) 
+				&& StringUtils.notNullOrEmpty(linha) && linha.length()>6 
+				&& !linha.contains(IdentificadorArquivoTarget.CPF.getDescricao())
+				&& !linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao())
+				&& Util.palavraSomenteNumeros(linha.substring(linha.length()-7, linha.length()))){
+			linhasComCargo.add(linha);
 		}
 	}
 	
