@@ -71,10 +71,8 @@
 		
 		<ui:define name="resultFiltro" >
 			<p:dataTable id="resumos" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaResumos" rows="30" emptyMessage="Nenhum Resumo foi encontrado."
-			 		 value="#{bean.resultSearch}" var="resumo" paginator="#{bean.resultSearch.rowCount > 0}"
-			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
-			 		 rowStyleClass="bgLinha1,bgLinha2">
+		   			 widgetVar="tabelaResumos"  emptyMessage="Nenhum Resumo foi encontrado."
+			 		 value="#{bean.resultSearch}" var="resumo" rendered="#{bean.resultSearch.rowCount > 0}" rowStyleClass="bgLinha1,bgLinha2">
 			 		 
 					 <p:column headerText="Ok" style="text-align:center;" >
 							<p:selectBooleanCheckbox id="valoresConferidos" disabled="true" value="#{resumo.valoresResumoConferidos()}" style="#{bean.getEstiloLinha(resumo)}"/>
@@ -123,6 +121,61 @@
 					<p:column headerText="Somatório Remuneração" style="text-align:right;" >
 		   				<h:outputText id="somatorioRemuneracao"  value="#{resumo.somatorioRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
+		   			
+		   			 <p:columnGroup type="footer">
+			            <p:row>
+			                <p:column colspan="3" style="text-align:right;font-weight: bold" footerText="Totais Setores(R$):" />
+			                <p:column footerText="#{bean.resumoSetorTotal.quantidadePagamentos}" style="text-align:right;font-weight: bold"/>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorTotalProventos"  value="#{bean.resumoSetorTotal.totalProventos}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorTotalLiquido"  value="#{bean.resumoSetorTotal.totalLiquido}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorTotalDescontos"  value="#{bean.resumoSetorTotal.totalDescontos}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorTotalRemuneracao"  value="#{bean.resumoSetorTotal.totalRemuneracao}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorSomatorioProventos"  value="#{bean.resumoSetorTotal.somatorioProventos}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorSomatorioLiquido"  value="#{bean.resumoSetorTotal.somatorioLiquido}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorSomatorioDescontos"  value="#{bean.resumoSetorTotal.somatorioDescontos}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			                <p:column  style="text-align:right;font-weight: bold" >
+				   				<f:facet name="footer">
+				   					<h:outputText id="resumoSetorSomatorioRemuneracao"  value="#{bean.resumoSetorTotal.somatorioRemuneracao}" 
+				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
+				   				</f:facet>
+		                    </p:column>
+			            </p:row>
+			        </p:columnGroup>
 			</p:dataTable> 
 		</ui:define>
 		

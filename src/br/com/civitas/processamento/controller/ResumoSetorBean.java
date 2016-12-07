@@ -36,6 +36,7 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 	private ArquivoPagamentoService arquivoPagamentoService;
 
 	private Cidade cidade;
+	private ResumoSetor resumoSetorTotal;
 	private List<Cidade> cidades;
 	private List<ArquivoPagamento> arquivoPagamentos;
 	
@@ -55,13 +56,14 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 		if(Objects.nonNull(getEntitySearch().getArquivoPagamento()) && Objects.nonNull(getCidade())){
 			try {
 				limpaListas();
-				List<ResumoSetor> list = null;
-				list = service.buscarPorArquivoPagamento(getEntitySearch().getArquivoPagamento());
-				if (list.isEmpty()) {
+				List<ResumoSetor> resumos = null;
+				resumos = service.buscarPorArquivoPagamento(getEntitySearch().getArquivoPagamento());
+				if (resumos.isEmpty()) {
 					throw new ApplicationException("Consulta sem resultados.");
 				}
-				getResultSearch().setWrappedData(list);
+				getResultSearch().setWrappedData(resumos);
 				setOriginalResult((List<ResumoSetor>) getResultSearch().getWrappedData());
+				carregarResumoTotal(resumos);
 				setCurrentState(STATE_SEARCH);
 			} catch (ApplicationException e) {
 				e.printStackTrace();
@@ -75,6 +77,19 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 		}
 	}
 	
+	private void carregarResumoTotal(List<ResumoSetor> resumos) {
+		resumoSetorTotal = new ResumoSetor();
+		resumoSetorTotal.setQuantidadePagamentos(resumos.stream().mapToInt(r -> r.getQuantidadePagamentos()).sum());
+		resumoSetorTotal.setTotalDescontos(resumos.stream().mapToDouble(r -> r.getTotalDescontos()).sum());
+		resumoSetorTotal.setTotalLiquido(resumos.stream().mapToDouble(r -> r.getTotalLiquido()).sum());
+		resumoSetorTotal.setTotalProventos(resumos.stream().mapToDouble(r -> r.getTotalProventos()).sum());
+		resumoSetorTotal.setTotalRemuneracao(resumos.stream().mapToDouble(r -> r.getTotalRemuneracao()).sum());
+		resumoSetorTotal.setSomatorioDescontos(resumos.stream().mapToDouble(r -> r.getSomatorioDescontos()).sum());
+		resumoSetorTotal.setSomatorioLiquido(resumos.stream().mapToDouble(r -> r.getSomatorioLiquido()).sum());
+		resumoSetorTotal.setSomatorioProventos(resumos.stream().mapToDouble(r -> r.getSomatorioProventos()).sum());
+		resumoSetorTotal.setSomatorioRemuneracao(resumos.stream().mapToDouble(r -> r.getSomatorioRemuneracao()).sum());
+	}
+
 	public String getEstiloLinha(ResumoSetor resumoSetor){
 		return resumoSetor.valoresResumoConferidos()  ? "color:#4f4f4f !important;" : "color:#d9534f !important;";
 	}
@@ -118,6 +133,14 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 
 	public void setCidade(Cidade cidade) {
 		this.cidade = cidade;
+	}
+
+	public ResumoSetor getResumoSetorTotal() {
+		return resumoSetorTotal;
+	}
+
+	public void setResumoSetorTotal(ResumoSetor resumoSetorTotal) {
+		this.resumoSetorTotal = resumoSetorTotal;
 	}
 
 }
