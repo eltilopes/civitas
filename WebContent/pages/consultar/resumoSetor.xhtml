@@ -70,8 +70,8 @@
 		
 		
 		<ui:define name="resultFiltro" >
-			<p:dataTable id="resumos" styleClass="table table-responsive table-mobile"
-		   			 widgetVar="tabelaResumos"  emptyMessage="Nenhum Resumo foi encontrado."
+			<p:dataTable id="resumos" styleClass="table table-responsive table-mobile" resizableColumns="true" 
+		   			 widgetVar="tabelaResumos"  emptyMessage="Nenhum Resumo foi encontrado." tableStyle="width:auto !important"
 			 		 value="#{bean.resultSearch}" var="resumo" rendered="#{bean.resultSearch.rowCount > 0}" rowStyleClass="bgLinha1,bgLinha2">
 			 		 
 					 <p:column headerText="Ok" style="text-align:center;" >

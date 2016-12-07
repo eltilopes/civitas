@@ -30,26 +30,23 @@ import org.primefaces.model.StreamedContent;
 import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
-import br.com.civitas.processamento.entity.Ano;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
-import br.com.civitas.processamento.entity.Mes;
 import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
-import br.com.civitas.processamento.service.AnoService;
+import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CargaHorariaPagamentoService;
 import br.com.civitas.processamento.service.CargoService;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.EventoPagamentoService;
 import br.com.civitas.processamento.service.EventoService;
-import br.com.civitas.processamento.service.MesService;
 import br.com.civitas.processamento.service.NivelPagamentoService;
 import br.com.civitas.processamento.service.PagamentoService;
 import br.com.civitas.processamento.service.SecretariaService;
@@ -69,11 +66,8 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	@ManagedProperty("#{cidadeService}")
 	private CidadeService cidadeService;
 
-	@ManagedProperty("#{anoService}")
-	private AnoService anoService;
-
-	@ManagedProperty("#{mesService}")
-	private MesService mesService;
+	@ManagedProperty("#{arquivoPagamentoService}")
+	private ArquivoPagamentoService arquivoPagamentoService;
 
 	@ManagedProperty("#{secretariaService}")
 	private SecretariaService secretariaService;
@@ -100,8 +94,6 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private CargoService cargoService;
 
 	private List<Cidade> cidades;
-	private List<Ano> anos;
-	private List<Mes> meses;
 	private List<Cargo> cargosDisponiveis;
 	private List<Cargo> cargosSelecionados;
 	private List<Setor> setoresDisponiveis;
@@ -121,13 +113,14 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	private Map<String, Double> somatorioValores;
 	private Map<String, Double> somatorioValoresPaginacao;
 	
+	private Cidade cidade;
+	private List<ArquivoPagamento> arquivoPagamentos;
+	
 	private StreamedContent arquivoExcel;
 	
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarTodasAtivas();
-		anos = anoService.buscarTodos();
-		meses = mesService.buscarTodos();
 		getEntitySearch().setArquivo(new ArquivoPagamento());
 	}
 
@@ -138,14 +131,15 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	}
 
 	public void carregarPorCidade() {
-		if (Objects.nonNull(getEntitySearch().getArquivo().getCidade())) {
-			setSecretariasDisponiveis(secretariaService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setSetoresDisponiveis(setorService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargosDisponiveis(cargoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setUnidadesDisponiveis(unidadeTrabalhoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setNiveisDisponiveis(nivelPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setCargasDisponiveis(cargaHorariaPagamentoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
-			setEventosDisponiveis(eventoService.buscarCidade(getEntitySearch().getArquivo().getCidade()));
+		if (Objects.nonNull(getCidade())) {
+			arquivoPagamentos = arquivoPagamentoService.buscarPorCidade(getCidade());
+			setSecretariasDisponiveis(secretariaService.buscarCidade(getCidade()));
+			setSetoresDisponiveis(setorService.buscarCidade(getCidade()));
+			setCargosDisponiveis(cargoService.buscarCidade(getCidade()));
+			setUnidadesDisponiveis(unidadeTrabalhoService.buscarCidade(getCidade()));
+			setNiveisDisponiveis(nivelPagamentoService.buscarCidade(getCidade()));
+			setCargasDisponiveis(cargaHorariaPagamentoService.buscarCidade(getCidade()));
+			setEventosDisponiveis(eventoService.buscarCidade(getCidade()));
 			setEventosSelecionados(getEventosDisponiveis());
 			setCargosSelecionados(new ArrayList<Cargo>());
 			setSetoresSelecionados(new ArrayList<Setor>());
@@ -158,23 +152,27 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 	@Override
 	public void find(ActionEvent event) {
-		try {
-			List<Pagamento> list = null;
-			list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargosSelecionados, secretariasSelecionadas, setoresSelecionados,
-					unidadesSelecionadas, niveisSelecionados, cargasSelecionados);
-
-			popularEventosSelecionados(list);
-			if (list.isEmpty()) {
-				throw new ApplicationException("Consulta sem resultados.");
+		if(Objects.nonNull(getEntitySearch().getArquivo()) && Objects.nonNull(getCidade())){
+			try {
+				List<Pagamento> list = null;
+				list = service.getPagamentoPorArquivo(getEntitySearch().getArquivo(), cargosSelecionados, secretariasSelecionadas, setoresSelecionados,
+						unidadesSelecionadas, niveisSelecionados, cargasSelecionados);
+	
+				popularEventosSelecionados(list);
+				if (list.isEmpty()) {
+					throw new ApplicationException("Consulta sem resultados.");
+				}
+				setCurrentState(STATE_SEARCH);
+			} catch (ApplicationException e) {
+				e.printStackTrace();
+				FacesUtils.addWarnMessage(e.getMessage());
+			} catch (Exception e) {
+				e.printStackTrace();
+				FacesUtils.addErrorMessage(getMessage("ERROR_MESSAGE"));
 			}
-			setCurrentState(STATE_SEARCH);
-		} catch (ApplicationException e) {
-			e.printStackTrace();
-			FacesUtils.addWarnMessage(e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			FacesUtils.addErrorMessage(getMessage("ERROR_MESSAGE"));
-		}
+		}else{
+			FacesUtils.addWarnMessage("Selecione a Cidade, Ano e Mês para Consulta.");
+		}	
 	}
 
 	private void popularEventosSelecionados(List<Pagamento> list) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -345,28 +343,24 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		somatorioValoresPaginacao = new HashMap<String, Double>();
 	}
 
-	public List<Ano> getAnos() {
-		return anos;
+	public Cidade getCidade() {
+		return cidade;
 	}
 
-	public void setAnos(List<Ano> anos) {
-		this.anos = anos;
+	public void setCidade(Cidade cidade) {
+		this.cidade = cidade;
 	}
 
-	public List<Mes> getMeses() {
-		return meses;
+	public List<ArquivoPagamento> getArquivoPagamentos() {
+		return arquivoPagamentos;
 	}
 
-	public void setMeses(List<Mes> meses) {
-		this.meses = meses;
+	public void setArquivoPagamentos(List<ArquivoPagamento> arquivoPagamentos) {
+		this.arquivoPagamentos = arquivoPagamentos;
 	}
 
-	public void setAnoService(AnoService anoService) {
-		this.anoService = anoService;
-	}
-
-	public void setMesService(MesService mesService) {
-		this.mesService = mesService;
+	public void setArquivoPagamentoService(ArquivoPagamentoService arquivoPagamentoService) {
+		this.arquivoPagamentoService = arquivoPagamentoService;
 	}
 
 	public List<Cidade> getCidades() {

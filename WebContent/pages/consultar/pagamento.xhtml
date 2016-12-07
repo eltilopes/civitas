@@ -39,37 +39,9 @@
 			<div class="row">
 				<div class="col-md-4">
 					<div class="form-group">
-						<h:outputText value="Ano " />
-						<h:selectOneMenu id="anoSearch"
-							value="#{bean.entitySearch.arquivo.ano}"
-							converter="entityConverter" styleClass="form-control">
-							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano}"
-								value="#{bean.anos}" />
-						</h:selectOneMenu>
-						<h:message for="anoSearch" tooltip="true"
-							styleClass="error-messages" />
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="form-group">
-						<h:outputText value="Mês " />
-						<h:selectOneMenu id="mesSearch"
-							value="#{bean.entitySearch.arquivo.mes}"
-							converter="entityConverter" styleClass="form-control">
-							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
-							<f:selectItems var="o" itemValue="#{o}"
-								itemLabel="#{o.descricao.toUpperCase()}" value="#{bean.meses}" />
-						</h:selectOneMenu>
-						<h:message for="mesSearch" tooltip="true"
-							styleClass="error-messages" />
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="form-group">
 						<h:outputText value="Cidade " />
 						<p:selectOneMenu id="cidadeSearch" style="width: auto !important;"
-							value="#{bean.entitySearch.arquivo.cidade}"
+							value="#{bean.cidade}"
 							converter="entityConverter" styleClass="form-control">
 							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 							<f:selectItems var="o" itemValue="#{o}"
@@ -82,9 +54,24 @@
 							styleClass="error-messages" />
 					</div>
 				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<h:outputText value="Ano / Mês" />
+						<h:selectOneMenu id="arquivoPagamentoSearch"
+							value="#{bean.entitySearch.arquivo}"
+							converter="entityConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.ano.ano} / #{o.mes.descricao}"
+								value="#{bean.arquivoPagamentos}" />
+						</h:selectOneMenu>
+						<h:message for="arquivoPagamentoSearch" tooltip="true"
+							styleClass="error-messages" />
+					</div>
+				</div>
 			</div>
 			<h:panelGroup id="panelPorCidade"
-				rendered="#{bean.entitySearch.arquivo.cidade != null}">
+				rendered="#{bean.cidade != null}">
+				
 				<div class="container-fluid">
 					<div class="row">
 						<h:panelGroup id="panelSecretarias"
