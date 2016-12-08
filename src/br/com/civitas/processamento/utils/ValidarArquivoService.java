@@ -134,9 +134,6 @@ public class ValidarArquivoService {
 				if(linha.contains(cargo.getDescricao())){
 					cargosValidados.add(linha);
 				}
-				if(linha.contains("MARIA JOSE BARROS DE OLIVEIRA")){
-					System.out.println(linha);
-				}
 			}
 		}
 		linhasComCargo.removeAll(cargosValidados);

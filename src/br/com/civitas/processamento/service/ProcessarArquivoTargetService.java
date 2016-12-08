@@ -491,9 +491,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(linhaAtual.contains("01/08/2014")){
-			System.out.println(linhaAtual);
-		}
 		if(processamentoPagamento  &&	localizarCargo(linhaAtual)	){
 			cargo = getCargo();
 			if(aguardandoDadosMatricula){
