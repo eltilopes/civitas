@@ -68,12 +68,15 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 			} catch (ApplicationException e) {
 				e.printStackTrace();
 				FacesUtils.addWarnMessage(e.getMessage());
+				limpaListas();
 			} catch (Exception e) {
 				e.printStackTrace();
 				FacesUtils.addErrorMessage(getMessage("ERROR_MESSAGE"));
+				limpaListas();
 			}
 		}else{
 			FacesUtils.addWarnMessage("Selecione a Cidade, Ano e Mês para Consulta.");
+			limpaListas();
 		}
 	}
 	

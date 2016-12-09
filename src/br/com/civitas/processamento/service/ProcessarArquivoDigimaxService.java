@@ -196,7 +196,7 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 		if (processamentoResumo && Util.valorContemNumero(linhaAtual)) {
 			getTotaisResumo(linhaAtual);
 		}
-		if (processamentoPagamento && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+		if (!processamentoResumo && Objects.nonNull(resumoSetor)) {
 			verificarResumoSetor();
 		}
 	}
@@ -239,6 +239,9 @@ public class ProcessarArquivoDigimaxService extends ProcessarArquivoPagamento im
 				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
 						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
 				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+		if(pagamento.getMatriculaPagamento().getSecretaria().equals(secretariaResumo) && pagamento.getMatriculaPagamento().getSetor().equals(setorResumo)){
+			pagamentosSetor.add(pagamento);
+		}
 		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
 		resumoSetor.setSetor(setorResumo);
 		resumoSetor.setSecretaria(secretariaResumo);
