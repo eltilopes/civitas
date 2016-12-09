@@ -62,14 +62,38 @@
 		</ui:define>	
 		
 		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Resumos Setores #{bean.cidade.descricao} 
-			 #{bean.entitySearch.arquivoPagamento.mes.descricao}  #{bean.entitySearch.arquivoPagamento.ano.ano}" />
+			<ui:param name="tituloPainel" value="Resumos Setores " />
+			  
 		</ui:define>
 	
 		<ui:define name="botoesInsertFiltro" />
 		
 		
 		<ui:define name="resultFiltro" >
+			<h:panelGroup rendered="#{bean.resultSearch.rowCount > 0}"  >
+				<div class="well">
+					<table class="table table-responsive" >
+						<tr>
+							<td>
+							   <p><b>ARQUIVO SELECIONADO: </b> #{bean.cidade.descricao} #{bean.entitySearch.arquivoPagamento.mes.descricao}  #{bean.entitySearch.arquivoPagamento.ano.ano}</p>
+							   <p><b>NOME ARQUIVO: </b> #{bean.entitySearch.arquivoPagamento.nomeArquivo}</p>
+							   <p><b>DATA PROCESSAMENTO: </b> 
+								  	<h:outputText value="#{bean.entitySearch.arquivoPagamento.dataProcessamento}"   >
+				   						<f:convertDateTime pattern="dd/MM/yyyy" />
+				   					</h:outputText>	
+				   				</p>
+							   <p><b>QUANTIDADE VÍNCULOS: </b> #{bean.entitySearch.arquivoPagamento.totalPagamentos}</p>
+						   </td>
+						   <td >
+						   		<p><b>TOTAL PROVENTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalProventos}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL DESCONTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalDescontos}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL REMUNERAÇÃO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalRemuneracao}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL LÍQUIDO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" /></p>
+				 	  	   </td>
+				 	  	</tr>
+				 	 </table> 	   
+				</div>
+			</h:panelGroup>	
 			<p:dataTable id="resumos" styleClass="table table-responsive table-mobile" resizableColumns="true" 
 		   			 widgetVar="tabelaResumos"  emptyMessage="Nenhum Resumo foi encontrado." tableStyle="width:auto !important"
 			 		 value="#{bean.resultSearch}" var="resumo" rendered="#{bean.resultSearch.rowCount > 0}" rowStyleClass="bgLinha1,bgLinha2">
