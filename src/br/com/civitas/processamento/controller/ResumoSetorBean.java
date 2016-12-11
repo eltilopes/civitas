@@ -91,6 +91,7 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 		resumoSetorTotal.setSomatorioLiquido(resumos.stream().mapToDouble(r -> r.getSomatorioLiquido()).sum());
 		resumoSetorTotal.setSomatorioProventos(resumos.stream().mapToDouble(r -> r.getSomatorioProventos()).sum());
 		resumoSetorTotal.setSomatorioRemuneracao(resumos.stream().mapToDouble(r -> r.getSomatorioRemuneracao()).sum());
+		getEntitySearch().getArquivoPagamento().setTotalSetores(resumos.size());
 	}
 
 	public String getEstiloLinha(ResumoSetor resumoSetor){

@@ -53,7 +53,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private String linhaAnterior = "";
 	private String descricaoLinha;
 	private double valorRecisao;
-	
+	int qtdSetores = 0;
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception {
 		setArquivoPagamento(arquivoPagamento);
 		processar();
@@ -75,12 +75,17 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			String linha = br.readLine();
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
+			if(linha.contains(IdentificadorArquivoLayout.INICIO_RESUMO.getDescricao())){
+				qtdSetores++;
+			}
 		}
 		pagamento.getMatricula().getMatriculaPagamento().setVinculo(getVinculo(getVinculo(ultimaLinha), ultimaLinha));
 		pagamentos.add(pagamento);
 		br.close();
 		getPagamentoService().inserirPagamentos(pagamentos, getEventos(), getArquivoPagamento());
+		System.out.println("Quantidade Resumo Setores: " + resumosSetores.size());
 		getResumoSetorService().insertAll(resumosSetores);
+		System.out.println("Quantidade Setores: " + qtdSetores);
 	}
 
 	private void carregarEventos() throws IOException {
@@ -122,6 +127,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		processamentoResumo = false;
 		ultimaLinha = "";
 		linhaAnterior = "";
+		qtdSetores = 0;
 	}
 
 	private void localizarEvento(String linha) {
@@ -170,7 +176,11 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void verificarIdentificadorResumo(String linha) {
+		if(Objects.nonNull(setor) && setor.getDescricao().contains("FUNC REDE PUB EDU INFANTIL/CX 40%") && linha.contains(IdentificadorArquivoLayout.INICIO_RESUMO.getDescricao())){
+			System.out.println(setor.getDescricao());
+		}
 		if (linha.contains(IdentificadorArquivoLayout.INICIO_RESUMO.getDescricao())) {
+			System.out.println(setor.getDescricao());
 			processamentoResumo = true;
 			resumoSetor = new ResumoSetor();
 			setorResumo = setor;
@@ -182,6 +192,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void verificarResumoSetor() {
+		System.out.println("Passou aqui: " + qtdSetores + " - " + setorResumo.getDescricao());
 		valorRecisao = 0d;
 		List<Pagamento> pagamentosSetor = pagamentos.stream()
 				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
@@ -404,6 +415,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private Setor getSetor(String linhaAtual) throws ApplicationException {
+		if(linhaAtual.contains("FUNC REDE PUB EDU INFANTIL/CX 40%")){
+			System.out.println(linhaAtual);
+		}
 		Setor setor = new Setor();
 		try {
 			String descricao = linhaAtual

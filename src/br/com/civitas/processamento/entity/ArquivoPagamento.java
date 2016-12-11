@@ -78,6 +78,9 @@ public class ArquivoPagamento implements IEntity {
 	private Date dataProcessamento;
 	
 	@Transient
+	private int totalSetores;
+	
+	@Transient
 	private UploadedFile file;
 	
 	public ArquivoPagamento(){
@@ -194,7 +197,15 @@ public class ArquivoPagamento implements IEntity {
 	public void setDataProcessamento(Date dataProcessamento) {
 		this.dataProcessamento = dataProcessamento;
 	}
+	
+	public int getTotalSetores() {
+		return totalSetores;
+	}
 
+	public void setTotalSetores(int totalSetores) {
+		this.totalSetores = totalSetores;
+	}
+	
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		Map<String, Object> map = new HashMap<String, Object>();
