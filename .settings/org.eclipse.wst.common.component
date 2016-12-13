@@ -4,6 +4,8 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes/" source-path="/ImportedClasses"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/Arquivos"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/testResources"/>
+        <wb-resource deploy-path="/WEB-INF/classes/META-INF" source-path="/WebContent/META-INF"/>
         <property name="context-root" value="civitas"/>
         <property name="java-output-path" value="/civitas/build/classes"/>
     </wb-module>

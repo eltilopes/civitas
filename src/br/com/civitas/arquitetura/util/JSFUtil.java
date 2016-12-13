@@ -92,7 +92,7 @@ public class JSFUtil {
 	
 	public static ResourceBundle getBundle(){
 		if(facesContextIsNull()){
-			return ResourceBundle.getBundle("eBank", new Locale("pt_BR"));
+			return ResourceBundle.getBundle("civitas", new Locale("pt_BR"));
 		}
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		Application facesApplication = facesContext.getApplication();

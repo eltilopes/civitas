@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+   
+	<usuario id="1" nome="Elton" login="ELTON" senha="21232f297a57a5a743894a0e4a801fc3" ativo="true" root="true" altera_senha="false"/>
+	
+	<controle_senha id="1" usuario_id="1" senha="21232f297a57a5a743894a0e4a801fc3" data="2013-03-26 12:14:04.503"/>
+	
+</dataset>
