@@ -5,7 +5,7 @@ public enum IdentificadorArquivoInformatica {
 		INICIO_EVENTO("VENCIMENTO BASE"),
 		FIM_EVENTO("VANTAGENS..:"), 
 		INICIO_RESUMO_SETOR("RESUMO DO SETOR:"),
-		FIM_RESUMO_SETOR("TOTAL DE SERVIDORES:"), 
+		FIM_RESUMO_SETOR("BASE PREV. MUNICIPAL:"), 
 		INICIO_RESUMO_GERAL("RESUMO GERAL"),
 		FIM_RESUMO_GERAL("SISTEMA DE RECURSOS HUMANOS E FOLHA DE PAGAMENTO"), 
 		SECRETARIA("SEC.:"), 
@@ -21,6 +21,7 @@ public enum IdentificadorArquivoInformatica {
 		FIM_PAGAMENTO_INDIVIDUAL("VALOR LÍQUIDO..:"), 
 		SEPARADOR_ARQUIVO("------------------------------------------------------------------------------------------------------------------------------------"), 
 		IDENTIFICADOR_UNIDADE_TRABALHO("00000"), 
+		TOTAL_SERVIDORES("TOTAL DE SERVIDORES:"), 
 		TOTAL_DESCONTOS("DESCONTO:"), 
 		TOTAL_PROVENTOS("VANTAGEM:"), 
 		TOTAL_LIQUIDO("LÍQUIDO.:");

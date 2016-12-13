@@ -29,7 +29,6 @@ import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.entity.UnidadeTrabalho;
 import br.com.civitas.processamento.entity.Vinculo;
 import br.com.civitas.processamento.enums.IdentificadorArquivoInformatica;
-import br.com.civitas.processamento.enums.IdentificadorArquivoInformatica;
 import br.com.civitas.processamento.interfac.IProcessarArquivoPagamento;
 
 @Service
@@ -66,6 +65,8 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 
 	private void carregarPagamentos() throws Exception {
 		processamentoEventos = false;
+		processamentoResumo = false;
+		resumoSetor = null;
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine(); 
@@ -196,20 +197,19 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		}
 		if(linha.contains(IdentificadorArquivoInformatica.FIM_EVENTO.getDescricao()) 
 				|| linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_GERAL.getDescricao()) 
+				|| linha.contains(IdentificadorArquivoInformatica.TOTAL_SERVIDORES.getDescricao()) 
 				|| linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_SETOR.getDescricao()) ){
 			processamentoEventos = false;
 		}
 	}
 
 	private void verificarIdentificadorResumoSetor(String linha) {
-		if(linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_SETOR.getDescricao())
-			|| linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_GERAL.getDescricao())){ 
+		if(linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_GERAL.getDescricao()) ||
+		   linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_SETOR.getDescricao())){ 
 			processamentoResumo = true;
-			if(processamentoPagamentoAtivo){
-				resumoSetor = new ResumoSetor();
-				setorResumo = setor;
-				secretariaResumo = secretaria;
-			}
+			resumoSetor = new ResumoSetor();
+			setorResumo = setor;
+			secretariaResumo = secretaria;
 		}
 		if(processamentoResumo && (linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_SETOR.getDescricao()))
 			|| linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_GERAL.getDescricao())){ 
@@ -229,62 +229,62 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	
 	private void verificarResumo(String linhaAtual) {
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if (processamentoPagamentoAtivo && processamentoResumo && Util.valorContemNumero(linhaAtual)) {
+		if (!processamentoEventos && processamentoResumo && Util.valorContemNumero(linhaAtual)) {
 			getTotaisResumo(linhaAtual);
 		}
-		if (processamentoPagamentoAtivo && !processamentoResumo && Objects.nonNull(resumoSetor)) {
+		if (!processamentoEventos && !processamentoResumo && Objects.nonNull(resumoSetor)) {
 			verificarResumoSetor();
 		}
 	}
 	
 	//TODO: Ajustar aqui
 	private void verificarResumoSetor() {
-		List<Pagamento> pagamentosSetor = pagamentos.stream()
-				.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
-						&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
-				.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
-		if(Objects.isNull(pagamento.getMatriculaPagamento().getSecretaria()) && Objects.isNull(pagamento.getMatriculaPagamento().getSetor())){
-			pagamentosSetor.add(pagamento);
-		}
-		resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
-		resumoSetor.setSetor(setorResumo);
-		resumoSetor.setSecretaria(secretariaResumo);
-		resumoSetor.setArquivoPagamento(getArquivoPagamento());
-		pagamentosSetor.stream().forEach(p -> {
-			resumoSetor.setSomatorioLiquido(resumoSetor.getSomatorioLiquido() + p.getTotalLiquido());
-			resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
-			resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
-		});
-		resumoSetor.arredondarValoresResumo();
-		resumosSetores.add(resumoSetor);
-		resumoSetor = null;
-	}
-	
-	private void getTotaisResumo(String linhaAtual) {
-		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_DESCONTOS.getDescricao())) {
-			resumoSetor.setTotalDescontos(getValorTotalResumo(linhaAtual));
-		}
-		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_PROVENTOS.getDescricao())) {
-			resumoSetor.setTotalProventos(getValorTotalResumo(linhaAtual));
-		}
-		if (linhaComTotalLiquido(linhaAtual)) {
-			resumoSetor.setTotalLiquido(getValorTotalResumo(linhaAtual));
+		if(!setorAdicionado()){
+			List<Pagamento> pagamentosSetor = pagamentos.stream()
+					.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
+							&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
+					.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
+			if(pagamento.getMatriculaPagamento().getSecretaria().equals(secretariaResumo) 
+					&& pagamento.getMatriculaPagamento().getSetor().equals(setorResumo)){
+				pagamentosSetor.add(pagamento);
+			}
+			resumoSetor.setQuantidadePagamentos(pagamentosSetor.size());
+			resumoSetor.setSetor(setorResumo);
+			resumoSetor.setSecretaria(secretariaResumo);
+			resumoSetor.setArquivoPagamento(getArquivoPagamento());
+			pagamentosSetor.stream().forEach(p -> {
+				resumoSetor.setSomatorioLiquido(resumoSetor.getSomatorioLiquido() + p.getTotalLiquido());
+				resumoSetor.setSomatorioDescontos(resumoSetor.getSomatorioDescontos() + p.getTotalDescontos());
+				resumoSetor.setSomatorioProventos(resumoSetor.getSomatorioProventos() + p.getTotalProventos());
+			});
+			resumoSetor.arredondarValoresResumo();
+			resumosSetores.add(resumoSetor);
+			resumoSetor = null;
 		}
 	}
 	
-	private boolean linhaComTotalLiquido(String linhaAtual) {
-		return linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao())
-				&& Util.palavraSomenteNumeros(linhaAtual.replace(IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao(),"")
-				.replace(".","")
-				.replace(",","").trim());
+	private boolean setorAdicionado() {
+		return Objects.nonNull(setorResumo) && Objects.nonNull(resumosSetores) && resumosSetores.stream().map(r-> r.getSetor()).collect(Collectors.toCollection(ArrayList<Setor>::new)).contains(setorResumo);
 	}
 
+	private void getTotaisResumo(String linhaAtual) {
+		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_DESCONTOS.getDescricao())) {
+			resumoSetor.setTotalDescontos(getValorTotalResumo(linhaAtual, IdentificadorArquivoInformatica.TOTAL_DESCONTOS.getDescricao()));
+		}
+		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_PROVENTOS.getDescricao())) {
+			resumoSetor.setTotalProventos(getValorTotalResumo(linhaAtual, IdentificadorArquivoInformatica.TOTAL_PROVENTOS.getDescricao()));
+		}
+		if (linhaAtual.contains(IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao())) {
+			resumoSetor.setTotalLiquido(getValorTotalResumo(linhaAtual, IdentificadorArquivoInformatica.TOTAL_LIQUIDO.getDescricao()));
+		}
+	}
 	
-	private Double getValorTotalResumo(String linhaAtual) {
-		int posicaoPrimeiroNumero = Util.posicaoPrimeiraNumero(linhaAtual);
-		linhaAtual = linhaAtual.substring(posicaoPrimeiroNumero - 1, linhaAtual.length());
+	private Double getValorTotalResumo(String linhaAtual, String chave) {
+		String linha = linhaAtual.substring(linhaAtual.indexOf(chave) + chave.length(), linhaAtual.length());
+		int posicaoPrimeiroNumero = Util.posicaoPrimeiraNumero(linha);
+		linha = linha.substring(posicaoPrimeiroNumero - 1, linha.length());
 		return Double.parseDouble(
-				getValorEvento(linhaAtual, linhaAtual.indexOf(IdentificadorArquivoInformatica.VIRGULA.getDescricao())));
+				getValorEvento(linha, linha.indexOf(IdentificadorArquivoInformatica.VIRGULA.getDescricao())));
 	}
 	
 	private void finalizarPagamento(String linhaAtual) {
@@ -394,9 +394,12 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		try {
 			String descricao = linhaAtual.substring(
 					linhaAtual.indexOf(IdentificadorArquivoInformatica.SETOR.getDescricao()) + IdentificadorArquivoInformatica.SETOR.getDescricao().length()).trim();
+			String codigo = descricao.substring(0,
+					descricao.indexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao())).trim();
 			descricao = descricao.substring(
 					descricao.indexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao()),
 					descricao.length()).trim();
+			setor.setCodigo(Integer.parseInt(codigo));
 			setor.setCidade(getArquivoPagamento().getCidade());
 			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			setor.setDescricao(descricao);
@@ -505,6 +508,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 			matricula = getMatricula(matricula, linhaAtual);
 		}
 		setMatriculaPagamento(linhaAtual);
+		pagamento.setMatriculaPagamento(matricula.getMatriculaPagamento());
 		pagamento.setMatricula(matricula);
 	}
 	
