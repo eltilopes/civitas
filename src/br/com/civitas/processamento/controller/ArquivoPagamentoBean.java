@@ -111,12 +111,12 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
 		} catch (ApplicationException e) {
 			logger.error(e);
-			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			FacesUtils.addErrorMessage(e.getMessage());
+			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 		}catch (Exception e) {
 			logger.error(e);
-			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
+			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
 		}finally {
 			arquivo = new ArquivoPagamento();
 		}

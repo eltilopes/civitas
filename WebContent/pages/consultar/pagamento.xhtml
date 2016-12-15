@@ -194,7 +194,7 @@
 										<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
 											itemLabel="#{e.nome}" itemValue="#{e}" />
 										<p:column>
-											<h:outputText value="#{evento.nome}" />
+											<h:outputText value="#{evento.chave} - #{evento.nome}" />
 										</p:column>
 									</p:selectManyMenu>
 								</div>

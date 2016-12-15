@@ -237,14 +237,14 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		}
 	}
 	
-	//TODO: Ajustar aqui
+
 	private void verificarResumoSetor() {
 		if(!setorAdicionado()){
 			List<Pagamento> pagamentosSetor = pagamentos.stream()
 					.filter(p -> p.getMatriculaPagamento().getSetor().equals(setorResumo) 
 							&& p.getMatriculaPagamento().getSecretaria().equals(secretariaResumo))
 					.collect(Collectors.toCollection(ArrayList<Pagamento>::new));
-			if(pagamento.getMatriculaPagamento().getSecretaria().equals(secretariaResumo) 
+			if(Objects.nonNull(pagamento) && pagamento.getMatriculaPagamento().getSecretaria().equals(secretariaResumo) 
 					&& pagamento.getMatriculaPagamento().getSetor().equals(setorResumo)){
 				pagamentosSetor.add(pagamento);
 			}
