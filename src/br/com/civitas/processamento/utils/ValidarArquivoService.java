@@ -174,6 +174,7 @@ public class ValidarArquivoService {
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao())){
 			linhasComCargo.add(linhaAnterior);
 		}else if(!linhaAnterior.contains(IdentificadorArquivoTarget.PREFEITURA_MUNICIPAL.getDescricao()) 
+				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
 				&& StringUtils.notNullOrEmpty(linha) && linha.length()>6 
 				&& !linha.contains(IdentificadorArquivoTarget.CPF.getDescricao())
 				&& !linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao())
