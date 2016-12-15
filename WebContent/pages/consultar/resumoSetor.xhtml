@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://java.sun.com/jsf/core"
@@ -44,7 +44,7 @@
 						rendered="#{bean.cidade != null}">
 						<div class="col-md-4">
 							<div class="form-group">
-								<h:outputText value="Ano / Mês" />
+								<h:outputText value="Ano / MÃªs" />
 								<h:selectOneMenu id="arquivoPagamentoSearch"
 									value="#{bean.entitySearch.arquivoPagamento}"
 									converter="entityConverter" styleClass="form-control">
@@ -82,14 +82,14 @@
 				   						<f:convertDateTime pattern="dd/MM/yyyy" />
 				   					</h:outputText>	
 				   				</p>
-							   <p><b>QUANTIDADE VÍNCULOS: </b> #{bean.entitySearch.arquivoPagamento.totalPagamentos}</p>
+							   <p><b>QUANTIDADE VÃNCULOS: </b> #{bean.entitySearch.arquivoPagamento.totalPagamentos}</p>
 							   <p><b>QUANTIDADE SETORES: </b> #{bean.entitySearch.arquivoPagamento.totalSetores}</p>
 						   </td>
 						   <td >
 						   		<p><b>TOTAL PROVENTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalProventos}" converter="valorNumericoMoedaConverter" /></p>
 						   		<p><b>TOTAL DESCONTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalDescontos}" converter="valorNumericoMoedaConverter" /></p>
-						   		<p><b>TOTAL REMUNERAÇÃO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalRemuneracao}" converter="valorNumericoMoedaConverter" /></p>
-						   		<p><b>TOTAL LÍQUIDO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL REMUNERAÃ‡ÃƒO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalRemuneracao}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL LÃQUIDO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" /></p>
 				 	  	   </td>
 				 	  	</tr>
 				 	 </table> 	   
@@ -111,7 +111,7 @@
 		   				<h:outputText id="descricaoSetor" value="#{resumo.setor.codigo} - #{resumo.setor.descricao}" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Nº Pagamentos" style="text-align:right;" >
+					<p:column headerText="NÂº Pagamentos" style="text-align:right;" >
 		   				<h:outputText id="numPagamentos" value="#{resumo.quantidadePagamentos}" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
@@ -119,7 +119,7 @@
 		   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Total Líquido" style="text-align:right;" >
+					<p:column headerText="Total LÃ­quido" style="text-align:right;" >
 		   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
@@ -127,23 +127,23 @@
 		   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Total Remuneração" style="text-align:right;" >
+					<p:column headerText="Total RemuneraÃ§Ã£o" style="text-align:right;" >
 		   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-		   			<p:column headerText="Somatório Proventos" style="text-align:right;" >
+		   			<p:column headerText="SomatÃ³rio Proventos" style="text-align:right;" >
 		   				<h:outputText id="somatorioProventos"  value="#{resumo.somatorioProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Somatório Líquido" style="text-align:right;" >
+					<p:column headerText="SomatÃ³rio LÃ­quido" style="text-align:right;" >
 		   				<h:outputText id="somatorioLiquido"  value="#{resumo.somatorioLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Somatório Descontos" style="text-align:right;" >
+					<p:column headerText="SomatÃ³rio Descontos" style="text-align:right;" >
 		   				<h:outputText id="somatorioDescontos" value="#{resumo.somatorioDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Somatório Remuneração" style="text-align:right;" >
+					<p:column headerText="SomatÃ³rio RemuneraÃ§Ã£o" style="text-align:right;" >
 		   				<h:outputText id="somatorioRemuneracao"  value="#{resumo.somatorioRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
