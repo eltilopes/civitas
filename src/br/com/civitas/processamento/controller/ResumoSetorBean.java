@@ -42,7 +42,7 @@ public class ResumoSetorBean extends AbstractCrudBean<ResumoSetor, ResumoSetorSe
 	
 	@PostConstruct
 	public void init() {
-		cidades = cidadeService.buscarTodasAtivas();
+		cidades = cidadeService.buscarCidadesComArquivosProcessados();
 	}
 	
 	public void carregarPorCidade() {

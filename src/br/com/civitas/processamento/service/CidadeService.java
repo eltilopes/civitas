@@ -56,4 +56,13 @@ public class CidadeService extends AbstractPersistence<Cidade> {
 		return getSessionFactory().getCurrentSession().createQuery(sql.toString()).setParameter("cidade", nome).setParameter("estado", estado).list();
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Cidade> buscarCidadesComArquivosProcessados() {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT DISTINCT cid FROM ArquivoPagamento ap ");
+		sql.append(" INNER JOIN ap.cidade cid ");
+		sql.append(" ORDER BY cid.descricao ASC ");
+		Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+		return query.list();
+	}	
 }

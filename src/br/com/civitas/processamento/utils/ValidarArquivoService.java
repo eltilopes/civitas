@@ -26,14 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.ApplicationException;
-import br.com.civitas.arquitetura.util.Util;
-import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
 import br.com.civitas.processamento.entity.Cargo;
-import br.com.civitas.processamento.enums.IdentificadorArquivoTarget;
 import br.com.civitas.processamento.enums.TipoArquivo;
 import br.com.civitas.processamento.service.ArquivoPagamentoService;
 import br.com.civitas.processamento.service.CargoService;
+import br.com.civitas.processamento.service.ProcessarArquivoTargetService;
 
 @Service
 public class ValidarArquivoService {
@@ -59,6 +57,9 @@ public class ValidarArquivoService {
 
 	@Autowired
 	private CargoService cargoService;
+
+	@Autowired
+	private ProcessarArquivoTargetService processarArquivoTargetService;
 
 	public void validarArquivo(UploadedFile file, ArquivoPagamento arquivo) throws IOException {
 		iniciarValores(file, arquivo);
@@ -102,6 +103,7 @@ public class ValidarArquivoService {
 		document = PDDocument.load(new File(nomeArquivoPdfTemporario));
 		document.getClass();
 		int numeroLinha = 1;
+		String linhaComCargo;
 		if (!document.isEncrypted()) {
 			BufferedReader brEvento = prepararArquivoValidacao(document);
 			while (brEvento.ready() && !finalValidacao) {
@@ -110,7 +112,10 @@ public class ValidarArquivoService {
 					validarArquivoCidadeMesAno(linha,arquivo.getTipoArquivo() );
 				}
 				if (arquivo.getTipoArquivo().equals(TipoArquivo.ARQUIVO_TARGET)){
-					localizarCargo(linha);
+					linhaComCargo = processarArquivoTargetService.getLinhaComCargo(linha, linhaAnterior);
+					if(Objects.nonNull(linhaComCargo)){
+						linhasComCargo.add(linhaComCargo);
+					}
 					linhaAnterior = linha;
 				}else if(numeroLinha == arquivo.getTipoArquivo().getFimProcessamento()){	
 					finalValidacao = true;
@@ -162,27 +167,6 @@ public class ValidarArquivoService {
 		cargos.add(cargo);
 	}
 
-	private void localizarCargo(String linha) {
-		if(		(linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao()) 
-				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
-				|| linha.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao())) 
-				
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TOTAL_ORCAMENTARIO.getDescricao()) 
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TIPO.getDescricao())
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.FUNDO_RESERVA.getDescricao())
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao())){
-			linhasComCargo.add(linhaAnterior);
-		}else if(!linhaAnterior.contains(IdentificadorArquivoTarget.PREFEITURA_MUNICIPAL.getDescricao()) 
-				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
-				&& StringUtils.notNullOrEmpty(linha) && linha.length()>6 
-				&& !linha.contains(IdentificadorArquivoTarget.CPF.getDescricao())
-				&& !linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao())
-				&& Util.palavraSomenteNumeros(linha.substring(linha.length()-7, linha.length()))){
-			linhasComCargo.add(linha);
-		}
-	}
-	
 	private void validarArquivoCidadeMesAno(String linha, TipoArquivo tipoArquivo) {
 		if (linha.toUpperCase().contains(removerAcentos(arquivo.getCidade().getDescricao().toUpperCase()))
 				&& lancarExcessaoCidade) {

@@ -476,6 +476,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
+		if(Objects.nonNull(setor) && setor.getDescricao().equals("AGENTE DE OPERAÇAO E FISCALIZAÇAO")){
+			System.out.println(linhaAtual);
+		}
 		if(localizarCargo(linhaAtual)	){
 			cargo = getCargo();
 			String numeroMatricula = getNumeroMatricula();
@@ -503,9 +506,15 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private boolean localizarCargo(String linha ) {
-		getLinhaComCargo(linha);
+		String linhaTemp = getLinhaComCargo(linha, linhaAnterior);
+		if(Objects.nonNull(linhaTemp)){
+			linhaComCargo = linhaTemp;
+		}
+		if(linhaComCargo.contains("FRANCISCO MONTEIRO JUNIOR")){
+			System.out.println(linhaComCargo);
+		}
 		return ((linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())
-				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
+//				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
 				|| linha.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao()))
 
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TOTAL_ORCAMENTARIO.getDescricao())
@@ -515,9 +524,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao()));
 	}
 	
-	private void getLinhaComCargo(String linha) {
+	public String getLinhaComCargo(String linha, String linhaAnterior) {
 		if(		(linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao()) 
-				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
+//				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())
 				|| linha.contains(IdentificadorArquivoTarget.ADMISSAO.getDescricao())) 
 				
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TOTAL_ORCAMENTARIO.getDescricao()) 
@@ -525,15 +534,16 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.TIPO.getDescricao())
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.FUNDO_RESERVA.getDescricao())
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.PAGAMENTO_BANCO.getDescricao())){
-			linhaComCargo = linhaAnterior;
+			return linhaAnterior;
 		}else if(!linhaAnterior.contains(IdentificadorArquivoTarget.PREFEITURA_MUNICIPAL.getDescricao()) 
 				&& !linhaAnterior.contains(IdentificadorArquivoTarget.EMISSAO.getDescricao())
 				&& StringUtils.notNullOrEmpty(linha) && linha.length()>6 
 				&& !linha.contains(IdentificadorArquivoTarget.CPF.getDescricao())
 				&& !linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao())
 				&& Util.palavraSomenteNumeros(linha.substring(linha.length()-7, linha.length()))){
-			linhaComCargo = linha;
+			return linha;
 		}
+		return null;
 	}
 	
 	private int getCargaHoraria(String linhaAtual) throws ApplicationException {
@@ -566,6 +576,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 
 	private String getNumeroMatricula() throws Exception {
 		String numeroMatricula = linhaComCargo.substring(linhaComCargo.indexOf(cargo.getDescricao()) + cargo.getDescricao().length(), linhaComCargo.length()).trim();
+		numeroMatricula = numeroMatricula.replaceAll("[^0123456789]", "");
 		Integer numero = 0;
 		try {
 			numero = Integer.parseInt(numeroMatricula.replace("-", ""));
