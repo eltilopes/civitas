@@ -272,6 +272,22 @@
 			</h:panelGroup>	
 		</ui:define>
 		<ui:define name="resultInsert">
+			<h:panelGroup  rendered="#{bean.cargosNaoMapeados}" >
+				<fieldset >
+					<div class="row" >	
+						<div class="col-md-9 form-group">
+							<div class="alert alert-warning" role="alert">
+								<span class="glyphicon glyphicon-exclamation-sign"></span>
+								<strong>Existem Cargos não mapeados!</strong> 
+								<a  style="color:#777777;" href="#{request.contextPath}/pages/configuracao/cargo.jsf">
+									<strong> Mapear</strong> 
+								</a>
+							</div>
+						</div>
+					</div>	
+				</fieldset>
+			</h:panelGroup>
+
 			<h:panelGroup  rendered="#{!bean.resumos.isEmpty()}" >
 				<fieldset >
 					<legend>Resumo dos Setores Processados no Arquivo</legend>

@@ -12,6 +12,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 
 import br.com.civitas.arquitetura.ApplicationException;
@@ -67,7 +68,8 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private List<TipoArquivo> tiposArquivos;
 	private UploadedFile file;
 	private List<ResumoSetor> resumos;
-	private boolean valoresResumoConferidos = true;
+	private boolean valoresResumoConferidos;
+	private boolean cargosNaoMapeados;
 	
 	@PostConstruct
 	public void init() {
@@ -96,6 +98,7 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	}
 	
 	public void processarArquivo() {
+		cargosNaoMapeados = false;
 		resumos = new ArrayList<ResumoSetor>();
 		valoresResumoConferidos = true;
 		try {
@@ -108,11 +111,16 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 					valoresResumoConferidos = r.valoresResumoConferidos(); 
 				}
 			});
-			FacesUtils.addInfoMessage("Arquivo Processado com Sucesso!");
+			FacesUtils.addInfoMessage("Arquivo : '"+arquivo.getNomeArquivo()+"' Processado com Sucesso! "+
+			arquivo.getCidade().getDescricao()+" - "+arquivo.getMes().getDescricao()+" - "+arquivo.getAno().getAno() );
 		} catch (ApplicationException e) {
-			logger.error(e);
-			FacesUtils.addErrorMessage(e.getMessage());
-			logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
+			if(e.getMessage().equals(ValidarArquivoService.ARQUIVO_COM_CARGOS_NAO_MAPEADOS)){
+				cargosNaoMapeados = true;
+			}else{
+				logger.error(e);
+				FacesUtils.addErrorMessage(e.getMessage());
+				logErroProcessadorService.save(new LogErroProcessador(arquivo.getNomeArquivo(), e.getMessage()));
+			}	
 		}catch (Exception e) {
 			logger.error(e);
 			FacesUtils.addErrorMessage("Erro no processamento. Contate o administrador");
@@ -122,6 +130,16 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		}
 	}
 
+	public void updateFile(FileUploadEvent event) {
+	    UploadedFile uploadedFile = event.getFile();
+	    String fileName = uploadedFile.getFileName();
+	    System.out.println(fileName);
+	}
+	
+	public String mensagemCargoNaoMapeado(){
+		return ValidarArquivoService.ARQUIVO_COM_CARGOS_NAO_MAPEADOS;
+	}
+	
 	public String getEstiloResumo(){
 		return valoresResumoConferidos  ? "label label-success" : "label label-danger";
 	}
@@ -221,6 +239,18 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 
 	public void setValoresResumoConferidos(boolean valoresResumoConferidos) {
 		this.valoresResumoConferidos = valoresResumoConferidos;
+	}
+
+	public boolean isCargosNaoMapeados() {
+		return cargosNaoMapeados;
+	}
+
+	public void setCargosNaoMapeados(boolean cargosNaoMapeados) {
+		this.cargosNaoMapeados = cargosNaoMapeados;
+	}
+	
+	public ValidarArquivoService getValidarArquivoService() {
+		return validarArquivoService;
 	}
 
 }

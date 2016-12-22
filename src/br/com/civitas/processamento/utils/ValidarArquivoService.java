@@ -37,6 +37,7 @@ import br.com.civitas.processamento.service.ProcessarArquivoTargetService;
 public class ValidarArquivoService {
 
 	private static final String TIPO_ARQUIVO_PDF = "PDF";
+	public static final String ARQUIVO_COM_CARGOS_NAO_MAPEADOS = "Arquivo possui cargos nâo mapeados.";
 	private UploadedFile file;
 	private ArquivoPagamento arquivo;
 	private String nomeArquivoPdfTemporario;
@@ -144,7 +145,7 @@ public class ValidarArquivoService {
 		linhasComCargo.removeAll(cargosValidados);
 		if(!linhasComCargo.isEmpty()){
 			salvarCargos();
-			throw new ApplicationException("Arquivo possui cargos nâo mapeados.");
+			throw new ApplicationException(ARQUIVO_COM_CARGOS_NAO_MAPEADOS);
 		}
 	}
 
