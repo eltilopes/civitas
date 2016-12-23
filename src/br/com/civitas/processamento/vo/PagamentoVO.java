@@ -37,7 +37,7 @@ public class PagamentoVO {
 
 	public PagamentoVO(Pagamento pagamento) {
 		nomeFuncionario = pagamento.getMatricula().getNomeFuncionario();
-		admissao = new SimpleDateFormat("dd/MM/yyyy").format(pagamento.getMatricula().getDataAdmissao());
+		admissao = Objects.nonNull(pagamento.getMatricula().getDataAdmissao()) ? new SimpleDateFormat("dd/MM/yyyy").format(pagamento.getMatricula().getDataAdmissao()) : "";
 		vinculo = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getVinculo()) ? pagamento.getMatricula().getMatriculaPagamento().getVinculo().getDescricao() : "";
 		secretaria = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getSecretaria()) ? pagamento.getMatricula().getMatriculaPagamento().getSecretaria().getDescricao() : "";
 		unidadeTrabalho = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getUnidadeTrabalho()) ? pagamento.getMatricula().getMatriculaPagamento().getUnidadeTrabalho().getDescricao() : "";
