@@ -153,6 +153,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void verificarIdentificadorEvento(String linha) {
 		if(linhaAnterior.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && 
 				(linha.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao()) || 
 				 linha.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())		)){
 			processamentoEventos = true;
 		}
@@ -347,7 +348,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			localizarDiasTrabalhados(linhaAtual);
 			for(Evento evento : getEventos()){
 				if(getChaveEvento(linhaAtual.toUpperCase()).equals(evento.getNome().toUpperCase())){
-						pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
+					pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
 				}
 			}		
 		}	
