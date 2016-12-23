@@ -205,9 +205,6 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	}
 
 	private void adicionarValorEventoPagamento(Pagamento pagamento, EventoPagamento ep, EventoPagamento eventoPagamentoZerado) {
-		if(ep.getEvento().getNome().equals("EMPRESTIMO CAIXA ECON.FEDERAL")){
-			System.out.println(pagamento.getMatricula().getNomeFuncionario() +" : "+ ep.getEvento().getNome()+" : "+ep.getValor());
-		}
 		EventoPagamento eventoPagamento = ep;
 		int index = pagamento.getEventosPagamentoSelecionados().indexOf(eventoPagamentoZerado);
 		if(index != -1){
@@ -238,7 +235,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
         NumberFormat nf = NumberFormat.getInstance(locale);
         nf.setMaximumFractionDigits(2);
         nf.setMinimumFractionDigits(2);
-        if(value != null && !chave.equals(PagamentoVO.diasTrabalhadosColuna())){
+        if(value != null && !chave.equals(PagamentoVO.diasTrabalhadosColuna())
+        		&& !chave.equals(PagamentoVO.numeroMatriculaColuna())
+        		&& !chave.equals(PagamentoVO.cargaHorariaColuna())){
         	try {
         		return mapa != null ? nf.format(Double.parseDouble(value.replace(".", "").replace(",", ".").toString())) : "";
 			} catch (Exception e) {}
@@ -251,7 +250,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	public void somarValor(String chave, HashMap<String, Object> mapa) {
 		
 		try {
-			if(!chave.equals(PagamentoVO.diasTrabalhadosColuna())){
+			if(!chave.equals(PagamentoVO.diasTrabalhadosColuna())
+					&& !chave.equals(PagamentoVO.numeroMatriculaColuna())
+	        		&& !chave.equals(PagamentoVO.cargaHorariaColuna())){
 				String valor = getObject(chave, mapa);
 				valor = valor.replace(".", "").replace(",", ".");
 				Double value = Double.parseDouble(valor);
@@ -276,7 +277,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		}
 		if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
 			for (EventoPagamento eventoPagamento : pagamento.getEventosPagamentoSelecionados()) {
-					pagamentosMap.put(eventoPagamento.getEvento().getChave(), String.format("%.2f", eventoPagamento.getValor()));
+					pagamentosMap.put(eventoPagamento.getEvento().getNome(), String.format("%.2f", eventoPagamento.getValor()));
 			}
 		}
 		return pagamentosMap;

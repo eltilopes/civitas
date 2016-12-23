@@ -10,6 +10,8 @@ import br.com.civitas.processamento.entity.Pagamento;
 public class PagamentoVO {
 
 	public String nomeFuncionario;
+	public String numeroMatricula;
+	public String cargaHoraria;
 	public String admissao;
 	public String vinculo;
 	public String secretaria;
@@ -23,6 +25,8 @@ public class PagamentoVO {
 	
 	public PagamentoVO(boolean field){
 		nomeFuncionario = nomeFuncionarioColuna();
+		numeroMatricula = numeroMatriculaColuna();
+		cargaHoraria = cargaHorariaColuna();
 		admissao = admissaoColuna();
 		vinculo = vinculoColuna();
 		secretaria = secretariaColuna();
@@ -37,6 +41,8 @@ public class PagamentoVO {
 
 	public PagamentoVO(Pagamento pagamento) {
 		nomeFuncionario = pagamento.getMatricula().getNomeFuncionario();
+		numeroMatricula = pagamento.getMatricula().getNumeroMatricula();
+		cargaHoraria = pagamento.getMatricula().getMatriculaPagamento().getCargaHoraria()+"";
 		admissao = Objects.nonNull(pagamento.getMatricula().getDataAdmissao()) ? new SimpleDateFormat("dd/MM/yyyy").format(pagamento.getMatricula().getDataAdmissao()) : "";
 		vinculo = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getVinculo()) ? pagamento.getMatricula().getMatriculaPagamento().getVinculo().getDescricao() : "";
 		secretaria = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getSecretaria()) ? pagamento.getMatricula().getMatriculaPagamento().getSecretaria().getDescricao() : "";
@@ -53,6 +59,10 @@ public class PagamentoVO {
 		switch (fieldName) {
 		case "nomeFuncionario":
 			return nomeFuncionarioColuna();
+		case "numeroMatricula":
+			return numeroMatriculaColuna();
+		case "cargaHoraria":
+			return cargaHorariaColuna();
 		case "admissao":
 			return admissaoColuna();
 		case "vinculo":
@@ -79,6 +89,14 @@ public class PagamentoVO {
 	
 	public static String nomeFuncionarioColuna(){
 		return "NOME FUNC.";
+	}
+	
+	public static String numeroMatriculaColuna(){
+		return "NUM. MAT.";
+	}
+	
+	public static String cargaHorariaColuna(){
+		return "CARGA HOR.";
 	}
 	
 	public static String admissaoColuna(){
@@ -127,6 +145,8 @@ public class PagamentoVO {
 
 	public static ArrayList<String> getNomesColunaSemDouble() {
 		String[] array = {nomeFuncionarioColuna(),
+				 numeroMatriculaColuna(),
+				 cargaHorariaColuna(),
 				 admissaoColuna(),
 				 vinculoColuna(),
 				 secretariaColuna(),

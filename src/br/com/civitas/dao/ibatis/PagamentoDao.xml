@@ -13,9 +13,11 @@
 		<association property="matricula" javaType="br.com.civitas.processamento.entity.Matricula">
 			<id property="id" column="ci_matricula"/>
 			<result property="nomeFuncionario" column="nm_funcionario" />
+			<result property="numeroMatricula" column="nr_matricula" />
 			<result property="dataAdmissao" column="dt_admissao" />
 			<association property="matriculaPagamento" javaType="br.com.civitas.processamento.entity.MatriculaPagamento">
 				<id property="id" column="ci_matricula_pagamento"/>
+				<result property="cargaHoraria" column="nr_carga_horaria" />
 				<association property="vinculo" javaType="br.com.civitas.processamento.entity.Vinculo">
 					<id property="id" column="ci_vinculo"/>
 					<result property="descricao" column="ds_vinculo"/>
@@ -65,8 +67,10 @@
 			,p.nr_total_proventos
 			,mm.ci_matricula
 			,mm.nm_funcionario
+			,mm.nr_matricula
 			,mm.dt_admissao
 			,m.ci_matricula_pagamento
+			,m.nr_carga_horaria
 			,v.ci_vinculo
 			,v.ds_descricao ds_vinculo
 			,sec.ci_secretaria
