@@ -462,6 +462,9 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	}
 	
 	private Date getDataAdmissao(String linhaAtual) {
+		if(StringUtils.contarVezesPalavraNaFrase(linhaAtual, IdentificadorArquivoInformatica.BARRA.getDescricao()) < 2){
+			return null;
+		}
 		try {
 			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 			return (Date)formatter.parse(linhaAtual.substring(
