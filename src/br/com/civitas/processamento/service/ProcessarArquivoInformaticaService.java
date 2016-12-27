@@ -558,8 +558,15 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			String descricao = linha.substring(0,linha.length() - 10).trim();
-			descricao = descricao.substring(descricao.lastIndexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao()), descricao.length()).trim();
+			String descricao;
+			if(StringUtils.contarVezesPalavraNaFrase(linha, IdentificadorArquivoInformatica.BARRA.getDescricao()) < 2){
+				String linhaInvertida = new StringBuffer(linha).reverse().toString();
+				linhaInvertida = linhaInvertida.substring(0,Util.posicaoPrimeiraNumero(linhaInvertida) );
+				descricao = new StringBuffer(linhaInvertida).reverse().toString();
+			}else{
+				descricao = linha.substring(0,linha.length() - 10).trim();
+				descricao = descricao.substring(descricao.lastIndexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao()), descricao.length()).trim();
+			}
 			Integer numero = descricao.substring(0,2).hashCode();
 			vinculo.setNumero(numero); 
 			vinculo.setDescricao(descricao);
