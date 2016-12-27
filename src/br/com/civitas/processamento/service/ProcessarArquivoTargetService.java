@@ -154,6 +154,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		if(linhaAnterior.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && 
 				(linha.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao()) || 
 				 linha.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.FERIAS_VENCIDAS.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.PENSAO_VITALICIA.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.PENSAO_ALIMENTICIA.getDescricao()) || 
+				 linha.contains(IdentificadorArquivoTarget.SUBSIDIO.getDescricao()) || 
 				 linha.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())		)){
 			processamentoEventos = true;
 		}
@@ -477,9 +481,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private  void localizarMatricula(String linhaAtual) throws Exception {
-		if(Objects.nonNull(setor) && setor.getDescricao().equals("AGENTE DE OPERAÇAO E FISCALIZAÇAO")){
-			System.out.println(linhaAtual);
-		}
 		if(localizarCargo(linhaAtual)	){
 			cargo = getCargo();
 			String numeroMatricula = getNumeroMatricula();
@@ -510,9 +511,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		String linhaTemp = getLinhaComCargo(linha, linhaAnterior);
 		if(Objects.nonNull(linhaTemp)){
 			linhaComCargo = linhaTemp;
-		}
-		if(linhaComCargo.contains("FRANCISCO MONTEIRO JUNIOR")){
-			System.out.println(linhaComCargo);
 		}
 		return ((linha.contains(IdentificadorArquivoTarget.VINCULO.getDescricao())
 //				|| linha.contains(IdentificadorArquivoTarget.LOTACAO.getDescricao())

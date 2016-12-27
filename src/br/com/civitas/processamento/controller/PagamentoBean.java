@@ -292,7 +292,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		}
 		if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
 			for (Evento evento : eventosSelecionados) {
-				colunas.add((String) evento.getNome());
+				if(!colunas.contains((String) evento.getNome())){
+					colunas.add((String) evento.getNome());
+				}
 			}
 		}
 		return colunas;
