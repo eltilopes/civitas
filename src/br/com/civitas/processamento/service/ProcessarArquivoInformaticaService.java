@@ -47,6 +47,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private  boolean processamentoPagamentoAtivo = false;
 	private  boolean processamentoEventos = false;
 	private  boolean processamentoResumo = false;
+	private  boolean processamentoResumoSecretaria = false;
 	private  String linhaAnterior = "";
 	
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception{
@@ -109,13 +110,15 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		processamentoPagamentoAtivo = false;
 		processamentoEventos = false;
 		processamentoResumo = false;
+		processamentoResumoSecretaria = false;
 		linhaAnterior = "";
 	}
 
 	private void localizarEvento(String linha) {
 		verificarIdentificadorEvento(linha);
 		verificarIdentificadorResumoSetor(linha);
-		if(processamentoEventos && !processamentoResumo && !linha.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
+		if(processamentoEventos && !processamentoResumo && !processamentoResumoSecretaria 
+				&& !linha.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
 			List<Evento> eventosNaLinha = getEventoNaLinha(linha);
 			for(Evento e : eventosNaLinha){
 				getEvento(e, linha);
@@ -132,16 +135,16 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 				Evento evento = new Evento();
 				evento.setChave(linhaEvento.substring(0,4));
 				int posicaoInicialIdentificador = 5 ;
-				int posicaoPrimeiraVirgula = linha.indexOf(IdentificadorArquivoInformatica.VIRGULA.getDescricao()) ;
-				String linhaInvertida = new StringBuffer(linha.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
+				int posicaoPrimeiraVirgula = linhaEvento.indexOf(IdentificadorArquivoInformatica.VIRGULA.getDescricao()) ;
+				String linhaInvertida = new StringBuffer(linhaEvento.substring(0, posicaoPrimeiraVirgula)).reverse().toString();
 				int posicaoEspacoLinhaInvertida = linhaInvertida.indexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao()) ;
-				evento.setNome(getNomeEvento(linha.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida)));
+				evento.setNome(getNomeEvento(linhaEvento.substring(posicaoInicialIdentificador, posicaoPrimeiraVirgula - posicaoEspacoLinhaInvertida)));
 				evento.setCidade(getArquivoPagamento().getCidade());;
 				evento.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 				eventosNaLinha.add(evento);
 			}
 		} catch (Exception e) {
-			throw new ApplicationException("Erro ao pegar o Chave Evento. Linha: " + linha);
+			throw new ApplicationException("Erro ao pegar a Chave do Evento. Linha: " + linha);
 		}
 		return eventosNaLinha;
 	}
@@ -204,6 +207,9 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	}
 
 	private void verificarIdentificadorResumoSetor(String linha) {
+		if(linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_SECRETARIA.getDescricao())){ 
+			processamentoResumoSecretaria = true;	
+		}		
 		if(linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_GERAL.getDescricao()) ||
 		   linha.contains(IdentificadorArquivoInformatica.INICIO_RESUMO_SETOR.getDescricao())){ 
 			processamentoResumo = true;
@@ -214,6 +220,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		if(processamentoResumo && (linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_SETOR.getDescricao()))
 			|| linha.contains(IdentificadorArquivoInformatica.FIM_RESUMO_GERAL.getDescricao())){ 
 			processamentoResumo = false;
+			processamentoResumoSecretaria = false;
 		}
 	}
 
@@ -307,7 +314,8 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 	private void localizarEventosPagamento(String linhaAtual) {
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
-		if(processamentoEventos && processamentoPagamentoAtivo && !processamentoResumo && !linhaAtual.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
+		if(processamentoEventos && processamentoPagamentoAtivo && !processamentoResumo&& !processamentoResumoSecretaria
+				&& !linhaAtual.contains(IdentificadorArquivoInformatica.SEPARADOR_ARQUIVO.getDescricao())){
 			getDiasTrabalhados(linhaAtual);
 			List<Evento> eventosNaLinha = getEventoNaLinha(linhaAtual);
 			List<String> eventosLinha = carregarEventosLinha(linhaAtual, verificarPosicaoSegundoEvento(linhaAtual));
@@ -551,7 +559,7 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Nome do Funcionário. Linha: " + linha);
 		}
-		return nome ;
+		return nome.trim() ;
 		
 	}
 

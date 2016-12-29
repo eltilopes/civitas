@@ -20,9 +20,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -121,6 +122,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	@PostConstruct
 	public void init() {
 		cidades = cidadeService.buscarCidadesComArquivosProcessados();
+		pagamentosMap  = new ArrayList<Map<String, Object>>();
 		getEntitySearch().setArquivo(new ArquivoPagamento());
 	}
 
@@ -307,24 +309,29 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		return eventoPagamento;
 	}
 
-	@SuppressWarnings("resource")
 	public void exportarExcel() {
-
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		HSSFSheet firstSheet = workbook.createSheet("Pagamentos");
-		String nomeArquivo = "pagamento.xls";
-		
+		Workbook  workbook ;
+		String nomeArquivo = "pagamento.xlsx";
+		FileInputStream fis;
 		try {
+			fis = new FileInputStream("file.xls");
+            workbook = WorkbookFactory.create(fis);
+            org.apache.poi.ss.usermodel.Sheet firstSheet = workbook.getSheetAt(0);
 			int numeroLinha = 0;
-			HSSFRow row = firstSheet.createRow(numeroLinha++);
+			Row  row = firstSheet.createRow(numeroLinha++);
 			int numeroCelulaColuna = 0;
 			boolean primeiraColuna = true;
 			for(String nomeColuna : pagamentosColumnsMap){
 				row = firstSheet.getRow(0);
-				row.createCell(numeroCelulaColuna).setCellValue(nomeColuna);
+				System.out.println(numeroCelulaColuna +" : "+ nomeColuna);
+				Cell cell=row.getCell(numeroCelulaColuna);
+				if(cell == null)     cell = row.createCell(numeroCelulaColuna, Cell.CELL_TYPE_STRING);
+                cell.setCellValue(nomeColuna);
 				for (Map<String, Object> mapa : pagamentosMap) {
 					row = primeiraColuna ? firstSheet.createRow(numeroLinha++) : firstSheet.getRow(numeroLinha++);
-					row.createCell(numeroCelulaColuna).setCellValue(getObject(nomeColuna,(HashMap<String, Object>) mapa));
+					cell=row.getCell(numeroCelulaColuna);
+					if(cell == null)     cell = row.createCell(numeroCelulaColuna, Cell.CELL_TYPE_STRING);
+	                cell.setCellValue(getObject(nomeColuna,(HashMap<String, Object>) mapa));
 				}
 				numeroCelulaColuna++;
 				numeroLinha = 1;
@@ -338,7 +345,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Erro ao exportar arquivo");
+			FacesUtils.addErrorMessage("Erro ao exportar arquivo");
 		} 
 	} 
 	   

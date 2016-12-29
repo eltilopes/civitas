@@ -213,7 +213,7 @@
 	<ui:define name="botoesInsertFiltro">
 
 		<h:commandLink id="confirma" process="@this"
-			class="btn btn-primary tool-tip" rendered="true"
+			class="btn btn-primary tool-tip" rendered="#{!bean.pagamentosMap.isEmpty()}"
 			actionListener="#{bean.exportarExcel()}"> Exportar Excel
 				<p:fileDownload value="#{bean.arquivoExcel}" />
 		</h:commandLink>
@@ -228,7 +228,7 @@
 				resizableColumns="true" widgetVar="tabelaPagamentos" rows="50"
 				emptyMessage="Nenhum Pagamento foi encontrado."
 				value="#{bean.pagamentosMap}" var="mapVO" paginator="true"
-				rendered="true" paginatorPosition="bottom"
+				rendered="#{!bean.pagamentosMap.isEmpty()}"  paginatorPosition="bottom"
 				rowStyleClass="bgLinha1,bgLinha2">
 				<p:ajax event="page" listener="#{bean.onPaginate}"
 					oncomplete="refreshFooter()" />
