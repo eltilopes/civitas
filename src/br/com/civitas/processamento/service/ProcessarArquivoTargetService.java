@@ -54,6 +54,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private  String linhaAnterior = "";
 	private  String linhaComCargo = "";
 	private  List<String> nomesCargos;
+	private  List<String> nomesEventos;
 	private String descricaoNivelPagamento;
 	
 	public List<ResumoSetor> processar(ArquivoPagamento arquivoPagamento) throws Exception{
@@ -92,6 +93,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			localizarEvento(linha);
 			linhaAnterior = linha;
 		}
+		nomesEventos = getEventos().stream().map(e -> e.getNome()).collect(Collectors.toList());
 		linhaAnterior = "";
 		brEvento.close();
 	}
@@ -117,6 +119,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		setVinculos(getVinculoService().buscarPorCidade(getArquivoPagamento().getCidade()));
 		setEventos(getEventoService().buscarTipoArquivoCidade(getArquivoPagamento().getCidade(), getArquivoPagamento().getTipoArquivo()));
 		nomesCargos = getCargos().stream().map(cargo -> cargo.getDescricao()).collect(Collectors.toList());
+		nomesEventos = new ArrayList<>();
 		processamentoPagamento = false;
 		processandoPagamentos = false;
 		processamentoEventos = false;
@@ -153,17 +156,24 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	private void verificarIdentificadorEvento(String linha) {
 		if(linhaAnterior.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao()) && 
 				(linha.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.FERIAS_VENCIDAS.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.PENSAO_VITALICIA.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.PENSAO_ALIMENTICIA.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.SUBSIDIO.getDescricao()) || 
-				 linha.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao())		)){
+						 linha.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao()) || 
+						 linha.contains(IdentificadorArquivoTarget.FERIAS_VENCIDAS.getDescricao()) || 
+						 linha.contains(IdentificadorArquivoTarget.PENSAO_VITALICIA.getDescricao()) || 
+						 linha.contains(IdentificadorArquivoTarget.PENSAO_ALIMENTICIA.getDescricao()) || 
+						 linha.contains(IdentificadorArquivoTarget.SUBSIDIO.getDescricao()) || 
+						 linha.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao()) ||
+						 linhaContemEvento(linha))){
 			processamentoEventos = true;
 		}
 		if(processamentoEventos && (linha.contains(IdentificadorArquivoTarget.PIS_PASEP.getDescricao()) || linha.contains(IdentificadorArquivoTarget.FIM_EVENTO.getDescricao()) || fimPagina(linha)) ){
 			processamentoEventos = false;
 		}
+	}
+
+	private boolean linhaContemEvento(String linha) {
+		return !nomesEventos.stream()
+		  .filter(nome -> linha.contains(nome))
+		  .collect(Collectors.toList()).isEmpty();
 	}
 
 	private boolean fimPagina(String linha) {
@@ -346,6 +356,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarEventosPagamento(String linhaAtual) {
+		if(Objects.nonNull(matricula) && matricula.getNomeFuncionario().contains("ELIS REGINA SILVA OLIVEIRA")){
+			System.out.println(linhaAtual);
+		}
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
 		if(processamentoEventos && processamentoPagamento && !processamentoResumo && !linhaAtual.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
@@ -353,6 +366,9 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			for(Evento evento : getEventos()){
 				if(getChaveEvento(linhaAtual.toUpperCase()).equals(evento.getNome().toUpperCase())){
 					pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
+					if(Objects.nonNull(matricula) && matricula.getNomeFuncionario().contains("ELIS REGINA SILVA OLIVEIRA")){
+						System.out.println("EVENTO :" + evento.getNome().toUpperCase());
+					}
 				}
 			}		
 		}	
