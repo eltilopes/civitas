@@ -157,7 +157,14 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 				nomeVerificado = nomeVerificado + palavra + " ";
 			}
 		}
-		return nomeVerificado.toUpperCase().trim();
+		nomeVerificado = nomeVerificado.toUpperCase().trim();
+		if(nomeVerificado.contains(IdentificadorArquivoInformatica.ATS.getDescricao())){
+			return IdentificadorArquivoInformatica.ATS.getDescricao();
+		}
+		if(nomeVerificado.contains(IdentificadorArquivoInformatica.CONSIGNACAO_CEF.getDescricao())){
+			return IdentificadorArquivoInformatica.CONSIGNACAO_CEF.getDescricao();
+		}
+		return nomeVerificado;
 	}
 
 	private boolean existeCaractereInvalido(String palavra) {

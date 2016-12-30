@@ -16,6 +16,8 @@ public enum IdentificadorArquivoInformatica {
 		DESCONTO("DESCONTOS..:"), 
 		ESPACO_NA_LINHA(" ")	,	
 		BARRA("/")	,	
+		ATS("ATS")	,	
+		CONSIGNACAO_CEF("CONSIGNACAO CEF")	,	
 		PERCENTUAL("%")	,	
 		VIRGULA(","), 
 		INICIO_PAGAMENTOS("COD. SERVIDOR"), 
