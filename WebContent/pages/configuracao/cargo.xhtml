@@ -68,18 +68,24 @@
 		</ui:define>	
 		
 		<ui:define name="tituloPainel">
-			<ui:param name="tituloPainel" value="Cargos" />
+				<ui:param name="tituloPainel" value="Cargos" />
 		</ui:define>
 	
-		<ui:define name="botoesInsertFiltro">
+		<ui:define name="botoesFiltro">
+			<p:commandButton styleClass="btn btn-primary" value="Consultar"
+				ajax="false" onclick="carregando.show()"
+				update=":painelGlobal" oncomplete="carregando.hide();"
+				actionListener="#{bean['find']}" />
+				
 			<p:commandButton value="Existe Cargos Inativos"
-						 actionListener="#{bean.visuaizarCargosInativos()}" 
-						 rendered="#{sessionScope.perms.CARGO_C and bean.existeCargosInativos}"
-						 styleClass="btn btn-primary"
-						 update=":painelGlobal"
-						 ajax="false"/>
-
+				actionListener="#{bean.visuaizarCargosInativos()}"
+				rendered="#{sessionScope.perms.CARGO_C and bean.existeCargosInativos}"
+				styleClass="btn btn-primary"
+				update=":painelGlobal"
+				ajax="false"/>
 		</ui:define>
+	
+		<ui:define name="botoesInsertFiltro" />
 	
 		<ui:define name="resultFiltro" >
 			<p:dataTable id="cargosInativos" styleClass="table table-responsive table-mobile" 

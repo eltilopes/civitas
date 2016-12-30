@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ActionEvent;
 
 import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.arquitetura.util.FacesUtils;
@@ -46,9 +47,22 @@ public class CargoBean extends AbstractCrudBean<Cargo, CargoService>  implements
 		setExisteCargosInativos(service.existeCargosInativos());
 	}
 
+	@Override
+	public void find(ActionEvent event) {
+		setCargosInativos(new ArrayList<>());
+		setExisteCargosInativos(service.existeCargosInativos());
+		super.find(event);
+	}
+	
+	@Override
+	public void cancel(ActionEvent event) {
+		setExisteCargosInativos(service.existeCargosInativos());
+		super.cancel(event);
+	}
+	
 	public void visuaizarCargosInativos(){
+		limpaListas();
 		setCargosInativos(service.buscarTodosInativos(getEntitySearch()));
-		setExisteCargosInativos(false);
 	}
 	
 	@Override
