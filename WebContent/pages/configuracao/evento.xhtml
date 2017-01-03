@@ -25,6 +25,8 @@
     		Eventos
 		</ui:define>
 		
+		<ui:define name="botoesInsertFiltro" />
+		
 		<ui:define name="camposFiltro">
 			<fieldset>
 				<div class="row">
@@ -32,7 +34,7 @@
 							<div class="form-group">
 							<h:outputText value="Cidade " />
 							<h:selectOneMenu id="cidadeSearch"
-											 value="#{bean.entity.cidade}"
+											 value="#{bean.entitySearch.cidade}"
 											 converter="entityConverter" styleClass="form-control">
 								<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 								<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toUpperCase()}"
@@ -45,7 +47,7 @@
 					<div class="col-md-4 form-group">
 						<h:outputText value="Tipo Arquivo " />
 						<h:selectOneMenu id="tipoArquivoSearch" 
-										 value="#{bean.entity.tipoArquivo}" 
+										 value="#{bean.entitySearch.tipoArquivo}" 
 										 converter="enumConverter" styleClass="form-control">
 							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
 							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.toString().toUpperCase()}" 
@@ -53,6 +55,17 @@
 						</h:selectOneMenu>
 						<h:message for="tipoArquivoSearch" tooltip="true"
 							styleClass="error-messages" />	
+					</div>
+					<div class="col-md-4 form-group">
+						<h:outputText value="Tipo Evento: " style="font-weight: normal;" />
+						<h:selectOneMenu id="tipoEventoSearch" 
+										 value="#{bean.entitySearch.tipoEvento}" 
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.toString().toUpperCase()}" 
+										   value="#{bean.tiposEventos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoEventoSearch" tooltip="true" 	styleClass="error-messages" />
 					</div>
 				</div>	
 			</fieldset>		
@@ -70,12 +83,26 @@
 			 		 rendered="#{bean.resultSearch.rowCount > 0}" paginatorPosition="bottom"
 			 		 rowStyleClass="bgLinha1,bgLinha2">
 			 		 
+			 		 <p:column headerText="" style="width:60px; text-align:center;" >
+						<div class="colunaAcao">					    			
+							<h:commandLink id="cmdUpd" actionListener="#{bean.prepareUpdate}">
+							    <i class="glyphicon glyphicon-edit" />
+							</h:commandLink>
+							<p:tooltip id="toolTipUpdate" for="cmdUpd" value="Editar"
+								showEffect="fade" trackMouse="true" />
+						</div>
+					</p:column>
+			 		 
 			 		 <p:column headerText="Cidade" >
 						<h:outputText value="#{evento.cidade.descricao.toUpperCase()}" />
 					 </p:column>
 			 		 
 			 		 <p:column headerText="Tipo Arquivo" >
 						<h:outputText value="#{evento.tipoArquivo.descricao}" />
+					 </p:column>
+			
+			 		 <p:column headerText="Tipo Evento" >
+						<h:outputText value="#{evento.tipoEvento.descricao}" />
 					 </p:column>
 			
 			 		 <p:column headerText="Nome" >
@@ -89,6 +116,68 @@
 			</p:dataTable> 
 		</ui:define>
 		
+		<ui:define name="camposInsert">
+			<fieldset>
+				<legend>Cadastro de Evento</legend>
+				<div class="row" >
+					<div class="col-md-6 form-group">
+						<h:outputText value="Cidade:" style="font-weight: normal;"/>
+						<h:inputText id="cidadeInsert" value="#{bean.entity.cidade.descricao}" disabled="true" styleClass="form-control"  />
+						<h:message for="cidadeInsert" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<h:outputText value="Tipo Arquivo: " style="font-weight: normal;"/>
+						<h:inputText id="tipoArquivoInsert" styleClass="form-control" disabled="true"  value="#{bean.entity.tipoArquivo.descricao}" />
+						<h:message for="tipoArquivoInsert" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<h:outputText value="Nome: " style="font-weight: normal;"/>
+						<h:inputText id="nomeInsert" disabled="true"  styleClass="form-control" value="#{bean.entity.nome}" />
+						<h:message for="nomeInsert" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row" >	
+					<div class="col-md-6 form-group">
+						<h:outputText value="Chave: " style="font-weight: normal;"/>
+						<h:inputText id="chaveInsert" styleClass="form-control" disabled="true" value="#{bean.entity.chave}" />
+						<h:message for="chaveInsert" tooltip="true" styleClass="error-messages" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6 form-group">
+						<h:outputText value="Tipo Evento: " style="font-weight: normal;" />
+						<h:selectOneMenu id="tipoEventoInsert" 
+										 value="#{bean.entity.tipoEvento}" 
+										 converter="enumConverter" styleClass="form-control">
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.toString().toUpperCase()}" 
+										   value="#{bean.tiposEventos}" />		   
+						</h:selectOneMenu>
+						<h:message for="tipoEventoInsert" tooltip="true" 	styleClass="error-messages" />
+					</div>
+				</div>
+			</fieldset>
+		</ui:define>
+		
+		<ui:define name="botoesInsert">
+		<h:panelGroup id="botoes">
+			<p></p>
+		    <p:commandButton styleClass="btn btn-primary" value="Atualizar"
+				actionListener="#{bean['update']}"
+				rendered="#{bean['editing']}"
+				oncomplete="carregando.hide(); mensagemAviso.show();"
+				update=":painelGlobal" onclick="carregando.show();"
+				ajax="false" />
+				
+			<p:commandButton styleClass="btn btn-primary" value="Voltar"
+				actionListener="#{bean['cancel']}" immediate="true"
+				update=":painelGlobal" ajax="false" />
+			<p></p>
+		</h:panelGroup>
+	</ui:define>
     </ui:composition>
 	
 </html>

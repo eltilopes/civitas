@@ -18,6 +18,7 @@ import javax.persistence.Table;
 
 import br.com.civitas.arquitetura.entity.IEntity;
 import br.com.civitas.processamento.enums.TipoArquivo;
+import br.com.civitas.processamento.enums.TipoEvento;
 
 @Entity
 @Table(name = "tb_evento")
@@ -45,6 +46,10 @@ public class Evento implements IEntity {
 	@Enumerated(EnumType.ORDINAL)
 	private TipoArquivo tipoArquivo;
 
+	@Column(name = "nr_tipo_evento",nullable = false)
+	@Enumerated(EnumType.ORDINAL)
+	private TipoEvento tipoEvento  = TipoEvento.NENHUM;
+	
 	public Evento() {
 	}
 
@@ -100,6 +105,8 @@ public class Evento implements IEntity {
 			map.put("cidade.id",cidade.getId() );
 		}if(tipoArquivo != null  ){
 			map.put("tipoArquivo",tipoArquivo.getCodigo() );
+		}if(tipoEvento != null  ){
+			map.put("tipoEvento",tipoEvento.getCodigo() );
 		}
 		return map;
 	}	
@@ -118,6 +125,14 @@ public class Evento implements IEntity {
 
 	public void setTipoArquivo(TipoArquivo tipoArquivo) {
 		this.tipoArquivo = tipoArquivo;
+	}
+
+	public TipoEvento getTipoEvento() {
+		return tipoEvento;
+	}
+
+	public void setTipoEvento(TipoEvento tipoEvento) {
+		this.tipoEvento = tipoEvento;
 	}
 
 	@Override

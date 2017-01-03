@@ -12,6 +12,7 @@ import br.com.civitas.arquitetura.controller.AbstractCrudBean;
 import br.com.civitas.processamento.entity.Cidade;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.enums.TipoArquivo;
+import br.com.civitas.processamento.enums.TipoEvento;
 import br.com.civitas.processamento.factory.FactoryEnuns;
 import br.com.civitas.processamento.service.CidadeService;
 import br.com.civitas.processamento.service.EventoService;
@@ -30,11 +31,14 @@ public class EventoBean extends AbstractCrudBean<Evento, EventoService>  impleme
 	
 	private List<Cidade> cidades;
 	private List<TipoArquivo> tiposArquivos;
+	private List<TipoEvento> tiposEventos;
 	
 	@PostConstruct
 	public void init(){
 		cidades = cidadeService.buscarTodasAtivas();
 		tiposArquivos = FactoryEnuns.listaTipoArquivo();
+		tiposEventos = FactoryEnuns.listaTipoEvento();
+		getEntitySearch().setTipoEvento(null);
 	}
 
 	public List<Cidade> getCidades() {
@@ -60,6 +64,14 @@ public class EventoBean extends AbstractCrudBean<Evento, EventoService>  impleme
 
 	public void setCidadeService(CidadeService cidadeService) {
 		this.cidadeService = cidadeService;
+	}
+
+	public List<TipoEvento> getTiposEventos() {
+		return tiposEventos;
+	}
+
+	public void setTiposEventos(List<TipoEvento> tiposEventos) {
+		this.tiposEventos = tiposEventos;
 	}
 	
 }
