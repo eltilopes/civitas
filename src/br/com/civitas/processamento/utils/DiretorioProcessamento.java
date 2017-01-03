@@ -2,8 +2,8 @@ package br.com.civitas.processamento.utils;
 
 public class DiretorioProcessamento {
 	
-	private static final String DIRETORIO_TEMPORARIO = "C:/CIVITAS/TEMPORARIO";
-	private static final String DIRETORIO_PROCESSADO = "C:/CIVITAS/PROCESSADO";
+	private static final String DIRETORIO_TEMPORARIO = "/home/bruno/civitas/temporarios";
+	private static final String DIRETORIO_PROCESSADO = "/home/bruno/civitas/processados";
 	
 	public static String getDiretorioTemporario() {
 		return DIRETORIO_TEMPORARIO;
