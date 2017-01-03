@@ -596,11 +596,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 					"application/vnd.ms-excel", nomeArquivo));
 
 		} catch (Exception e) {
-
 			e.printStackTrace();
-
-			System.out.println("Erro ao exportar arquivo");
-
 		}
 
 	}

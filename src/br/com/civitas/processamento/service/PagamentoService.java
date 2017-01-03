@@ -74,7 +74,7 @@ public class PagamentoService extends AbstractPersistence<Pagamento> {
 				eventoPagamentoService.inserirEventosPagamento(p.getEventosPagamento());
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	

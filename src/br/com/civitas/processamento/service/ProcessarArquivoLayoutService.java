@@ -357,6 +357,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	public Integer temInteiro(String descricao) {
+		if(descricao.contains("º")){
+			return null;
+		}
 		char[] c = descricao.toCharArray();
 		for (int i = 0; i < c.length; i++) {
 			if (Character.isDigit(c[i])) {

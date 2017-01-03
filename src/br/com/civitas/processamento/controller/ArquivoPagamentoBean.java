@@ -12,7 +12,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 
 import br.com.civitas.arquitetura.ApplicationException;
@@ -130,12 +129,6 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		}
 	}
 
-	public void updateFile(FileUploadEvent event) {
-	    UploadedFile uploadedFile = event.getFile();
-	    String fileName = uploadedFile.getFileName();
-	    System.out.println(fileName);
-	}
-	
 	public String mensagemCargoNaoMapeado(){
 		return ValidarArquivoService.ARQUIVO_COM_CARGOS_NAO_MAPEADOS;
 	}

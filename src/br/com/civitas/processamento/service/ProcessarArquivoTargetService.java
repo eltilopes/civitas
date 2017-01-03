@@ -356,9 +356,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarEventosPagamento(String linhaAtual) {
-		if(Objects.nonNull(matricula) && matricula.getNomeFuncionario().contains("ELIS REGINA SILVA OLIVEIRA")){
-			System.out.println(linhaAtual);
-		}
 		verificarIdentificadorEvento(linhaAtual);
 		verificarIdentificadorResumoSetor(linhaAtual);
 		if(processamentoEventos && processamentoPagamento && !processamentoResumo && !linhaAtual.contains(IdentificadorArquivoTarget.INICIO_EVENTO.getDescricao())){
@@ -366,9 +363,6 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			for(Evento evento : getEventos()){
 				if(getChaveEvento(linhaAtual.toUpperCase()).equals(evento.getNome().toUpperCase())){
 					pagamento.getEventosPagamento().add(getEventoPagamento(linhaAtual, evento));
-					if(Objects.nonNull(matricula) && matricula.getNomeFuncionario().contains("ELIS REGINA SILVA OLIVEIRA")){
-						System.out.println("EVENTO :" + evento.getNome().toUpperCase());
-					}
 				}
 			}		
 		}	

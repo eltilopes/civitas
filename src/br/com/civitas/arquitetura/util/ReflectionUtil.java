@@ -73,9 +73,9 @@ public class ReflectionUtil {
 				try {
 					return (Serializable) field.get(entidade);
 				} catch (IllegalArgumentException e) {
-					System.out.println(e);
+					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					System.out.println(e);
+					e.printStackTrace();
 				}
 			}
 
