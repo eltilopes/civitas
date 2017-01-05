@@ -23,8 +23,12 @@
 	</ui:define>
 
 	<ui:define name="tituloFieldSetFiltro">
-    		Pagamento
-		</ui:define>
+    	Pagamento 
+	</ui:define>
+
+	<ui:define name="avisoFiltro">
+		<h:outputText value="Selecione no máximo 243 eventos para a consulta." style="color:#9c1f1f;font-weight: bold;"  />
+	</ui:define>
 
 	<script>
 		$(document).ready(function() {
@@ -186,13 +190,14 @@
 							rendered="#{!bean.eventosDisponiveis.isEmpty()}">
 							<div class="col-md-4">
 								<div class="form-group">
-									<h:outputText value="Selecione os Eventos a serem exibidos" />
+									<h:outputText value="Selecione os Eventos(#{bean.eventosSelecionados.size()} evento(s) selecionado(s))" />
 									<p:selectManyMenu id="eventos" style="height: 80px !important;"
 										value="#{bean.eventosSelecionados}" converter="entityConverter"
 										var="evento" filter="true" filterMatchMode="endsWith"
 										showCheckbox="true" styleClass="form-control">
 										<f:selectItems value="#{bean.eventosDisponiveis}" var="e"
 											itemLabel="#{e.nome}" itemValue="#{e}" />
+										<p:ajax event="change" update=":formConsulta:panelEvento"/>
 										<p:column>
 											<h:outputText value="#{evento.chave} - #{evento.nome}" />
 										</p:column>

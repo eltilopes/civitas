@@ -71,11 +71,12 @@
 
 						<div class="card-view">
 							<div class="card-view-content-header">
-								<ui:insert name="tituloFieldSetFiltro">
-									<h4>
+								<h4>
+									<ui:insert name="tituloFieldSetFiltro">
 										<h:outputText value="Campos da Consulta" />
-									</h4>
-								</ui:insert>
+									</ui:insert>
+								</h4>
+								<ui:insert name="avisoFiltro" />
 							</div>
 							<div class="card-view-content">
 								<ui:insert name="camposFiltro">
