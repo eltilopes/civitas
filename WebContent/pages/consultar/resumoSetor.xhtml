@@ -88,8 +88,8 @@
 						   <td >
 						   		<p><b>TOTAL PROVENTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalProventos}" converter="valorNumericoMoedaConverter" /></p>
 						   		<p><b>TOTAL DESCONTOS(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalDescontos}" converter="valorNumericoMoedaConverter" /></p>
-						   		<p><b>TOTAL REMUNERAÇÃO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalRemuneracao}" converter="valorNumericoMoedaConverter" /></p>
-						   		<p><b>TOTAL LÍQUIDO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" /></p>
+						   		<!-- <p><b>TOTAL REMUNERAÇÃO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalRemuneracao}" converter="valorNumericoMoedaConverter" /></p>
+						   		<p><b>TOTAL LÍQUIDO(R$): </b> <h:outputText  value="#{bean.entitySearch.arquivoPagamento.totalLiquido}" converter="valorNumericoMoedaConverter" /></p> -->
 				 	  	   </td>
 				 	  	</tr>
 				 	 </table> 	   
@@ -119,33 +119,33 @@
 		   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Total Líquido" style="text-align:right;" >
+					<!-- <p:column headerText="Total Líquido" style="text-align:right;" >
 		   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-		   			</p:column>
+		   			</p:column> -->
 		   			
 					<p:column headerText="Total Descontos" style="text-align:right;" >
 		   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Total Remuneração" style="text-align:right;" >
+					<!-- <p:column headerText="Total Remuneração" style="text-align:right;" >
 		   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-		   			</p:column>
+		   			</p:column> -->
 		   			
 		   			<p:column headerText="Somatório Proventos" style="text-align:right;" >
 		   				<h:outputText id="somatorioProventos"  value="#{resumo.somatorioProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Somatório Líquido" style="text-align:right;" >
+					<!-- <p:column headerText="Somatório Líquido" style="text-align:right;" >
 		   				<h:outputText id="somatorioLiquido"  value="#{resumo.somatorioLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-		   			</p:column>
+		   			</p:column> -->
 		   			
 					<p:column headerText="Somatório Descontos" style="text-align:right;" >
 		   				<h:outputText id="somatorioDescontos" value="#{resumo.somatorioDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 		   			</p:column>
 		   			
-					<p:column headerText="Somatório Remuneração" style="text-align:right;" >
+					<!-- <p:column headerText="Somatório Remuneração" style="text-align:right;" >
 		   				<h:outputText id="somatorioRemuneracao"  value="#{resumo.somatorioRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-		   			</p:column>
+		   			</p:column> -->
 		   			
 		   			 <p:columnGroup type="footer">
 			            <p:row>
@@ -157,48 +157,48 @@
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
 		                    </p:column>
-			                <p:column  style="text-align:right;font-weight: bold" >
+			                <!-- <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorTotalLiquido"  value="#{bean.resumoSetorTotal.totalLiquido}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
-		                    </p:column>
+		                    </p:column> -->
 			                <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorTotalDescontos"  value="#{bean.resumoSetorTotal.totalDescontos}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
 		                    </p:column>
-			                <p:column  style="text-align:right;font-weight: bold" >
+			                <!-- <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorTotalRemuneracao"  value="#{bean.resumoSetorTotal.totalRemuneracao}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
-		                    </p:column>
+		                    </p:column> -->
 			                <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorSomatorioProventos"  value="#{bean.resumoSetorTotal.somatorioProventos}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
 		                    </p:column>
-			                <p:column  style="text-align:right;font-weight: bold" >
+			                <!-- <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorSomatorioLiquido"  value="#{bean.resumoSetorTotal.somatorioLiquido}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
-		                    </p:column>
+		                    </p:column> -->
 			                <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorSomatorioDescontos"  value="#{bean.resumoSetorTotal.somatorioDescontos}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
 		                    </p:column>
-			                <p:column  style="text-align:right;font-weight: bold" >
+			                <!-- <p:column  style="text-align:right;font-weight: bold" >
 				   				<f:facet name="footer">
 				   					<h:outputText id="resumoSetorSomatorioRemuneracao"  value="#{bean.resumoSetorTotal.somatorioRemuneracao}" 
 				   						converter="valorNumericoMoedaConverter"  style="text-align:right;font-weight: bold"/>
 				   				</f:facet>
-		                    </p:column>
+		                    </p:column> -->
 			            </p:row>
 			        </p:columnGroup>
 			</p:dataTable> 

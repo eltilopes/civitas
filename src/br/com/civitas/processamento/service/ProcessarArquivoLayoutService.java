@@ -87,6 +87,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		BufferedReader brEvento = new BufferedReader(getFileReaderEvento());
 		while (brEvento.ready()) {
 			String linha = brEvento.readLine();
+			if (linha.contains("81.907,96") || linha.contains("81.612,36"))
+				System.out.println("ACHOU!!!");
 			localizarEvento(linha);
 		}
 		brEvento.close();

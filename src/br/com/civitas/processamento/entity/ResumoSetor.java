@@ -175,7 +175,7 @@ public class ResumoSetor implements IEntity {
 	}
 		
 	public boolean valoresResumoConferidos(){
-		return totalDescontos.equals(somatorioDescontos) && totalProventos.equals(somatorioProventos) && totalRemuneracao.equals(somatorioRemuneracao) && totalLiquido.equals(somatorioLiquido) ;
+		return totalDescontos.equals(somatorioDescontos) && totalProventos.equals(somatorioProventos) /*&& totalRemuneracao.equals(somatorioRemuneracao) && totalLiquido.equals(somatorioLiquido)*/ ;
 	}
 	
 	@Override

@@ -78,7 +78,8 @@
 						<h:selectOneMenu id="tipoArquivoSearch" 
 										 value="#{bean.entitySearch.tipoArquivo}" 
 										 converter="enumConverter" styleClass="form-control">
-							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<!-- <f:selectItem itemLabel="SELECIONE" itemValue="#{null}" /> -->
+							<f:selectItem itemLabel="LAYOUT" itemValue="#{arquivoPagamentoBean.tipoArquivo}" />
 							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
 										   value="#{bean.tiposArquivos}" />		   
 						</h:selectOneMenu>
