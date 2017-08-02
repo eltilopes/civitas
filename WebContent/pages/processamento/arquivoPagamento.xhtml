@@ -80,8 +80,8 @@
 										 converter="enumConverter" styleClass="form-control">
 							<!-- <f:selectItem itemLabel="SELECIONE" itemValue="#{null}" /> -->
 							<f:selectItem itemLabel="LAYOUT" itemValue="#{arquivoPagamentoBean.tipoArquivo}" />
-							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
-										   value="#{bean.tiposArquivos}" />		   
+							<!-- <f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" />	 -->	   
 						</h:selectOneMenu>
 						<h:message for="tipoArquivoSearch" tooltip="true"
 							styleClass="error-messages" />	
