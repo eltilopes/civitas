@@ -65,7 +65,6 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	private List<Ano> anos;
 	private List<Mes> meses;
 	private List<TipoArquivo> tiposArquivos;
-	private TipoArquivo tipoArquivo = TipoArquivo.ARQUIVO_LAYOUT;
 	private UploadedFile file;
 	private List<ResumoSetor> resumos;
 	private boolean valoresResumoConferidos;
@@ -76,7 +75,9 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 		cidades = cidadeService.buscarTodasAtivas();
 		anos = anoService.buscarTodos();
 		meses = mesService.buscarTodos();
-		tiposArquivos = FactoryEnuns.listaTipoArquivo();
+		//tiposArquivos = FactoryEnuns.listaTipoArquivo();
+		tiposArquivos = new ArrayList<>();
+		tiposArquivos.add(TipoArquivo.ARQUIVO_LAYOUT);
 		resumos = new ArrayList<ResumoSetor>();
 		
 		
@@ -247,14 +248,6 @@ public class ArquivoPagamentoBean extends AbstractCrudBean<ArquivoPagamento, Arq
 	
 	public ValidarArquivoService getValidarArquivoService() {
 		return validarArquivoService;
-	}
-
-	public TipoArquivo getTipoArquivo() {
-		return tipoArquivo;
-	}
-
-	public void setTipoArquivo(TipoArquivo tipoArquivo) {
-		this.tipoArquivo = tipoArquivo;
 	}
 
 }

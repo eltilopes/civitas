@@ -78,10 +78,9 @@
 						<h:selectOneMenu id="tipoArquivoSearch" 
 										 value="#{bean.entitySearch.tipoArquivo}" 
 										 converter="enumConverter" styleClass="form-control">
-							<!-- <f:selectItem itemLabel="SELECIONE" itemValue="#{null}" /> -->
-							<f:selectItem itemLabel="LAYOUT" itemValue="#{arquivoPagamentoBean.tipoArquivo}" />
-							<!-- <f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
-										   value="#{bean.tiposArquivos}" />	 -->	   
+							<f:selectItem itemLabel="SELECIONE" itemValue="#{null}" />
+							<f:selectItems var="o" itemValue="#{o}" itemLabel="#{o.descricao.toString().toUpperCase()}" 
+										   value="#{bean.tiposArquivos}" /> 
 						</h:selectOneMenu>
 						<h:message for="tipoArquivoSearch" tooltip="true"
 							styleClass="error-messages" />	
@@ -323,17 +322,17 @@
 				   				<h:outputText id="totalProventos"  value="#{resumo.totalProventos}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
-							<p:column headerText="Total Líquido" style="text-align:right;" >
+							<!-- <p:column headerText="Total Líquido" style="text-align:right;" >
 				   				<h:outputText id="totalLiquido"  value="#{resumo.totalLiquido}" converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-				   			</p:column>
+				   			</p:column> -->
 				   			
 							<p:column headerText="Total Descontos" style="text-align:right;" >
 				   				<h:outputText id="totalDescontos" value="#{resumo.totalDescontos}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
 				   			</p:column>
 				   			
-							<p:column headerText="Total Remuneração" style="text-align:right;" >
+							<!-- <p:column headerText="Total Remuneração" style="text-align:right;" >
 				   				<h:outputText id="totalRemuneracao"  value="#{resumo.totalRemuneracao}"  converter="valorNumericoMoedaConverter" style="#{bean.getEstiloLinha(resumo)}"/>
-				   			</p:column>
+				   			</p:column> -->
 						</p:dataTable> 
 					</div>	
 				</fieldset>	
