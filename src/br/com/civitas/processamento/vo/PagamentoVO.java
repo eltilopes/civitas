@@ -20,7 +20,8 @@ public class PagamentoVO {
 	public String cargaHorariaPagamento;
 	public String setor;
 	public String funcao;
-	public String diasTrabalhados;
+	public String colunaDiasTrabalhados;
+	public Double diasTrabalhados;
 	public String proventos;
 	
 	public PagamentoVO(boolean field){
@@ -35,7 +36,7 @@ public class PagamentoVO {
 		cargaHorariaPagamento = cargaHorariaPagamentoColuna();
 		setor = setorColuna();
 		funcao = funcaoColuna();
-		diasTrabalhados = diasTrabalhadosColuna();
+		colunaDiasTrabalhados = diasTrabalhadosColuna();
 		proventos = proventosColuna();
 	}
 

@@ -69,7 +69,7 @@ public class MatriculaPagamento implements IEntity {
 	private Vinculo vinculo;
 	
 	@Column(name = "nr_carga_horaria",nullable = false)
-	private int cargaHoraria;
+	private Double cargaHoraria;
 
 	public Long getId() {
 		return id;
@@ -127,7 +127,7 @@ public class MatriculaPagamento implements IEntity {
 		this.cargaHorariaPagamento = cargaHorariaPagamento;
 	}
 
-	public int getCargaHoraria() {
+	public Double getCargaHoraria() {
 		return cargaHoraria;
 	}
 
@@ -139,7 +139,7 @@ public class MatriculaPagamento implements IEntity {
 		this.unidadeTrabalho = unidadeTrabalho;
 	}
 
-	public void setCargaHoraria(int cargaHoraria) {
+	public void setCargaHoraria(Double cargaHoraria) {
 		this.cargaHoraria = cargaHoraria;
 	}
 

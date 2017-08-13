@@ -59,7 +59,7 @@ public class Pagamento implements IEntity {
 	private Double totalRemuneracao = 0d;
 
 	@Column(name = "nr_dias_trabalhados")
-	private String diasTrabalhados;
+	private Double diasTrabalhados;
 	  
 	@Transient
 	private MatriculaPagamento matriculaPagamento;
@@ -140,11 +140,11 @@ public class Pagamento implements IEntity {
 		this.matriculaPagamento = matriculaPagamento;
 	}
 
-	public String getDiasTrabalhados() {
+	public Double getDiasTrabalhados() {
 		return diasTrabalhados;
 	}
 
-	public void setDiasTrabalhados(String diasTrabalhados) {
+	public void setDiasTrabalhados(Double diasTrabalhados) {
 		this.diasTrabalhados = diasTrabalhados;
 	}
 

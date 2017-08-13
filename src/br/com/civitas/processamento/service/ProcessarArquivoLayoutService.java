@@ -87,8 +87,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		BufferedReader brEvento = new BufferedReader(getFileReaderEvento());
 		while (brEvento.ready()) {
 			String linha = brEvento.readLine();
-			if (linha.contains("81.907,96") || linha.contains("81.612,36"))
-				System.out.println("ACHOU!!!");
 			localizarEvento(linha);
 		}
 		brEvento.close();
@@ -519,10 +517,10 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private void getDiasTrabalhados(String linhaAtual) {
 		if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao())) {
-			String dias = linhaAtual
-					.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
+			String dias = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
 			dias = dias.substring(0, dias.indexOf("d") + 1).trim();
-			pagamento.setDiasTrabalhados(dias);
+			Double qtdDias = Double.parseDouble(dias);
+			pagamento.setDiasTrabalhados(qtdDias);
 		}
 	}
 
@@ -708,15 +706,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		return vinculo;
 	}
 
-	private int getCargaHoraria() throws ApplicationException {
+	private Double getCargaHoraria() throws ApplicationException {
 		String cargaHoraria = "";
-		int cargaHorariaNumero = 0;
+		double cargaHorariaNumero = 0;
 		try {
-			cargaHoraria = linhaAnterior.substring(
-					(linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao())
-							+ IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length()),
-					linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
-			cargaHorariaNumero = Integer.parseInt(cargaHoraria.trim());
+			cargaHoraria = linhaAnterior.substring((linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao()) + IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length()), linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
+			cargaHorariaNumero = Double.parseDouble(cargaHoraria.trim());
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);
 		}

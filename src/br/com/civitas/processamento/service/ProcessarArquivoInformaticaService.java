@@ -346,7 +346,8 @@ public class ProcessarArquivoInformaticaService extends ProcessarArquivoPagament
 					linhaAtual.indexOf(IdentificadorArquivoInformatica.VENCIMENTO_BASE.getDescricao()) 
 					+ IdentificadorArquivoInformatica.VENCIMENTO_BASE.getDescricao().length()).trim();
 			dias = dias.substring(0, dias.indexOf(IdentificadorArquivoInformatica.ESPACO_NA_LINHA.getDescricao())).trim();
-			pagamento.setDiasTrabalhados(dias);
+			Double qtdDias = Double.parseDouble(dias);
+			pagamento.setDiasTrabalhados(qtdDias);
 		}
 	}
 
