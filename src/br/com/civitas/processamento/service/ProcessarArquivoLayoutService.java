@@ -516,9 +516,9 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void getDiasTrabalhados(String linhaAtual) {
-		if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao())) {
+		if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao()) && linhaAtual.contains("d")) {
 			String dias = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
-			dias = dias.substring(0, dias.indexOf("d") + 1).trim();
+			dias = dias.substring(0, dias.indexOf("d")).trim();
 			Double qtdDias = Double.parseDouble(dias);
 			pagamento.setDiasTrabalhados(qtdDias);
 		}

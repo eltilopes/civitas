@@ -196,6 +196,9 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 			pagamento.setEventosPagamentoSelecionados(new ArrayList<EventoPagamento>());
 			if(Objects.nonNull(eventosSelecionados) && !eventosSelecionados.isEmpty()){
 				for(Evento evento : eventosSelecionados){
+					if (evento.getChave() == null) {
+						System.out.println("teste");
+					}
 					Double valorEvento = 0D;
 					EventoPagamento eventoPagamentoZerado = getEventoValorZerado(evento);
 					pagamento.getEventosPagamentoSelecionados().add(eventoPagamentoZerado);
@@ -241,19 +244,20 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 	}
 
 	public String getObject(String chave, HashMap<String, Object> mapa) {
-		String value = (String) mapa.get(chave);
+		String value = mapa.get(chave).toString();
 		Locale locale = new Locale("pt", "BR");
-        NumberFormat nf = NumberFormat.getInstance(locale);
-        nf.setMaximumFractionDigits(2);
-        nf.setMinimumFractionDigits(2);
-        if(value != null && !chave.equals(PagamentoVO.diasTrabalhadosColuna())
-        		&& !chave.equals(PagamentoVO.numeroMatriculaColuna())
-        		&& !chave.equals(PagamentoVO.cargaHorariaColuna())){
-        	try {
-        		return mapa != null ? nf.format(Double.parseDouble(value.replace(".", "").replace(",", ".").toString())) : "";
-			} catch (Exception e) {}
-        }
-		return mapa != null ? (String) mapa.get(chave) : "";
+		NumberFormat nf = NumberFormat.getInstance(locale);
+		nf.setMaximumFractionDigits(2);
+		nf.setMinimumFractionDigits(2);
+		if (value != null && !chave.equals(PagamentoVO.diasTrabalhadosColuna())
+				&& !chave.equals(PagamentoVO.numeroMatriculaColuna())
+				&& !chave.equals(PagamentoVO.cargaHorariaColuna())) {
+			try {
+				return mapa != null ? nf.format(Double.parseDouble(value.replace(".", "").replace(",", ".").toString())) : "";
+			} catch (Exception e) {
+			}
+		}
+		return mapa != null ? (String) mapa.get(chave).toString() : "";
 	}
 	
 	
