@@ -381,11 +381,10 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void getDiasTrabalhados(String linhaAtual, String descricaoIdentificador) {
-		String dias = linhaAtual.substring(
-				linhaAtual.indexOf(descricaoIdentificador) 
-				+ descricaoIdentificador.length()).trim();
+		String dias = linhaAtual.substring(linhaAtual.indexOf(descricaoIdentificador) + descricaoIdentificador.length()).trim();
 		dias = dias.substring(0, dias.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao())).trim();
-		pagamento.setDiasTrabalhados(Util.valorContemNumero(dias) ? dias : pagamento.getDiasTrabalhados());
+		
+		pagamento.setDiasTrabalhados(Util.valorContemNumero(dias) ? Double.parseDouble(dias) : pagamento.getDiasTrabalhados());
 	}
 
 	private void localizarSecretariaSetor(String linhaAtual) {

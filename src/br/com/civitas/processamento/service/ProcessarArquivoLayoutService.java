@@ -518,11 +518,12 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	}
 
 	private void getDiasTrabalhados(String linhaAtual) {
-		if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao())) {
-			String dias = linhaAtual
-					.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
-			dias = dias.substring(0, dias.indexOf("d") + 1).trim();
-			pagamento.setDiasTrabalhados(dias);
+		if (linhaAtual.contains(IdentificadorArquivoLayout.SALARIO_BASE.getDescricao()) && linhaAtual.contains("d")) {
+			String dias = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao()) + 3).trim();
+			if (!dias.isEmpty()) {
+				dias = dias.substring(0, dias.indexOf("d")).trim();
+				pagamento.setDiasTrabalhados(Double.parseDouble(dias));
+			}
 		}
 	}
 
@@ -712,10 +713,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		String cargaHoraria = "";
 		int cargaHorariaNumero = 0;
 		try {
-			cargaHoraria = linhaAnterior.substring(
-					(linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao())
-							+ IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length()),
-					linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
+			cargaHoraria = linhaAnterior.substring((linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao())
+							+ IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length()), linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
 			cargaHorariaNumero = Integer.parseInt(cargaHoraria.trim());
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);

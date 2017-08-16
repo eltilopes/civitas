@@ -51,9 +51,10 @@ public class PagamentoVO {
 		cargaHorariaPagamento = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getCargaHorariaPagamento()) ? pagamento.getMatricula().getMatriculaPagamento().getCargaHorariaPagamento().getDescricao() : "";
 		setor = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getSetor()) ? pagamento.getMatricula().getMatriculaPagamento().getSetor().getDescricao() : "";
 		funcao = Objects.nonNull(pagamento.getMatricula().getMatriculaPagamento().getCargo()) ? pagamento.getMatricula().getMatriculaPagamento().getCargo().getDescricao() : "";
-		diasTrabalhados = pagamento.getDiasTrabalhados();
+		diasTrabalhados = Objects.nonNull(pagamento.getDiasTrabalhados()) ? pagamento.getDiasTrabalhados().toString() : "";
 		proventos = String.format("%.2f", pagamento.getTotalProventos());
 	}
+	
 	
 	public static String getNomeColuna(String fieldName){
 		switch (fieldName) {
