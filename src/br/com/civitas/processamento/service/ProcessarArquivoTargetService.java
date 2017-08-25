@@ -554,12 +554,12 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		return null;
 	}
 	
-	private int getCargaHoraria(String linhaAtual) throws ApplicationException {
-		int cargaHorariaNumero = 0;
+	private Double getCargaHoraria(String linhaAtual) throws ApplicationException {
+		Double cargaHorariaNumero = 0d;
 		try {
 			String cargaHoraria = linhaAtual.substring(0,linhaAtual.indexOf(IdentificadorArquivoTarget.CARGA_HORARIA.getDescricao())).trim();
 			cargaHoraria = cargaHoraria.substring(cargaHoraria.lastIndexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao(), cargaHoraria.length())).trim();
-			cargaHorariaNumero = Integer.parseInt(cargaHoraria);
+			cargaHorariaNumero = Double.parseDouble(cargaHoraria);
 		} catch (Exception e) {
 			throw new ApplicationException ("Erro ao pegar o Carga Horária. Linha: " + linhaAtual);
 		}

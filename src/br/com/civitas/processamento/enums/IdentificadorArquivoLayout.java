@@ -33,6 +33,7 @@ public enum IdentificadorArquivoLayout {
 		PEB_I("PEB I"),		
 		IRRF("I R R F"),	
 		CARGA_HORARIA("C.H.:"),
+		CARGA_HORARIA2("C.H:"),
 		PENSAO_ALIMENTICIA("PENSAO ALIM."),		
 		FMSS("FMSS"),		
 		AREA_ATUACAO("ÁREA DE ATUAÇÃO:"),		

@@ -73,6 +73,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine();
+			//System.out.println(linha);
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
 		}
@@ -87,8 +88,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		BufferedReader brEvento = new BufferedReader(getFileReaderEvento());
 		while (brEvento.ready()) {
 			String linha = brEvento.readLine();
-			if (linha.contains("81.907,96") || linha.contains("81.612,36"))
-				System.out.println("ACHOU!!!");
 			localizarEvento(linha);
 		}
 		brEvento.close();
@@ -572,7 +571,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private void localizarMatricula(String linhaAtual) throws Exception {
 
-		if (linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao())) {
+		if (linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao()) 
+				|| linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())) {
 			ultimaLinha = linhaAnterior;
 			if (linhaAtual.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())) {
 				processamentoPagamento = true;
@@ -655,16 +655,29 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private Cargo getCargo(String linhaAtual) throws ApplicationException {
 		Cargo cargo = new Cargo();
 		try {
-			int tamanhoNomeCargo = IdentificadorArquivoLayout.CARGO.getDescricao().length();
-			String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo);
-			String valorNumeroCargo = palavraComNumeroCargo.substring(0,
-					palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
-			cargo.setCidade(getArquivoPagamento().getCidade());
-			cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-			cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
-			cargo.setDescricao(palavraComNumeroCargo
-					.substring(palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
-					.replace("- -", "").trim());
+			int tamanhoNomeCargo = 0;
+
+			if (linhaAtual.contains("CARGO: CARGO 2")) {
+				tamanhoNomeCargo = IdentificadorArquivoLayout.CARGO.getDescricao().length();
+				String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo).trim();
+				String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
+				cargo.setCidade(getArquivoPagamento().getCidade());
+				cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+				cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
+				cargo.setDescricao(palavraComNumeroCargo.substring(
+						palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).replace("- -", "").trim());
+			} else {
+				tamanhoNomeCargo = IdentificadorArquivoLayout.NOME_CARGO.getDescricao().length();
+				String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo + 2);
+				String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
+				cargo.setCidade(getArquivoPagamento().getCidade());
+				cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+				cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
+				cargo.setDescricao(palavraComNumeroCargo
+						.substring(palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
+						.replace("- -", "").trim());
+			}
+
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Cargo. Linha: " + linhaAtual);
 		}
@@ -694,7 +707,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private Vinculo getVinculo(String linha) throws ApplicationException {
 		Vinculo vinculo = new Vinculo();
 		try {
-			int posicaoCargaHoraria = linha.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao());
+			int posicaoCargaHoraria = getPosicaoCargaHoraria(linha); 
 			String valorNumeroVinculo = linha.substring(posicaoCargaHoraria - 3, posicaoCargaHoraria);
 			vinculo.setNumero(Integer.parseInt(valorNumeroVinculo.trim()));
 			vinculo.setCidade(getArquivoPagamento().getCidade());
@@ -709,17 +722,36 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		return vinculo;
 	}
 
-	private int getCargaHoraria() throws ApplicationException {
+
+	private int getPosicaoCargaHoraria(String linha) {
+		int posicao  = linha.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao());
+		if (posicao != -1) 
+			return posicao;
+		
+		posicao = linha.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA2.getDescricao());
+		return posicao;
+	}
+
+	private Double getCargaHoraria() throws ApplicationException {
+		/*usar metodo getPosicaoCargaHoraria();*/
 		String cargaHoraria = "";
-		int cargaHorariaNumero = 0;
+		Double cargaHorariaNumero = 0D;
 		try {
-			cargaHoraria = linhaAnterior.substring((linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao())
-							+ IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length()), linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
-			cargaHorariaNumero = Integer.parseInt(cargaHoraria.trim());
+			cargaHoraria = linhaAnterior.substring((getPosicaoCargaHoraria(linhaAnterior) 
+					+ retornaTamanhoDescricaoIdentificadorCargaHoraria(linhaAnterior)), linhaAnterior.indexOf(IdentificadorArquivoLayout.VINCULO.getDescricao()));
+			cargaHorariaNumero = Double.valueOf(cargaHoraria.trim().replace(",","."));
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Carga Horária. Linha: " + linhaAnterior);
 		}
 		return cargaHorariaNumero;
+	}
+
+	private int retornaTamanhoDescricaoIdentificadorCargaHoraria(String linhaAnterior) {
+		int posicao  = linhaAnterior.indexOf(IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao());
+		if (posicao != -1) 
+			return IdentificadorArquivoLayout.CARGA_HORARIA.getDescricao().length();
+		
+		return IdentificadorArquivoLayout.CARGA_HORARIA2.getDescricao().length();
 	}
 
 }
