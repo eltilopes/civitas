@@ -29,11 +29,11 @@ public class Secretaria implements IEntity {
 	@SequenceGenerator(name = "seq_secretaria", sequenceName = "seq_secretaria", allocationSize = 1)
 	@Column(name = "ci_secretaria")
 	private Long id;
-	
-	@Column(name = "ds_descricao",nullable = false, length = 30)
+
+	@Column(name = "ds_descricao", nullable = false, length = 30)
 	private String descricao;
-	
-	@Column(name = "nr_tipo_arquivo",nullable = false)
+
+	@Column(name = "nr_tipo_arquivo", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
 	private TipoArquivo tipoArquivo;
 
@@ -41,34 +41,54 @@ public class Secretaria implements IEntity {
 	@JoinColumn(name = "cd_cidade", nullable = false)
 	private Cidade cidade;
 
+	@Column(name = "cd_secretaria", nullable = false)
+	private Long codigo;
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getDescricao() {
 		return descricao;
 	}
+
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
+
 	public TipoArquivo getTipoArquivo() {
 		return tipoArquivo;
 	}
+
 	public void setTipoArquivo(TipoArquivo tipoArquivo) {
 		this.tipoArquivo = tipoArquivo;
 	}
+
 	public Cidade getCidade() {
 		return cidade;
 	}
+
 	public void setCidade(Cidade cidade) {
 		this.cidade = cidade;
 	}
+
+	public Long getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(Long codigo) {
+		this.codigo = codigo;
+	}
+
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		return null;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -90,5 +110,5 @@ public class Secretaria implements IEntity {
 			return false;
 		return true;
 	}
-	
+
 }

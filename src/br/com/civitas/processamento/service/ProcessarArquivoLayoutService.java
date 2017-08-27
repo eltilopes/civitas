@@ -73,7 +73,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine();
-			//System.out.println(linha);
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
 		}
@@ -375,6 +374,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		try {
 			String descricao = "";
 			if (linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_SETOR.getDescricao())) {
+				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
 						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
@@ -382,6 +382,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 						.substring(0, descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
 						.trim();
 			} else if (linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())) {
+				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())
 								+ IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao().length(),
@@ -389,6 +390,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 				descricao = descricao.substring(descricao.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()) + 1,
 						descricao.length()).trim();
 			} else if (linhaAtual.contains(IdentificadorArquivoLayout.PAGINA.getDescricao())) {
+				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
 						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
@@ -400,11 +402,16 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			secretaria.setCidade(getArquivoPagamento().getCidade());
 			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			secretaria.setDescricao(descricao);
+			
 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Secretaria. Linha: " + linhaAtual);
 		}
 		return secretaria;
+	}
+
+	private long extraiCodigoSecretaria(String linhaAtual) {
+		return Long.parseLong(linhaAtual.substring(0, 3));
 	}
 
 	private Setor getSetor(String linhaAtual) throws ApplicationException {

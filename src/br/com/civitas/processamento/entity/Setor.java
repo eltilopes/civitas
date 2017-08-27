@@ -43,6 +43,10 @@ public class Setor implements IEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cd_cidade", nullable = false)
 	private Cidade cidade;
+	
+	/*@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cd_secretaria", nullable = false)
+	private Secretaria secretaria;*/
 
 	public Long getId() {
 		return id;
@@ -74,10 +78,19 @@ public class Setor implements IEntity {
 	public void setCodigo(Integer codigo) {
 		this.codigo = codigo;
 	}
+
+	/*public Secretaria getSecretaria() {
+		return secretaria;
+	}
+	public void setSecretaria(Secretaria secretaria) {
+		this.secretaria = secretaria;
+	}*/
+	
 	@Override
 	public Map<String, Object> notEmptyFields() {
 		return null;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
