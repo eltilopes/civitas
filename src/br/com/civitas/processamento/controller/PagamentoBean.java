@@ -52,6 +52,7 @@ import br.com.civitas.processamento.service.PagamentoService;
 import br.com.civitas.processamento.service.SecretariaService;
 import br.com.civitas.processamento.service.SetorService;
 import br.com.civitas.processamento.service.UnidadeTrabalhoService;
+import br.com.civitas.processamento.utils.DiretorioProcessamento;
 import br.com.civitas.processamento.vo.PagamentoVO;
 
 @ManagedBean
@@ -341,7 +342,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 					numeroLinha = 1;
 					primeiraColuna = false;
 				}
-				File out = new File("file.xls");
+				File out = new File(DiretorioProcessamento.getDiretorioTemporario() + "file.xls");
 				workbook.write(new FileOutputStream(out));
 				setArquivoExcel(new DefaultStreamedContent(new FileInputStream(out),
 						"application/vnd.ms-excel", nomeArquivo));
