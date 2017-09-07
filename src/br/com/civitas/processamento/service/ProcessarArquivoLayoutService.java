@@ -38,7 +38,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private Pagamento pagamento;
 	private Matricula matricula;
 	private Secretaria secretaria;
-	private NivelPagamento nivelPagamento;
+	//private NivelPagamento nivelPagamento;
 	private Setor setor;
 	private Setor setorResumo;
 	private Secretaria secretariaResumo;
@@ -96,7 +96,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		pagamento = null;
 		matricula = null;
 		pagamentos = new ArrayList<Pagamento>();
-		nivelPagamento = null;
+		//nivelPagamento = null;
 		secretaria = null;
 		setor = null;
 		resumoSetor = null;
@@ -206,7 +206,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 	private void localizarPagamentos(String linhaAtual) throws Exception {
 		localizarSecretariaSetor(linhaAtual);
 		localizarMatricula(linhaAtual);
-		localizarNivelGrupoPagamento(linhaAtual);
+		//localizarNivelGrupoPagamento(linhaAtual);
 		localizarUnidadeTrabalho(linhaAtual);
 		verificarIdentificador(linhaAtual);
 		verificarResumo(linhaAtual);
@@ -241,7 +241,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 				getValorEvento(linhaAtual, linhaAtual.indexOf(IdentificadorArquivoLayout.VIRGULA.getDescricao())));
 	}
 
-	private void localizarNivelGrupoPagamento(String linhaAtual) {
+	/*private void localizarNivelGrupoPagamento(String linhaAtual) {
 		if (linhaAtual.contains(IdentificadorArquivoLayout.NIVEL.getDescricao())
 				&& !linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())) {
 			nivelPagamento = getNivelPagamento(getNivelPagamento(linhaAtual), linhaAtual);
@@ -249,7 +249,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			matricula.getMatriculaPagamento().setCargaHorariaPagamento(
 					getCargaHorariaPagamento(getCargaHorariaPagamento(linhaAtual), linhaAtual));
 		}
-	}
+	}*/
 
 	private void localizarUnidadeTrabalho(String linhaAtual) {
 		if (linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao())
@@ -276,7 +276,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		}
 	}
 
-	private CargaHorariaPagamento getCargaHorariaPagamento(String linhaAtual) throws ApplicationException {
+	/*private CargaHorariaPagamento getCargaHorariaPagamento(String linhaAtual) throws ApplicationException {
 		CargaHorariaPagamento cargaHorariaPagamento = new CargaHorariaPagamento();
 		try {
 			String codigo = linhaAtual.substring(0, linhaAtual.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()))
@@ -316,35 +316,30 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			throw new ApplicationException("Erro ao pegar a Nivel Pagamento. Linha: " + linhaAtual);
 		}
 		return nivelPagamento;
-	}
+	}*/
 
 	private UnidadeTrabalho getUnidadeTrabalho(String linhaAtual) throws ApplicationException {
 		UnidadeTrabalho unidadeTrabalho = new UnidadeTrabalho();
 		try {
-			String codigo = linhaAtual
-					.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
-			codigo = codigo.trim();
-			codigo = codigo.substring(0, codigo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
-					.trim();
+			String codigo;
 			String descricaoUnidadeTrabalho;
-			if (linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao())) {
-				descricaoUnidadeTrabalho = linhaAtual
-						.substring(linhaAtual.indexOf(codigo) + codigo.length(),
-								linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao()))
-						.trim();
-			} else {
-				descricaoUnidadeTrabalho = linhaAtual
-						.substring(linhaAtual.indexOf(codigo) + codigo.length(),
-								linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2.getDescricao()))
-						.trim();
-			}
-			Integer inicioCodigoUnidadeDois = temInteiro(descricaoUnidadeTrabalho);
-			if (Objects.nonNull(inicioCodigoUnidadeDois)) {
-				descricaoUnidadeTrabalho = descricaoUnidadeTrabalho.substring(0, inicioCodigoUnidadeDois).trim();
-			}
-			if (descricaoUnidadeTrabalho.substring(0, 1).equals(IdentificadorArquivoLayout.HIFEN.getDescricao())) {
-				descricaoUnidadeTrabalho = descricaoUnidadeTrabalho
-						.replace(IdentificadorArquivoLayout.HIFEN.getDescricao(), "").trim();
+			String novaLinha;
+
+			//IF se contem apebas uma unid. trab - ELSE se contem duas..
+			if(linhaAtual.contains(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao())) {
+				novaLinha = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao()), 
+						linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2_HIFEN.getDescricao()));
+				novaLinha = novaLinha.replace(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao(), "").trim();
+				
+				codigo = novaLinha.split(" ", 2)[0];
+				descricaoUnidadeTrabalho = novaLinha.split(" ", 2)[1];
+			}else {
+				novaLinha = linhaAtual.substring(linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao()), 
+						linhaAtual.indexOf(IdentificadorArquivoLayout.UNIDADE_TRABALHO_2.getDescricao()));
+				novaLinha = novaLinha.replace(IdentificadorArquivoLayout.UNIDADE_TRABALHO.getDescricao(), "").trim();
+				
+				codigo = novaLinha.split(" ", 2)[0];
+				descricaoUnidadeTrabalho = novaLinha.split(" - ", 2)[1];
 			}
 			unidadeTrabalho.setCidade(getArquivoPagamento().getCidade());
 			unidadeTrabalho.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
@@ -374,7 +369,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		try {
 			String descricao = "";
 			if (linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_SETOR.getDescricao())) {
-				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
+				secretaria.setCodigo(Long.parseLong(linhaAtual.substring(0, 3)));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
 						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
@@ -382,7 +377,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 						.substring(0, descricao.lastIndexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
 						.trim();
 			} else if (linhaAnterior.contains(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())) {
-				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
+				secretaria.setCodigo(Long.parseLong(linhaAtual.substring(0, 3)));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao())
 								+ IdentificadorArquivoLayout.AGRUPAMENTO_GERAL.getDescricao().length(),
@@ -390,7 +385,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 				descricao = descricao.substring(descricao.indexOf(IdentificadorArquivoLayout.HIFEN.getDescricao()) + 1,
 						descricao.length()).trim();
 			} else if (linhaAtual.contains(IdentificadorArquivoLayout.PAGINA.getDescricao())) {
-				secretaria.setCodigo(extraiCodigoSecretaria(linhaAtual));
+				secretaria.setCodigo(Long.parseLong(linhaAtual.substring(0, 3)));
 				descricao = linhaAtual.substring(
 						linhaAtual.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()),
 						linhaAtual.indexOf(IdentificadorArquivoLayout.PAGINA.getDescricao()));
@@ -408,10 +403,6 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			throw new ApplicationException("Erro ao pegar a Secretaria. Linha: " + linhaAtual);
 		}
 		return secretaria;
-	}
-
-	private long extraiCodigoSecretaria(String linhaAtual) {
-		return Long.parseLong(linhaAtual.substring(0, 3));
 	}
 
 	private Setor getSetor(String linhaAtual) throws ApplicationException {
@@ -578,8 +569,7 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 
 	private void localizarMatricula(String linhaAtual) throws Exception {
 
-		if (linhaAtual.contains(IdentificadorArquivoLayout.CARGO.getDescricao()) 
-				|| linhaAtual.contains(IdentificadorArquivoLayout.NOME_CARGO.getDescricao())) {
+		if (linhaAtual.startsWith("CARGO:")) {
 			ultimaLinha = linhaAnterior;
 			if (linhaAtual.contains(IdentificadorArquivoLayout.INICIO_EVENTO.getDescricao())) {
 				processamentoPagamento = true;
@@ -663,27 +653,29 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 		Cargo cargo = new Cargo();
 		try {
 			int tamanhoNomeCargo = 0;
-
-			if (linhaAtual.contains("CARGO: CARGO 2")) {
-				tamanhoNomeCargo = IdentificadorArquivoLayout.CARGO.getDescricao().length();
-				String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo).trim();
-				String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
-				cargo.setCidade(getArquivoPagamento().getCidade());
-				cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-				cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
-				cargo.setDescricao(palavraComNumeroCargo.substring(
-						palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).replace("- -", "").trim());
-			} else {
-				tamanhoNomeCargo = IdentificadorArquivoLayout.NOME_CARGO.getDescricao().length();
-				String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo + 2);
-				String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
-				cargo.setCidade(getArquivoPagamento().getCidade());
-				cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
-				cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
-				cargo.setDescricao(palavraComNumeroCargo
-						.substring(palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
-						.replace("- -", "").trim());
-			}
+			
+				if (linhaAtual.contains("CARGO: CARGO 2")) {
+					tamanhoNomeCargo = IdentificadorArquivoLayout.CARGO.getDescricao().length();
+					String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo).trim();
+					String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
+					cargo.setCidade(getArquivoPagamento().getCidade());
+					cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+					cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
+					cargo.setDescricao(palavraComNumeroCargo.substring(
+							palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao())).replace("- -", "").trim());
+				} else {
+					tamanhoNomeCargo = IdentificadorArquivoLayout.NOME_CARGO.getDescricao().length();
+					String palavraComNumeroCargo = linhaAtual.substring(tamanhoNomeCargo + 2);
+					String valorNumeroCargo = palavraComNumeroCargo.substring(0, palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()));
+					cargo.setCidade(getArquivoPagamento().getCidade());
+					cargo.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
+					cargo.setNumero(Integer.parseInt(valorNumeroCargo.trim()));
+					cargo.setDescricao(palavraComNumeroCargo
+							.substring(palavraComNumeroCargo.indexOf(IdentificadorArquivoLayout.ESPACO_NA_LINHA.getDescricao()))
+							.replace("- -", "").trim());
+				}
+			
+			
 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Cargo. Linha: " + linhaAtual);
