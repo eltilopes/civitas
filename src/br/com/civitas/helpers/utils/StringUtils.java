@@ -1,9 +1,11 @@
 package br.com.civitas.helpers.utils;
 
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtils {
 
@@ -50,6 +52,24 @@ public class StringUtils {
 
 	public static String converteStringUTF8(String valor) {
 		return decodeUTF8(encodeUTF8(valor));
+	}
+	
+	public static boolean contemDiasTrabalhados(String string) {
+		return string.matches("^\\s\\d{1,2}\\D\\s$");
+	}
+	
+	public static String getDiasTrabalhados(String linha) {
+		
+		String queremosIsso = "^\\s\\d{1,2}\\D\\s$";
+		
+		Pattern p = Pattern.compile(queremosIsso);
+		Matcher m = p.matcher(linha);
+		
+		while(m.find()) {
+			return m.group();
+		}
+		
+		return null;
 	}
 
 }

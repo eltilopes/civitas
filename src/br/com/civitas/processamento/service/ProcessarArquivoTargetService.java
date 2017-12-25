@@ -77,6 +77,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine(); 
+			System.out.println(linha);
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
 		}
@@ -369,7 +370,12 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 	}
 
 	private void localizarDiasTrabalhados(String linhaAtual) {
-		if(linhaAtual.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao())){
+		if(StringUtils.contemDiasTrabalhados(linhaAtual)) {
+			 Double.parseDouble(StringUtils.getDiasTrabalhados(linhaAtual));
+		}
+		
+		//pagamento.setDiasTrabalhados(StringUtils.contemDiasTrabalhados(linhaAtual) ? Double.parseDouble(StringUtils.getDiasTrabalhados(linhaAtual)) : pagamento.getDiasTrabalhados());
+		/*if(linhaAtual.contains(IdentificadorArquivoTarget.SALARIO_BASE.getDescricao())){
 			getDiasTrabalhados(linhaAtual,IdentificadorArquivoTarget.SALARIO_BASE.getDescricao() );
 		}else if(linhaAtual.contains(IdentificadorArquivoTarget.VENCIMENTO_BASE_LEI.getDescricao())){
 			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE_LEI.getDescricao());
@@ -377,15 +383,15 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.VENCIMENTO_BASE.getDescricao());
 		}else if(linhaAtual.contains(IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao())){
 			getDiasTrabalhados(linhaAtual, IdentificadorArquivoTarget.LICENCA_MATERNIDADE.getDescricao());
-		}
+		}*/
 	}
 
-	private void getDiasTrabalhados(String linhaAtual, String descricaoIdentificador) {
+	/*private void getDiasTrabalhados(String linhaAtual, String descricaoIdentificador) {
 		String dias = linhaAtual.substring(linhaAtual.indexOf(descricaoIdentificador) + descricaoIdentificador.length()).trim();
 		dias = dias.substring(0, dias.indexOf(IdentificadorArquivoTarget.ESPACO_NA_LINHA.getDescricao())).trim();
-		
+		System.out.println();
 		pagamento.setDiasTrabalhados(Util.valorContemNumero(dias) ? Double.parseDouble(dias) : pagamento.getDiasTrabalhados());
-	}
+	}*/
 
 	private void localizarSecretariaSetor(String linhaAtual) {
 		if(linhaAtual.contains(IdentificadorArquivoTarget.ORGAO.getDescricao()) 	){
