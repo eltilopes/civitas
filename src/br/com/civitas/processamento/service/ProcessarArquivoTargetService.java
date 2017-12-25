@@ -77,7 +77,7 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 		BufferedReader br = new BufferedReader(getFilReaderPagamento());
 		while (br.ready()) {
 			String linha = br.readLine(); 
-			System.out.println(linha);
+			//System.out.println(linha);
 			localizarPagamentos(linha);
 			linhaAnterior = linha;
 		}
@@ -438,6 +438,8 @@ public class ProcessarArquivoTargetService extends ProcessarArquivoPagamento imp
 			secretaria.setCidade(getArquivoPagamento().getCidade());
 			secretaria.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			secretaria.setDescricao(descricao);
+			secretaria.setCodigo(Long.parseLong(linhaAtual.split(" ", 0)[0]));
+			System.out.println();
 			
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar a Secretaria. Linha: " + linhaAtual);
