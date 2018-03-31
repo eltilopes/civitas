@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 
 <project name="civitas" default="war">
 
@@ -20,7 +20,7 @@
 	</target>
 	
 	<target name="war" depends="compile">
-		<war destfile="dist/civitas.war" webxml="WebContent/WEB-INF/web.xml">
+		<war destfile="dist/civitas.war" webxml="WebContent/WEB-INF/web.xml" encoding="iso-8859-1">
 			<fileset dir="WebContent"/>
 			<lib dir="WebContent/WEB-INF/lib"/>
 			<classes dir="build/classes"/>
