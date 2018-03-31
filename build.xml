@@ -1,51 +1,59 @@
 <?xml version="1.0" ?>
 
-<project name="civitas" default="init">
+<project name="civitas" default="dist" basedir=".">
+    <description>
+        Project Description
+    </description>
+	
+  <!-- set global properties for this build -->
+  <property name="projectName" value="ProjectName"/>
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+  <property name="webcontent"  location="WebContent"/>
 
-	<property name="srcDir" location="src"/>
-	<property name="buildDir" location="build"/>
-	<property name="distDir" location="dist"/>
-	
-	<target name="init">
-		<tstamp/>
-		<mkdir dir="${buildDir}"/>
-		<mkdir dir="${distDir}"/>
-	</target>
-	
-	<!--
-	<path id="compile.classpath">
-		<fileset dir="WebContent/WEB-INF/lib">
-			<include name="*.jar"/>
-		</fileset>
-	</path>
-	-->
-	
-	<target name="dist" depends="compile">
-		<jar destfile="build/package-${DSTAMP}.jar" basedir="build">
-			<manifest>
-				<attribute name="Built-By" value="${user.name}"/>
-				<attribute name="Main-Class" value="package.Main"/>
-			</manifest>
-		</jar>
-	<jar destfile="build/package-src-${DSTAMP}.jar" basedir="src"/>
-	</target>
-	
-	<target name="compile" depends="init" >
-		<javac srcdir="src" destdir="build/classes" debug="true" />
-	</target>
-	
-	<target name="war" depends="compile">
-			<war destfile="dist/civitas.war" webxml="WebContent/WEB-INF/web.xml" >
-				<fileset dir="WebContent"/>
-				<lib dir="WebContent/WEB-INF/lib"/>
-				<classes dir="build/classes"/>
-			</war>
-		</target>
-	
-	
-	<target name="clean">
-		<delete dir="build"/>
-		<delete dir="dist"/>
-	</target>
-	
+  <target name="init">
+    	<!-- Create the time stamp -->
+   	 <tstamp/>
+    	<!-- Create the build directory structure used by compile -->
+    	<mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+  	description="compile the source " >
+    	<!-- Compile the java code from ${src} into ${build} -->
+   	<javac srcdir="${src}" destdir="${build}"/>
+  </target>
+
+  <target name="dist" depends="compile"
+  	description="generate the distribution" >
+    
+  	<!-- Create the distribution directory -->
+    	<mkdir dir="${dist}/lib"/>
+
+    	<!-- Put everything in ${build} into the {$projectName}-${DSTAMP}.jar file -->
+    	<jar jarfile="${dist}/lib/${projectName}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="war" depends="compile"
+  	description="generate the distribution war" >
+	    
+	<!-- Create the war distribution directory -->
+  	<mkdir dir="${dist}/war"/>
+    
+  	<!-- Follow standard WAR structure -->
+  	<copydir dest="${dist}/war/build/WEB-INF/" src="${webcontent}/WEB-INF/" />
+  	<copydir dest="${dist}/war/build/WEB-INF/classes/" src="${build}" />
+  		
+	<jar jarfile="${dist}/war/${projectName}.war" basedir="${dist}/war/build/"/>
+  </target>
+
+  <target name="clean"
+    	description="clean up" >
+  	
+    	<!-- Delete the ${build} and ${dist} directory trees -->
+    	<delete dir="${build}"/>
+    	<delete dir="${dist}"/>
+  </target>
 </project>
+
