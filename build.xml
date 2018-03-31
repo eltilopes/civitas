@@ -42,9 +42,10 @@
 		</war>
 	</target>
 	
+	<!--
 	<target name="clean">
 		<delete dir="${buildDir}"/>
 		<delete dir="${distDir}"/>
 	</target>
-	
+	-->
 </project>
