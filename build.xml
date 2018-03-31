@@ -42,9 +42,9 @@
   	<mkdir dir="${dist}/war"/>
     
   	<!-- Follow standard WAR structure -->
-  	<copydir dest="${dist}/war/build/WEB-INF/" src="${webcontent}/WEB-INF/" />
+  	<copydir dest="${dist}/war/build/WEB-INF/" src="${webcontent}/WEB-INF/lib" />
   	<copydir dest="${dist}/war/build/WEB-INF/classes/" src="${build}" />
-  		
+  	
 	<jar jarfile="${dist}/war/${projectName}.war" basedir="${dist}/war/build/"/>
   </target>
 
