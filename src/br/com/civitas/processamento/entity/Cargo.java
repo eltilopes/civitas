@@ -50,6 +50,10 @@ public class Cargo implements IEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cd_cidade", nullable = false)
 	private Cidade cidade;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "cd_setor", nullable = false)
+	private Setor setor;
 
 	public Long getId() {
 		return id;
@@ -126,6 +130,12 @@ public class Cargo implements IEntity {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	public Setor getSetor() {
+		return setor;
+	}
+	public void setSetor(Setor setor) {
+		this.setor = setor;
 	}
 
 }

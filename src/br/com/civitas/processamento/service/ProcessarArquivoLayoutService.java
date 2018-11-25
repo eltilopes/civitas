@@ -16,13 +16,11 @@ import br.com.civitas.arquitetura.ApplicationException;
 import br.com.civitas.arquitetura.util.Util;
 import br.com.civitas.helpers.utils.StringUtils;
 import br.com.civitas.processamento.entity.ArquivoPagamento;
-import br.com.civitas.processamento.entity.CargaHorariaPagamento;
 import br.com.civitas.processamento.entity.Cargo;
 import br.com.civitas.processamento.entity.Evento;
 import br.com.civitas.processamento.entity.EventoPagamento;
 import br.com.civitas.processamento.entity.Matricula;
 import br.com.civitas.processamento.entity.MatriculaPagamento;
-import br.com.civitas.processamento.entity.NivelPagamento;
 import br.com.civitas.processamento.entity.Pagamento;
 import br.com.civitas.processamento.entity.ResumoSetor;
 import br.com.civitas.processamento.entity.Secretaria;
@@ -420,6 +418,8 @@ public class ProcessarArquivoLayoutService extends ProcessarArquivoPagamento imp
 			setor.setCidade(getArquivoPagamento().getCidade());
 			setor.setTipoArquivo(getArquivoPagamento().getTipoArquivo());
 			setor.setDescricao(descricao);
+			if(this.secretaria != null)
+				setor.setSecretaria(this.secretaria);
 
 		} catch (Exception e) {
 			throw new ApplicationException("Erro ao pegar o Setor. Linha: " + linhaAtual);

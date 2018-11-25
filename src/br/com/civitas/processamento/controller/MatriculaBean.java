@@ -149,7 +149,7 @@ public class MatriculaBean extends AbstractCrudBean<Matricula, MatriculaService>
 	public void carregarPorCidade() {
 		if (Objects.nonNull(getSecretaria().getCidade())) {
 			setSecretariasDisponiveis(secretariaService.buscarCidade(getSecretaria().getCidade()));
-			setSetoresDisponiveis(setorService.buscarCidade(getSecretaria().getCidade()));
+			setSetoresDisponiveis(setorService.buscarDisponiveis(getSecretaria().getCidade()));
 			setSetoresSelecionados(new ArrayList<Setor>());
 			setSecretariasSelecionadas(new ArrayList<Secretaria>());
 		}

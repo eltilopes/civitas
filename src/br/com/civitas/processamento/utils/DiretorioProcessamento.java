@@ -4,8 +4,8 @@ public class DiretorioProcessamento {
 	
 	private static final String DIRETORIO_TEMPORARIO_WINDOWS = "C:/CIVITAS/TEMPORARIO";
 	private static final String DIRETORIO_PROCESSADO_WINDOWS = "C:/CIVITAS/PROCESSADO";
-	private static final String DIRETORIO_TEMPORARIO_LINUX = "/opt/tomcat/arquivos/temporarios";
-	private static final String DIRETORIO_PROCESSADO_LINUX = "/opt/tomcat/arquivos/processados";
+	private static final String DIRETORIO_TEMPORARIO_LINUX = "/opt/CIVITAS/ARQUIVOS/TEMPORARIOS";
+	private static final String DIRETORIO_PROCESSADO_LINUX = "/opt/CIVITAS/ARQUIVOS/PROCESSADOS";
 	private static final String WINDOWS = "WINDOWS";
 	
 	public static String getDiretorioTemporario() {

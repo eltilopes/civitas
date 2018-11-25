@@ -44,9 +44,9 @@ public class Setor implements IEntity {
 	@JoinColumn(name = "cd_cidade", nullable = false)
 	private Cidade cidade;
 	
-	/*@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "cd_secretaria", nullable = false)
-	private Secretaria secretaria;*/
+	private Secretaria secretaria;
 
 	public Long getId() {
 		return id;
@@ -116,6 +116,12 @@ public class Setor implements IEntity {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	public Secretaria getSecretaria() {
+		return secretaria;
+	}
+	public void setSecretaria(Secretaria secretaria) {
+		this.secretaria = secretaria;
 	}
 	
 }

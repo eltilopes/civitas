@@ -92,6 +92,7 @@
 										<p:column>
 											<h:outputText value="#{secretaria.descricao}" />
 										</p:column>
+										<p:ajax update="setores"  listener="#{bean.atualizarSetoresDisponiveis()}" />
 									</p:selectManyMenu>
 								</div>
 							</div>

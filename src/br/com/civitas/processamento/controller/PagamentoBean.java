@@ -138,7 +138,7 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		if (Objects.nonNull(getCidade())) {
 			arquivoPagamentos = arquivoPagamentoService.buscarPorCidade(getCidade());
 			setSecretariasDisponiveis(secretariaService.buscarCidade(getCidade()));
-			setSetoresDisponiveis(setorService.buscarCidade(getCidade()));
+			setSetoresDisponiveis(setorService.buscarDisponiveis(getCidade(), getSecretariasSelecionadas()));
 			setCargosDisponiveis(cargoService.buscarCidade(getCidade()));
 			setUnidadesDisponiveis(unidadeTrabalhoService.buscarCidade(getCidade()));
 			setNiveisDisponiveis(nivelPagamentoService.buscarCidade(getCidade()));
@@ -352,6 +352,10 @@ public class PagamentoBean extends AbstractCrudBean<Pagamento, PagamentoService>
 		}else{
 			FacesUtils.addErrorMessage("Selecione no máximo 243 eventos.");
 		}
+	}
+	
+	public void atualizarSetoresDisponiveis() {
+		this.setoresDisponiveis = setorService.buscarDisponiveis(this.cidade, this.secretariasSelecionadas);
 	}
 	   
 	public void onPaginate(PageEvent event){

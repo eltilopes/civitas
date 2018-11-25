@@ -1,11 +1,14 @@
 package br.com.civitas.processamento.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.springframework.stereotype.Service;
 
 import br.com.civitas.arquitetura.persistence.AbstractPersistence;
 import br.com.civitas.processamento.entity.Cidade;
+import br.com.civitas.processamento.entity.Secretaria;
 import br.com.civitas.processamento.entity.Setor;
 import br.com.civitas.processamento.enums.TipoArquivo;
 
@@ -47,7 +50,7 @@ public class SetorService extends AbstractPersistence<Setor> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Setor> buscarCidade(Cidade cidade) {
+	public List<Setor> buscarDisponiveis(Cidade cidade) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(" SELECT s FROM Setor s ");
 		sql.append(" WHERE s.cidade = :cidade  ");
@@ -56,4 +59,34 @@ public class SetorService extends AbstractPersistence<Setor> {
 				.setParameter("cidade", cidade)
 				.list();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Setor> buscarDisponiveis(Cidade cidade, List<Secretaria> secretarias) {
+		if(secretarias != null && !secretarias.isEmpty()) {
+			List<Setor> setores = new ArrayList<>();
+			for (Secretaria secretaria : secretarias) {
+				StringBuilder sql = new StringBuilder();
+				sql.append(" SELECT s FROM Setor s ");
+				sql.append(" WHERE s.cidade = :cidade ");
+				sql.append(" AND s.secretaria = :secretaria ");
+				sql.append(" ORDER BY s.descricao ASC ");
+				
+				Query query = getSessionFactory().getCurrentSession().createQuery(sql.toString());
+				query.setParameter("cidade", cidade);
+				query.setParameter("secretaria", secretaria);
+				setores.addAll(query.list());
+			}
+			return setores;
+		}else {
+			StringBuilder sql = new StringBuilder();
+			sql.append(" SELECT s FROM Setor s ");
+			sql.append(" WHERE s.cidade = :cidade  ");
+			sql.append(" ORDER BY s.descricao ASC ");
+			return  getSessionFactory().getCurrentSession().createQuery(sql.toString())
+					.setParameter("cidade", cidade)
+					.list();
+		}
+	}
+	
+	
 }
